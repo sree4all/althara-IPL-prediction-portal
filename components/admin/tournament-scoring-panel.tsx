@@ -87,7 +87,7 @@ export function TournamentScoringPanel({
     <div className="rounded-md border border-border p-3">
       <p className="mb-2 text-sm font-semibold">Tournament answers &amp; scoring</p>
       <p className="mb-3 text-xs text-muted-foreground">
-        Player-facing visibility for the whole Season bonuses tab is set under Tournament lock (Admin).
+        Player-facing visibility for the whole Mega Bonus tab is set under Tournament lock (Admin).
         Here: allowed answers (one line: label | value), then the correct answer for scoring.
       </p>
       {msg ? <p className="mb-2 text-xs text-muted-foreground">{msg}</p> : null}

@@ -69,7 +69,7 @@ export function BonusPromptsForm({ matchId, answers, onAnswerChange }: Props) {
                     No choices loaded for this match prompt. In Admin → Bonus prompts, open the row for{" "}
                     <strong>this fixture</strong> (match-scoped), set Single choice, add lines under
                     &quot;Choices for players&quot;, and Save options — not only the season-wide prompts on
-                    the Season bonuses tab.
+                    the Mega Bonus tab.
                   </p>
                 ) : null}
                 <input

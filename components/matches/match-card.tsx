@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PredictionForm } from "@/components/matches/prediction-form";
+import { formatIstDateTime } from "@/lib/utils/time-format";
 
 export type MatchApiRow = {
   id: string;
@@ -18,7 +19,7 @@ type Props = {
 
 export function MatchCard({ match }: Props) {
   const locked = match.client_lock_hint;
-  const timeLabel = new Date(match.match_time_utc).toISOString().replace("T", " ").slice(0, 19);
+  const timeLabel = formatIstDateTime(match.match_time_utc);
 
   return (
     <Card className={locked ? "opacity-90" : ""}>
@@ -37,7 +38,7 @@ export function MatchCard({ match }: Props) {
             </span>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">Start (UTC): {timeLabel}</p>
+        <p className="text-xs text-muted-foreground">Start (IST): {timeLabel}</p>
       </CardHeader>
       <CardContent>
         {match.winner ? (

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 const links = [
   { href: "/matches", label: "Matches" },
   { href: "/prediction-stat", label: "Prediction Stat" },
-  { href: "/tournament", label: "Season bonuses" },
+  { href: "/tournament", label: "Mega Bonus" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/history", label: "History" },
   { href: "/admin", label: "Admin" },

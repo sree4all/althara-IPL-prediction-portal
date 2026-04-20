@@ -58,12 +58,12 @@ export function TournamentQuestionsForm({ standalone = false }: Props) {
 
   if (!questions.length) {
     return standalone ? (
-      <p className="text-sm text-muted-foreground">No season bonus questions are configured yet.</p>
+      <p className="text-sm text-muted-foreground">No Mega Bonus questions are configured yet.</p>
     ) : null;
   }
   return (
     <div className={standalone ? "rounded-md border border-border p-4" : "mt-3 rounded-md border border-border p-3"}>
-      <p className="mb-2 text-sm font-semibold">Season bonuses</p>
+      <p className="mb-2 text-sm font-semibold">Mega Bonus</p>
       <fieldset disabled={locked} className="space-y-3">
         {questions.map((q) => {
           const opts = q.options ?? [];
@@ -94,7 +94,7 @@ export function TournamentQuestionsForm({ standalone = false }: Props) {
         })}
       </fieldset>
       <Button type="button" size="sm" className="mt-3" onClick={save} disabled={locked}>
-        Save season bonus answers
+        Save Mega Bonus answers
       </Button>
     </div>
   );

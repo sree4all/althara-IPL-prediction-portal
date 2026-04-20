@@ -9,6 +9,7 @@ export type Profile = {
   rank: number | null;
   role?: string;
   legacy_alias_onboarding_completed?: boolean;
+  scoring_bootstrapped_at?: string | null;
   created_at: string;
   updated_at: string;
 };

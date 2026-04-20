@@ -33,7 +33,7 @@ export function TournamentConfigPanel({
   return (
     <div className="rounded-md border border-border p-3 space-y-4">
       <div>
-        <p className="text-sm font-semibold">Tournament answer lock (UTC)</p>
+        <p className="text-sm font-semibold">Tournament answer lock (IST)</p>
         <p className="mt-1 text-xs text-muted-foreground">
           After this time, players cannot edit season-long bonus answers.
         </p>
@@ -46,10 +46,10 @@ export function TournamentConfigPanel({
       </div>
 
       <div className="border-t border-border pt-3">
-        <p className="text-sm font-semibold">Season bonuses tab (all questions together)</p>
+        <p className="text-sm font-semibold">Mega Bonus tab (all questions together)</p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Until the tab is revealed, players do not see any season bonus questions or season-wide bonus
-          prompts. Check &quot;Reveal tab&quot; or set a date/time (UTC) when the tab should open.
+          Until the tab is revealed, players do not see any Mega Bonus questions or season-wide bonus
+          prompts. Check &quot;Reveal tab&quot; or set a date/time (IST) when the tab should open.
         </p>
         <label className="mt-2 flex items-center gap-2 text-sm">
           <input
@@ -57,10 +57,10 @@ export function TournamentConfigPanel({
             checked={tabRevealed}
             onChange={(e) => setTabRevealed(e.target.checked)}
           />
-          Reveal Season bonuses tab to players now
+          Reveal Mega Bonus tab to players now
         </label>
         <label className="mt-2 block text-xs text-muted-foreground">
-          Or reveal automatically after (local time below → stored as UTC)
+          Or reveal automatically after (IST time below)
           <input
             type="datetime-local"
             className="mt-1 w-full rounded-md border border-input px-2 py-1 text-sm"

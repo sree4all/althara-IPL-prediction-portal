@@ -11,7 +11,7 @@ export default function MatchesPage() {
       <UtcNowClock />
       <p className="mb-6 text-sm text-muted-foreground">
         Only matches you can still predict on are listed (next three first; use See more for the
-        rest). Predictions lock 30 minutes before start time (GMT/UTC).
+        rest). Predictions lock 30 minutes before start time (IST).
       </p>
       <MatchGrid />
     </div>

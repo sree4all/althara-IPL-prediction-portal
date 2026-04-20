@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/require-user";
 import { ensureDisplayNameFromOAuth } from "@/lib/auth/sync-profile";
+import { ensureProfileScoringBootstrap } from "@/lib/scoring/profile-bootstrap";
 import { AppNav } from "@/components/layout/app-nav";
 import { SyncingHistory } from "@/components/auth/syncing-history";
 import { WelcomeBanner } from "@/components/auth/welcome-banner";
@@ -12,6 +13,7 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const { supabase, user } = await requireUser();
+  await ensureProfileScoringBootstrap(user.id);
   await ensureDisplayNameFromOAuth(supabase, user);
   const profile = await getProfileForUser(supabase, user.id);
   if (profile?.legacy_alias_onboarding_completed === false) {
