@@ -4,6 +4,7 @@ import {
   DEFAULT_MAINTENANCE_BANNER_TEXT,
   fetchTournamentConfig2026,
   isMissingMaintenanceColumnsError,
+  isMissingMegaBonusPublicColumnError,
 } from "@/lib/data/tournament-config";
 
 export async function GET() {
@@ -74,6 +75,21 @@ export async function PATCH(request: Request) {
 
   let { error } = await supabase.from("tournament_config").upsert(fullPayload, upsertOpts);
 
+  // If 0023 not applied, retry with maintenance columns preserved (banner + mode still save).
+  if (error && isMissingMegaBonusPublicColumnError(error)) {
+    const withoutMega = {
+      season_year: fullPayload.season_year,
+      answer_lock_utc: fullPayload.answer_lock_utc,
+      season_bonuses_visible_after_utc: fullPayload.season_bonuses_visible_after_utc,
+      season_bonuses_revealed_by_admin: fullPayload.season_bonuses_revealed_by_admin,
+      maintenance_mode: fullPayload.maintenance_mode,
+      maintenance_banner_text: fullPayload.maintenance_banner_text,
+      updated_at: fullPayload.updated_at,
+    };
+    ({ error } = await supabase.from("tournament_config").upsert(withoutMega, upsertOpts));
+  }
+
+  // If 0022 not applied, retry without maintenance or mega columns.
   if (error && isMissingMaintenanceColumnsError(error)) {
     const withoutMaint = {
       season_year: fullPayload.season_year,
@@ -84,6 +100,19 @@ export async function PATCH(request: Request) {
       updated_at: fullPayload.updated_at,
     };
     ({ error } = await supabase.from("tournament_config").upsert(withoutMaint, upsertOpts));
+  }
+
+  if (error && isMissingMegaBonusPublicColumnError(error)) {
+    ({ error } = await supabase.from("tournament_config").upsert(
+      {
+        season_year: fullPayload.season_year,
+        answer_lock_utc: fullPayload.answer_lock_utc,
+        season_bonuses_visible_after_utc: fullPayload.season_bonuses_visible_after_utc,
+        season_bonuses_revealed_by_admin: fullPayload.season_bonuses_revealed_by_admin,
+        updated_at: fullPayload.updated_at,
+      },
+      upsertOpts,
+    ));
   }
 
   if (error) {

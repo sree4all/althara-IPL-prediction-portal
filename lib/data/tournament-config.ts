@@ -7,16 +7,16 @@ const SELECT_BASE =
 const SELECT_WITH_MAINT = `${SELECT_BASE}, maintenance_mode, maintenance_banner_text`;
 const SELECT_FULL = `${SELECT_WITH_MAINT}, mega_bonus_all_answers_visible`;
 
-/** PostgREST / Postgres when `0022_tournament_maintenance_mode` is not applied yet. */
+/** Upsert/select failed because maintenance columns from migration 0022 are missing. */
 export function isMissingMaintenanceColumnsError(err: { message?: string; code?: string } | null): boolean {
   if (!err?.message) return false;
   const m = err.message;
-  return (
-    m.includes("maintenance_mode") ||
-    m.includes("maintenance_banner_text") ||
-    m.includes("42703") ||
-    m.includes("does not exist")
-  );
+  return m.includes("maintenance_mode") || m.includes("maintenance_banner_text");
+}
+
+export function isMissingMegaBonusPublicColumnError(err: { message?: string; code?: string } | null): boolean {
+  if (!err?.message) return false;
+  return err.message.includes("mega_bonus_all_answers_visible");
 }
 
 export type TournamentConfigRow = {
@@ -53,14 +53,14 @@ export async function fetchTournamentConfig2026(
       error: null,
     };
   }
-  if (full.error?.message?.includes("mega_bonus_all_answers_visible")) {
-    const mid = await supabase
+  if (isMissingMegaBonusPublicColumnError(full.error)) {
+    const midRes = await supabase
       .from("tournament_config")
       .select(SELECT_WITH_MAINT)
       .eq("season_year", 2026)
       .maybeSingle();
-    if (!mid.error && mid.data) {
-      const d = mid.data;
+    if (!midRes.error && midRes.data) {
+      const d = midRes.data;
       return {
         data: {
           id: d.id as string | undefined,
@@ -77,6 +77,10 @@ export async function fetchTournamentConfig2026(
         error: null,
       };
     }
+    return {
+      data: null,
+      error: { message: midRes.error?.message ?? full.error.message },
+    };
   }
   if (!isMissingMaintenanceColumnsError(full.error)) {
     return { data: null, error: { message: full.error.message } };
@@ -105,22 +109,12 @@ export async function fetchTournamentConfig2026(
 export async function getMaintenanceGate(
   supabase: SupabaseClient,
 ): Promise<{ on: boolean; text: string }> {
-  const r = await supabase
-    .from("tournament_config")
-    .select("maintenance_mode, maintenance_banner_text")
-    .eq("season_year", 2026)
-    .maybeSingle();
-  if (!r.error && r.data) {
-    return {
-      on: Boolean(r.data.maintenance_mode),
-      text: (r.data.maintenance_banner_text as string | null) || DEFAULT_MAINTENANCE_BANNER_TEXT,
-    };
-  }
-  if (r.error && isMissingMaintenanceColumnsError(r.error)) {
+  const { data, error } = await fetchTournamentConfig2026(supabase);
+  if (error || !data) {
     return { on: false, text: DEFAULT_MAINTENANCE_BANNER_TEXT };
   }
-  if (r.error) {
-    return { on: false, text: DEFAULT_MAINTENANCE_BANNER_TEXT };
-  }
-  return { on: false, text: DEFAULT_MAINTENANCE_BANNER_TEXT };
+  return {
+    on: data.maintenance_mode,
+    text: (data.maintenance_banner_text ?? "").trim() || DEFAULT_MAINTENANCE_BANNER_TEXT,
+  };
 }
