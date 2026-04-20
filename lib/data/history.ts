@@ -121,10 +121,10 @@ export async function getHistoryRows(supabase: SupabaseClient, userId: string) {
     const ma = matchById.get(pa.match_id as string);
     const mb = matchById.get(pb.match_id as string);
     return compareMatchOrder(
-      ma?.external_key ?? null,
-      ma?.match_time_utc ?? null,
       mb?.external_key ?? null,
       mb?.match_time_utc ?? null,
+      ma?.external_key ?? null,
+      ma?.match_time_utc ?? null,
     );
   });
 
