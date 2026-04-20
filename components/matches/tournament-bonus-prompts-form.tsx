@@ -53,12 +53,16 @@ export function TournamentBonusPromptsForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ bonus_answers }),
     });
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
       toastPredictionError(data.error);
       return;
     }
-    toast.success("Mega Bonus answers saved successfully.");
+    toast.success(
+      typeof data.message === "string" && data.message
+        ? data.message
+        : "Mega Bonus answers saved successfully.",
+    );
   }
 
   if (!prompts.length) return null;

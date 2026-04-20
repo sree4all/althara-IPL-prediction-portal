@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 export type AdminMatchRow = {
@@ -101,10 +102,16 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
     const data = await res.json().catch(() => ({}));
     setBusy(false);
     if (!res.ok) {
-      setMsg(data.error ?? "Request failed");
+      const err = data.error ?? "Request failed";
+      setMsg(err);
+      toast.error(String(err));
       return;
     }
-    setMsg(`Scored. Ledger rows written: ${data.ledger_rows ?? 0}.`);
+    const summary =
+      (data as { message?: string }).message ??
+      `Scored. Ledger rows written: ${data.ledger_rows ?? 0}.`;
+    setMsg(summary);
+    toast.success(summary);
   }
 
   return (

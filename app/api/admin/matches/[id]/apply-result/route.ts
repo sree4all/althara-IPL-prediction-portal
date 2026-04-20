@@ -89,6 +89,7 @@ export async function POST(
 
   return NextResponse.json({
     ok: true,
+    message: `Match scored. ${result.ledgerRows} ledger row(s) written.`,
     match_id: matchId,
     ledger_rows: result.ledgerRows,
   });

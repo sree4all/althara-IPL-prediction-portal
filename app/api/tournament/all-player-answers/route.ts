@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { getSeasonConfig } from "@/lib/data/mvp2-repositories";
 import { fetchMegaBonusSlotAnswersGrid } from "@/lib/data/mega-bonus-slot-answers-grid";
 
@@ -32,7 +33,22 @@ export async function GET() {
     );
   }
 
-  const { data, error } = await fetchMegaBonusSlotAnswersGrid(supabase);
+  let service;
+  try {
+    service = createServiceClient();
+  } catch (e) {
+    return NextResponse.json(
+      {
+        error: "SERVICE_UNAVAILABLE",
+        message:
+          (e as Error).message ??
+          "Server cannot read all player answers (missing service credentials).",
+      },
+      { status: 503 },
+    );
+  }
+
+  const { data, error } = await fetchMegaBonusSlotAnswersGrid(service);
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -24,8 +24,10 @@ export function MegaBonusAnswersOverview() {
         const j = await res.json().catch(() => ({})) as { error?: string; message?: string };
         if (res.status === 403) {
           setError(j.message ?? "Sharing all player answers is turned off. Ask an admin to enable it.");
+        } else if (res.status === 503) {
+          setError(j.message ?? j.error ?? "Grid temporarily unavailable.");
         } else {
-          setError(j.error ?? "Could not load answers");
+          setError(j.error ?? j.message ?? "Could not load answers");
         }
         setData(null);
         setLoading(false);

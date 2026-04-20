@@ -32,5 +32,5 @@ export async function PATCH(request: Request) {
   }
   const { error } = await supabase.from("scoring_config").update(patch).eq("season_year", 2026);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, message: "Scoring config saved." });
 }

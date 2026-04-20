@@ -57,7 +57,11 @@ export function PredictionForm({
         toastPredictionError(data.error ?? data.message);
         return;
       }
-      toastPredictionRecorded(matchLabel, Boolean(data.was_update));
+      toastPredictionRecorded(
+        matchLabel,
+        Boolean(data.was_update),
+        typeof data.message === "string" ? data.message : undefined,
+      );
     } finally {
       setLoading(false);
     }

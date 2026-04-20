@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { TournamentConfigPanel } from "@/components/admin/tournament-config-panel";
 import { BonusPromptsPanel } from "@/components/admin/bonus-prompts-panel";
 
@@ -50,7 +51,12 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patch),
     });
-    if (res.ok)
+    const data = (await res.json().catch(() => ({}))) as {
+      ok?: boolean;
+      message?: string;
+      error?: string;
+    };
+    if (res.ok) {
       setCfg((prev) => ({
         ...prev,
         answer_lock_utc: patch.answer_lock_utc,
@@ -60,6 +66,10 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
         maintenance_banner_text: patch.maintenance_banner_text,
         mega_bonus_all_answers_visible: patch.mega_bonus_all_answers_visible,
       }));
+      toast.success(data.message ?? "Tournament settings saved.");
+    } else {
+      toast.error(data.error ?? "Could not save tournament settings.");
+    }
   }
 
   return (

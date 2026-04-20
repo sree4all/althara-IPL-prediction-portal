@@ -8,6 +8,8 @@ import { WelcomeBanner } from "@/components/auth/welcome-banner";
 import { getProfileForUser } from "@/lib/data/profile";
 import { getMaintenanceGate } from "@/lib/data/tournament-config";
 
+export const dynamic = "force-dynamic";
+
 export default async function AppLayout({
   children,
 }: {

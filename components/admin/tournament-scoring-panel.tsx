@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 type Question = {
@@ -77,10 +78,16 @@ export function TournamentScoringPanel({
     const data = await res.json().catch(() => ({}));
     setBusy(false);
     if (!res.ok) {
-      setMsg(data.error ?? "Scoring failed");
+      const err = data.error ?? "Scoring failed";
+      setMsg(err);
+      toast.error(String(err));
       return;
     }
-    setMsg(`Tournament scoring applied. Ledger rows: ${data.ledger_rows ?? 0}.`);
+    const summary =
+      (data as { message?: string }).message ??
+      `Tournament scoring applied. Ledger rows: ${data.ledger_rows ?? 0}.`;
+    setMsg(summary);
+    toast.success(summary);
   }
 
   return (

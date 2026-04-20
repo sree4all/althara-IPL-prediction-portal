@@ -129,5 +129,8 @@ export async function PATCH(request: Request) {
       { status: 500 },
     );
   }
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({
+    ok: true,
+    message: "Tournament settings saved.",
+  });
 }

@@ -13,5 +13,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
-  return NextResponse.json({ ok: true, ledger_rows: result.ledgerRows });
+  return NextResponse.json({
+    ok: true,
+    message: `Tournament scoring applied. ${result.ledgerRows} ledger row(s) written.`,
+    ledger_rows: result.ledgerRows,
+  });
 }

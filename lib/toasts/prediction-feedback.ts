@@ -7,7 +7,15 @@ const LOCKED =
   "Sorry! The deadline for this match was 30 minutes before start time (GMT). This match is now locked.";
 const TOURNAMENT_LOCKED = "Tournament answers are now locked.";
 
-export function toastPredictionRecorded(matchLabel: string, wasUpdate: boolean) {
+export function toastPredictionRecorded(
+  matchLabel: string,
+  wasUpdate: boolean,
+  messageFromApi?: string,
+) {
+  if (messageFromApi?.trim()) {
+    toast.success(messageFromApi.trim());
+    return;
+  }
   if (wasUpdate) {
     toast.success(UPDATED);
     return;

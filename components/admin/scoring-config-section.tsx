@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 type Config = {
@@ -47,7 +48,7 @@ export function ScoringConfigSection() {
   async function save() {
     if (!cfg) return;
     setSaving(true);
-    await fetch("/api/admin/scoring-config", {
+    const res = await fetch("/api/admin/scoring-config", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -56,7 +57,13 @@ export function ScoringConfigSection() {
         tournament_slot_points: cfg.tournament_slot_points,
       }),
     });
+    const data = (await res.json().catch(() => ({}))) as { message?: string; error?: string };
     setSaving(false);
+    if (res.ok) {
+      toast.success(data.message ?? "Scoring config saved.");
+    } else {
+      toast.error(data.error ?? "Could not save scoring config.");
+    }
   }
 
   if (loading || !cfg) {

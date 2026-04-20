@@ -184,6 +184,8 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({
+    ok: true,
+    message: wasUpdate ? "Prediction updated." : "Prediction saved.",
     prediction_id: pred?.id,
     match_id,
     updated_at: upsertPayload.updated_at,
