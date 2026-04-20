@@ -43,6 +43,7 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
     season_bonuses_revealed_by_admin: boolean;
     maintenance_mode: boolean;
     maintenance_banner_text: string;
+    mega_bonus_all_answers_visible: boolean;
   }) {
     const res = await fetch("/api/admin/config", {
       method: "PATCH",
