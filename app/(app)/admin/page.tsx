@@ -5,6 +5,7 @@ import { AdminConfigForm } from "@/components/admin/admin-config-form";
 import { ScoringConfigSection } from "@/components/admin/scoring-config-section";
 import { MatchResultPanel } from "@/components/admin/match-result-panel";
 import { TournamentScoringPanel } from "@/components/admin/tournament-scoring-panel";
+import { DEFAULT_MAINTENANCE_BANNER_TEXT, fetchTournamentConfig2026 } from "@/lib/data/tournament-config";
 
 export default async function AdminPage() {
   const { supabase, user } = await requireUser();
@@ -13,13 +14,10 @@ export default async function AdminPage() {
     redirect("/matches");
   }
 
-  const { data } = await supabase
-    .from("tournament_config")
-    .select(
-      "answer_lock_utc, season_bonuses_visible_after_utc, season_bonuses_revealed_by_admin, maintenance_mode, maintenance_banner_text",
-    )
-    .eq("season_year", 2026)
-    .maybeSingle();
+  const { data: cfg, error: cfgErr } = await fetchTournamentConfig2026(supabase);
+  if (cfgErr) {
+    throw new Error(cfgErr.message);
+  }
   const { data: bonus } = await supabase
     .from("bonus_prompts")
     .select("id, scope, match_id, prompt_key, prompt_text, is_active, display_order, input_type")
@@ -63,11 +61,11 @@ export default async function AdminPage() {
       <h1 className="text-2xl font-bold tracking-tight">Admin</h1>
       <AdminConfigForm
         initial={{
-          answer_lock_utc: data?.answer_lock_utc ?? null,
-          season_bonuses_visible_after_utc: data?.season_bonuses_visible_after_utc ?? null,
-          season_bonuses_revealed_by_admin: Boolean(data?.season_bonuses_revealed_by_admin),
-          maintenance_mode: Boolean(data?.maintenance_mode),
-          maintenance_banner_text: data?.maintenance_banner_text ?? "അടിമ പണിയിലാണ്",
+          answer_lock_utc: cfg?.answer_lock_utc ?? null,
+          season_bonuses_visible_after_utc: cfg?.season_bonuses_visible_after_utc ?? null,
+          season_bonuses_revealed_by_admin: Boolean(cfg?.season_bonuses_revealed_by_admin),
+          maintenance_mode: Boolean(cfg?.maintenance_mode),
+          maintenance_banner_text: cfg?.maintenance_banner_text ?? DEFAULT_MAINTENANCE_BANNER_TEXT,
           bonus_prompts: bonus ?? [],
           matches: adminMatches ?? [],
         }}

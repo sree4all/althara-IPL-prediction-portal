@@ -6,6 +6,7 @@ import { AppNav } from "@/components/layout/app-nav";
 import { SyncingHistory } from "@/components/auth/syncing-history";
 import { WelcomeBanner } from "@/components/auth/welcome-banner";
 import { getProfileForUser } from "@/lib/data/profile";
+import { getMaintenanceGate } from "@/lib/data/tournament-config";
 
 export default async function AppLayout({
   children,
@@ -19,14 +20,8 @@ export default async function AppLayout({
   if (profile?.legacy_alias_onboarding_completed === false) {
     redirect("/login/legacy-alias");
   }
-  const { data: seasonConfig } = await supabase
-    .from("tournament_config")
-    .select("maintenance_mode, maintenance_banner_text")
-    .eq("season_year", 2026)
-    .maybeSingle();
+  const { on: maintenanceModeOn, text: maintenanceText } = await getMaintenanceGate(supabase);
   const role = profile?.role ?? "user";
-  const maintenanceModeOn = Boolean(seasonConfig?.maintenance_mode);
-  const maintenanceText = seasonConfig?.maintenance_banner_text || "അടിമ പണിയിലാണ്";
   if (maintenanceModeOn && role !== "admin") {
     return (
       <div className="min-h-screen bg-background grid place-items-center px-6">

@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server";
 import { requireAdminOrResponse } from "@/lib/auth/require-admin";
+import {
+  DEFAULT_MAINTENANCE_BANNER_TEXT,
+  fetchTournamentConfig2026,
+  isMissingMaintenanceColumnsError,
+} from "@/lib/data/tournament-config";
 
 export async function GET() {
   const { supabase, denied } = await requireAdminOrResponse();
   if (denied) return denied;
 
-  const { data: config } = await supabase
-    .from("tournament_config")
-    .select(
-      "id, season_year, answer_lock_utc, season_bonuses_visible_after_utc, season_bonuses_revealed_by_admin, maintenance_mode, maintenance_banner_text",
-    )
-    .eq("season_year", 2026)
-    .maybeSingle();
+  const { data: config, error: cfgErr } = await fetchTournamentConfig2026(supabase);
+  if (cfgErr) {
+    return NextResponse.json({ error: cfgErr.message }, { status: 500 });
+  }
+
   const { data: questions } = await supabase
     .from("tournament_questions")
     .select("id, slot_no, question_text, is_active")
@@ -27,9 +30,9 @@ export async function GET() {
     season_year: 2026,
     answer_lock_utc: config?.answer_lock_utc ?? null,
     season_bonuses_visible_after_utc: config?.season_bonuses_visible_after_utc ?? null,
-    season_bonuses_revealed_by_admin: Boolean(config?.season_bonuses_revealed_by_admin),
-    maintenance_mode: Boolean(config?.maintenance_mode),
-    maintenance_banner_text: config?.maintenance_banner_text ?? "അടിമ പണിയിലാണ്",
+    season_bonuses_revealed_by_admin: config?.season_bonuses_revealed_by_admin ?? false,
+    maintenance_mode: config?.maintenance_mode ?? false,
+    maintenance_banner_text: config?.maintenance_banner_text ?? DEFAULT_MAINTENANCE_BANNER_TEXT,
     questions: questions ?? [],
     bonus_prompts: bonus_prompts ?? [],
   });
@@ -51,16 +54,37 @@ export async function PATCH(request: Request) {
   if (!body) return NextResponse.json({ error: "VALIDATION" }, { status: 400 });
 
   const season_year = body.season_year ?? 2026;
-  const { error } = await supabase.from("tournament_config").upsert({
+  const banner =
+    body.maintenance_banner_text?.trim() || DEFAULT_MAINTENANCE_BANNER_TEXT;
+
+  const fullPayload = {
     season_year,
     answer_lock_utc: body.answer_lock_utc ?? null,
     season_bonuses_visible_after_utc: body.season_bonuses_visible_after_utc ?? null,
     season_bonuses_revealed_by_admin: body.season_bonuses_revealed_by_admin ?? false,
     maintenance_mode: body.maintenance_mode ?? false,
-    maintenance_banner_text: body.maintenance_banner_text ?? "അടിമ പണിയിലാണ്",
+    maintenance_banner_text: banner,
     updated_at: new Date().toISOString(),
-  });
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  };
+
+  let { error } = await supabase.from("tournament_config").upsert(fullPayload);
+
+  if (error && isMissingMaintenanceColumnsError(error)) {
+    const withoutMaint = {
+      season_year: fullPayload.season_year,
+      answer_lock_utc: fullPayload.answer_lock_utc,
+      season_bonuses_visible_after_utc: fullPayload.season_bonuses_visible_after_utc,
+      season_bonuses_revealed_by_admin: fullPayload.season_bonuses_revealed_by_admin,
+      updated_at: fullPayload.updated_at,
+    };
+    ({ error } = await supabase.from("tournament_config").upsert(withoutMaint));
+  }
+
+  if (error) {
+    return NextResponse.json(
+      { error: error.message, hint: "If this mentions maintenance columns, apply migration 0022_tournament_maintenance_mode.sql" },
+      { status: 500 },
+    );
+  }
   return NextResponse.json({ ok: true });
 }
-
