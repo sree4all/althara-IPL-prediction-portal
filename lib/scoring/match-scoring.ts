@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { normAnswer } from "@/lib/scoring/normalize";
+import { isLegacyLateExcluded } from "@/lib/scoring/legacy-late-exclusions";
 
 export type ScoringConfigRow = {
   season_year: number;
@@ -27,7 +28,7 @@ export async function applyMatchScoring(
 
   const { data: match, error: mErr } = await supabase
     .from("matches")
-    .select("id, status, winner, bonus_result, home_team, away_team")
+    .select("id, external_key, status, winner, bonus_result, home_team, away_team")
     .eq("id", matchId)
     .maybeSingle();
   if (mErr || !match) {
@@ -50,6 +51,18 @@ export async function applyMatchScoring(
     .eq("match_id", matchId);
   if (pErr) {
     return { ok: false, error: pErr.message };
+  }
+  const userIds = [...new Set((predictions ?? []).map((p) => p.user_id as string))];
+  let excludedUsers = new Set<string>();
+  try {
+    const { data: excludedRows } = await supabase
+      .from("legacy_prediction_exclusions")
+      .select("user_id")
+      .eq("match_id", matchId)
+      .in("user_id", userIds.length > 0 ? userIds : ["00000000-0000-0000-0000-000000000000"]);
+    excludedUsers = new Set((excludedRows ?? []).map((r) => r.user_id as string));
+  } catch {
+    excludedUsers = new Set<string>();
   }
 
   const { data: promptRows } = await supabase
@@ -126,6 +139,8 @@ export async function applyMatchScoring(
 
   for (const pred of predictions ?? []) {
     const userId = pred.user_id as string;
+    if (excludedUsers.has(userId)) continue;
+    if (isLegacyLateExcluded(userId, (match.external_key as string | null) ?? null)) continue;
     const predictedWinner = pred.predicted_winner as string;
 
     let wDelta = 0;
@@ -187,14 +202,17 @@ export async function applyMatchScoring(
     }
 
     if (wDelta > 0) {
-      const { error: iErr } = await supabase.from("points_ledger").insert({
-        user_id: userId,
-        source_type: "match",
-        source_id: matchId,
-        points_delta: wDelta,
-        reason: "match_winner",
-        awarded_at: now,
-      });
+      const { error: iErr } = await supabase.from("points_ledger").upsert(
+        {
+          user_id: userId,
+          source_type: "match",
+          source_id: matchId,
+          points_delta: wDelta,
+          reason: "match_winner",
+          awarded_at: now,
+        },
+        { onConflict: "user_id,source_type,source_id" },
+      );
       if (iErr) {
         return { ok: false, error: iErr.message };
       }
