@@ -2,6 +2,12 @@
 
 Next.js + Supabase web app for IPL match predictions (GMT/UTC lock rules, leaderboard, CSV seeding).
 
+## Architecture
+
+![System architecture](docs/app-architecture.svg)
+
+Editable diagram (diagrams.net / draw.io): [`docs/app-architecture.drawio`](docs/app-architecture.drawio).
+
 ## Docs
 
 - Feature spec & setup: [`specs/001-ipl-prediction-portal/quickstart.md`](specs/001-ipl-prediction-portal/quickstart.md)

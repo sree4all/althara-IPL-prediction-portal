@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 820" width="1400" height="820">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#444"/>
+    </marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#fafafa"/>
+  <text x="24" y="36" font-family="system-ui,Segoe UI,sans-serif" font-size="22" font-weight="bold" fill="#111">Althara IPL Prediction Portal  System Architecture</text>
+
+  <!-- Client -->
+  <rect x="20" y="60" width="220" height="200" rx="8" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>
+  <text x="130" y="88" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="bold" fill="#111">Client layer</text>
+  <rect x="36" y="100" width="188" height="72" rx="6" fill="#fff" stroke="#3a87ad"/>
+  <text x="40" y="120" font-family="system-ui,sans-serif" font-size="11" fill="#222">
+    <tspan x="40" dy="0">Users  matches, predict, history,</tspan>
+    <tspan x="40" dy="14">leaderboard, Mega Bonus</tspan>
+  </text>
+  <rect x="36" y="182" width="188" height="68" rx="6" fill="#fff" stroke="#3a87ad"/>
+  <text x="40" y="202" font-family="system-ui,sans-serif" font-size="11" fill="#222">
+    <tspan x="40" dy="0">Admin  results, config, scoring,</tspan>
+    <tspan x="40" dy="14">maintenance mode</tspan>
+  </text>
+
+  <!-- Next.js -->
+  <rect x="260" y="60" width="560" height="360" rx="8" fill="#f3e5f5" stroke="#9673a6" stroke-width="2"/>
+  <text x="540" y="88" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="bold" fill="#111">Next.js App Router (TypeScript)</text>
+  <rect x="280" y="100" width="250" height="300" rx="6" fill="#f8cecc" stroke="#b85450"/>
+  <text x="405" y="124" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" font-weight="bold" fill="#111">UI + server components</text>
+  <text x="290" y="148" font-family="system-ui,sans-serif" font-size="10" fill="#333">
+    <tspan x="290" dy="0">/matches, /history, /leaderboard,</tspan>
+    <tspan x="290" dy="13">/tournament, /admin</tspan>
+    <tspan x="290" dy="26">Maintenance gate (non-admin)</tspan>
+    <tspan x="290" dy="39">requireUser, profile bootstrap</tspan>
+  </text>
+  <rect x="550" y="100" width="250" height="300" rx="6" fill="#d5e8d4" stroke="#82b366"/>
+  <text x="675" y="124" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" font-weight="bold" fill="#111">API routes</text>
+  <text x="560" y="148" font-family="system-ui,sans-serif" font-size="9.5" fill="#222">
+    <tspan x="560" dy="0">PATCH /api/admin/config</tspan>
+    <tspan x="560" dy="12">POST &/matches/[id]/apply-result</tspan>
+    <tspan x="560" dy="12">POST &/scoring/recompute-all-matches</tspan>
+    <tspan x="560" dy="12">POST /api/admin/tournament/apply-scoring</tspan>
+    <tspan x="560" dy="12">tournament-questions PATCH/PUT</tspan>
+  </text>
+
+  <!-- Scoring -->
+  <rect x="260" y="440" width="560" height="160" rx="8" fill="#ffe6cc" stroke="#d79b00" stroke-width="2"/>
+  <text x="540" y="468" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="bold" fill="#111">Scoring layer</text>
+  <rect x="280" y="480" width="170" height="100" rx="6" fill="#fff" stroke="#d79b00"/>
+  <text x="288" y="500" font-family="system-ui,sans-serif" font-size="10" fill="#222">
+    <tspan x="288" dy="0" font-weight="bold">applyMatchScoring</tspan>
+    <tspan x="288" dy="13">Ledger match/bonus, profiles</tspan>
+    <tspan x="288" dy="13">Legacy exclusions</tspan>
+  </text>
+  <rect x="465" y="480" width="170" height="100" rx="6" fill="#fff" stroke="#d79b00"/>
+  <text x="473" y="500" font-family="system-ui,sans-serif" font-size="10" fill="#222">
+    <tspan x="473" dy="0" font-weight="bold">applyTournamentScoring</tspan>
+    <tspan x="473" dy="13">Mega Bonus slots ’ ledger</tspan>
+  </text>
+  <rect x="650" y="480" width="150" height="100" rx="6" fill="#fff" stroke="#d79b00"/>
+  <text x="658" y="500" font-family="system-ui,sans-serif" font-size="10" fill="#222">
+    <tspan x="658" dy="0" font-weight="bold">tournament-config</tspan>
+    <tspan x="658" dy="13">Maintenance helpers</tspan>
+  </text>
+
+  <!-- Ops -->
+  <rect x="20" y="280" width="220" height="320" rx="8" fill="#f5f5f5" stroke="#a0522d" stroke-width="2"/>
+  <text x="130" y="308" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="bold" fill="#111">Operators</text>
+  <rect x="36" y="320" width="188" height="80" rx="6" fill="#fff" stroke="#a0522d"/>
+  <text x="40" y="340" font-family="system-ui,sans-serif" font-size="10" fill="#222">
+    <tspan x="40" dy="0">seed-csv.ts  imports;</tspan>
+    <tspan x="40" dy="13">completed matches ’ scoring</tspan>
+  </text>
+  <rect x="36" y="410" width="188" height="70" rx="6" fill="#fff" stroke="#a0522d"/>
+  <text x="40" y="430" font-family="system-ui,sans-serif" font-size="10" fill="#222">
+    <tspan x="40" dy="0">recompute:matches</tspan>
+    <tspan x="40" dy="13">backfill all completed</tspan>
+  </text>
+  <rect x="36" y="492" width="188" height="92" rx="6" fill="#fff" stroke="#a0522d"/>
+  <text x="40" y="512" font-family="system-ui,sans-serif" font-size="10" fill="#222">
+    <tspan x="40" dy="0">Supabase migrations</tspan>
+    <tspan x="40" dy="13">RLS, indexes, config cols</tspan>
+  </text>
+
+  <!-- Supabase -->
+  <rect x="840" y="60" width="540" height="540" rx="8" fill="#d9e1f2" stroke="#2f5597" stroke-width="2"/>
+  <text x="1110" y="88" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="bold" fill="#111">Supabase (Auth + Postgres + RLS)</text>
+  <rect x="860" y="100" width="240" height="90" rx="6" fill="#fff" stroke="#2f5597"/>
+  <text x="868" y="122" font-family="system-ui,sans-serif" font-size="10" fill="#222">
+    <tspan x="868" dy="0" font-weight="bold">Auth</tspan>
+    <tspan x="868" dy="13">JWT, profiles.role = admin</tspan>
+  </text>
+  <rect x="1120" y="100" width="240" height="90" rx="6" fill="#fff" stroke="#2f5597"/>
+  <text x="1128" y="122" font-family="system-ui,sans-serif" font-size="10" fill="#222">
+    <tspan x="1128" dy="0" font-weight="bold">Core tables</tspan>
+    <tspan x="1128" dy="13">profiles, matches, predictions,</tspan>
+    <tspan x="1128" dy="13">points_ledger, scoring_config</tspan>
+  </text>
+  <rect x="860" y="205" width="500" height="120" rx="6" fill="#fff" stroke="#2f5597"/>
+  <text x="868" y="228" font-family="system-ui,sans-serif" font-size="10" fill="#222">
+    <tspan x="868" dy="0" font-weight="bold">Bonus &amp; tournament</tspan>
+    <tspan x="868" dy="13">bonus_prompts, prediction_bonus_answers,</tspan>
+    <tspan x="868" dy="13">tournament_config, tournament_questions,</tspan>
+    <tspan x="868" dy="13">tournament_answers, options</tspan>
+  </text>
+  <rect x="860" y="340" width="500" height="100" rx="6" fill="#fff" stroke="#2f5597"/>
+  <text x="868" y="362" font-family="system-ui,sans-serif" font-size="10" fill="#222">
+    <tspan x="868" dy="0" font-weight="bold">Legacy</tspan>
+    <tspan x="868" dy="13">legacy_aliases, legacy_prediction_exclusions</tspan>
+  </text>
+  <rect x="860" y="455" width="500" height="125" rx="6" fill="#fff" stroke="#2f5597"/>
+  <text x="868" y="478" font-family="system-ui,sans-serif" font-size="10" fill="#222">
+    <tspan x="868" dy="0" font-weight="bold">Integrity &amp; perf</tspan>
+    <tspan x="868" dy="13">Unique partial indexes on points_ledger;</tspan>
+    <tspan x="868" dy="13">index on (source_id, source_type)</tspan>
+  </text>
+
+  <!-- Arrows (simplified) -->
+  <line x1="240" y1="160" x2="270" y2="200" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="530" y1="250" x2="850" y2="250" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="675" y1="400" x2="675" y2="430" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="820" y1="530" x2="850" y2="280" stroke="#666" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <line x1="130" y1="420" x2="260" y2="520" stroke="#888" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+</svg>

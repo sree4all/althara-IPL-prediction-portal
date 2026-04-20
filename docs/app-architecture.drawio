@@ -1,0 +1,180 @@
+<mxfile host="app.diagrams.net" modified="2026-04-20T00:00:00.000Z" agent="Codex" version="24.7.5" etag="althara-ipl-architecture">
+  <diagram id="arch-2026" name="App Architecture">
+    <mxGraphModel dx="1800" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Althara IPL Prediction Portal - System Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=22;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="10" width="760" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="clientsBox" value="Client Layer" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="60" width="320" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="clientUser" value="Authenticated User&#xa;- Matches / Predict / History&#xa;- Leaderboard / Mega Bonus" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#3a87ad;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="280" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="clientAdmin" value="Admin User&#xa;- Match result ops&#xa;- Tournament config &amp; scoring&#xa;- Maintenance mode toggle" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#3a87ad;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="220" width="280" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="nextBox" value="Next.js App Router (TypeScript)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#9673a6;fillColor=#f3e5f5;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="60" width="820" height="470" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uiBox" value="UI + Server Components" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#b85450;fillColor=#f8cecc;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="410" y="100" width="360" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="uiPages" value="Pages / Components&#xa;- /matches, /history, /leaderboard&#xa;- /tournament (Mega Bonus)&#xa;- /admin (panels for config, match scoring, tournament scoring)&#xa;- Maintenance gate in app layout (non-admin lock screen)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#b85450;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="430" y="145" width="320" height="215" as="geometry" />
+        </mxCell>
+        <mxCell id="uiAuth" value="Auth / Profile bootstrap&#xa;- requireUser&#xa;- requireAdminOrResponse&#xa;- ensureProfileScoringBootstrap" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#b85450;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="430" y="375" width="320" height="105" as="geometry" />
+        </mxCell>
+
+        <mxCell id="apiBox" value="API Routes" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#82b366;fillColor=#d5e8d4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="790" y="100" width="390" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="apiAdminCfg" value="Admin Config API&#xa;PATCH /api/admin/config&#xa;- tournament lock&#xa;- season bonuses visibility&#xa;- maintenance_mode + banner text" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#82b366;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="810" y="140" width="350" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="apiAdminMatch" value="Match Admin APIs&#xa;POST /api/admin/matches/[id]/apply-result&#xa;POST /api/admin/matches/[id]/reapply-scoring&#xa;POST /api/admin/scoring/recompute-all-matches" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#82b366;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="810" y="255" width="350" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="apiAdminTournament" value="Tournament Admin API&#xa;POST /api/admin/tournament/apply-scoring&#xa;PATCH /api/admin/tournament-questions/[id]&#xa;PUT /api/admin/tournament-questions/[id]/options" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#82b366;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="810" y="375" width="350" height="105" as="geometry" />
+        </mxCell>
+
+        <mxCell id="svcBox" value="Domain Services / Scoring Layer" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#d79b00;fillColor=#ffe6cc;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="550" width="820" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="svcMatch" value="applyMatchScoring(matchId)&#xa;- winner + bonus evaluation&#xa;- legacy late exclusions&#xa;- remove prior match/bonus ledger rows&#xa;- batch insert new ledger rows&#xa;- net update profiles.current_points&#xa;- mark matches.scored_at" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#d79b00;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="410" y="590" width="255" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="svcTournament" value="applyTournamentScoring(seasonYear)&#xa;- per-slot point config&#xa;- compare tournament_answers to correct_answer&#xa;- rewrite tournament_question ledger slice&#xa;- update profiles.current_points&#xa;- mark tournament_questions.scored_at" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#d79b00;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="685" y="590" width="250" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="svcCfg" value="Config helpers&#xa;- fetchTournamentConfig2026&#xa;- maintenance fallback when migration missing&#xa;- getMaintenanceGate" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#d79b00;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="955" y="590" width="225" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="opsBox" value="Operator Scripts / DevOps" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#a0522d;fillColor=#f5f5f5;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="400" width="320" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="opsSeed" value="scripts/seed-csv.ts&#xa;- seed matches/profiles/aliases&#xa;- completed match imports trigger applyMatchScoring" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#a0522d;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="450" width="280" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="opsRecompute" value="scripts/recompute-match-scoring.ts&#xa;npm run recompute:matches&#xa;- recompute all completed matches&#xa;- repair/backfill scoring gaps" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#a0522d;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="560" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="opsMigrations" value="Supabase migrations (schema + RLS)&#xa;- scoring indexes/uniques&#xa;- maintenance mode columns&#xa;- seasonal config updates" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#a0522d;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="675" width="280" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="supabaseBox" value="Supabase (Auth + PostgreSQL + RLS)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#2f5597;fillColor=#d9e1f2;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="60" width="640" height="710" as="geometry" />
+        </mxCell>
+        <mxCell id="sbAuth" value="Auth&#xa;- Supabase Auth users&#xa;- JWT + RLS policies&#xa;- profiles.role = admin gates mutation routes" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#2f5597;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1265" y="105" width="280" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="sbCore" value="Core Tables&#xa;- profiles&#xa;- matches&#xa;- predictions&#xa;- points_ledger&#xa;- scoring_config" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#2f5597;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1265" y="235" width="280" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="sbBonus" value="Bonus / Tournament Tables&#xa;- bonus_prompts&#xa;- prediction_bonus_answers&#xa;- tournament_config&#xa;- tournament_questions&#xa;- tournament_answers&#xa;- tournament_question_options" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#2f5597;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1265" y="385" width="280" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="sbLegacy" value="Legacy Migration Tables&#xa;- legacy_aliases&#xa;- legacy_prediction_exclusions (optional)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#2f5597;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1265" y="570" width="280" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="sbIdx" value="Performance + Integrity&#xa;- unique indexes on points_ledger slices&#xa;- source_id/source_type index&#xa;- dedupe migrations" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#2f5597;fillColor=#ffffff;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1265" y="680" width="280" height="75" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legendBox" value="Legend" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#666666;fillColor=#f5f5f5;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1565" y="105" width="290" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="legend1" value="Blue arrows: read/query flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1585" y="145" width="250" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend2" value="Green arrows: write/mutation flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1585" y="170" width="250" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend3" value="Orange arrows: scoring pipeline" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1585" y="195" width="250" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend4" value="Gray arrows: operator scripts / migrations" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1585" y="220" width="260" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" style="endArrow=block;strokeColor=#4a86e8;strokeWidth=2;" edge="1" parent="1" source="clientUser" target="uiPages">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="endArrow=block;strokeColor=#4a86e8;strokeWidth=2;" edge="1" parent="1" source="clientAdmin" target="uiPages">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="endArrow=block;strokeColor=#4a86e8;strokeWidth=2;" edge="1" parent="1" source="uiPages" target="apiBox">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="endArrow=block;strokeColor=#4a86e8;strokeWidth=2;" edge="1" parent="1" source="uiAuth" target="sbAuth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="endArrow=block;strokeColor=#4a86e8;strokeWidth=2;" edge="1" parent="1" source="uiPages" target="sbCore">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e6" value="applyMatchScoring" style="endArrow=block;strokeColor=#f6b26b;strokeWidth=2;" edge="1" parent="1" source="apiAdminMatch" target="svcMatch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="applyTournamentScoring" style="endArrow=block;strokeColor=#f6b26b;strokeWidth=2;" edge="1" parent="1" source="apiAdminTournament" target="svcTournament">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="config helper" style="endArrow=block;strokeColor=#f6b26b;strokeWidth=2;" edge="1" parent="1" source="apiAdminCfg" target="svcCfg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e9" style="endArrow=block;strokeColor=#6aa84f;strokeWidth=2;" edge="1" parent="1" source="svcMatch" target="sbCore">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" style="endArrow=block;strokeColor=#6aa84f;strokeWidth=2;" edge="1" parent="1" source="svcMatch" target="sbBonus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="endArrow=block;strokeColor=#6aa84f;strokeWidth=2;" edge="1" parent="1" source="svcMatch" target="sbLegacy">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" style="endArrow=block;strokeColor=#6aa84f;strokeWidth=2;" edge="1" parent="1" source="svcTournament" target="sbBonus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" style="endArrow=block;strokeColor=#6aa84f;strokeWidth=2;" edge="1" parent="1" source="svcTournament" target="sbCore">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" style="endArrow=block;strokeColor=#6aa84f;strokeWidth=2;" edge="1" parent="1" source="svcCfg" target="sbBonus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e15" value="seed + import" style="endArrow=block;strokeColor=#999999;strokeWidth=2;dashed=1;" edge="1" parent="1" source="opsSeed" target="sbCore">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" value="auto-score completed" style="endArrow=block;strokeColor=#999999;strokeWidth=2;dashed=1;" edge="1" parent="1" source="opsSeed" target="svcMatch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" value="recompute all matches" style="endArrow=block;strokeColor=#999999;strokeWidth=2;dashed=1;" edge="1" parent="1" source="opsRecompute" target="svcMatch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e18" value="schema + RLS" style="endArrow=block;strokeColor=#999999;strokeWidth=2;dashed=1;" edge="1" parent="1" source="opsMigrations" target="supabaseBox">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e19" style="endArrow=block;strokeColor=#4a86e8;strokeWidth=2;" edge="1" parent="1" source="apiAdminCfg" target="sbBonus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e20" style="endArrow=block;strokeColor=#4a86e8;strokeWidth=2;" edge="1" parent="1" source="apiAdminMatch" target="sbCore">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e21" style="endArrow=block;strokeColor=#4a86e8;strokeWidth=2;" edge="1" parent="1" source="apiAdminTournament" target="sbBonus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
