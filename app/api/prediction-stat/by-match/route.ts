@@ -48,36 +48,63 @@ export async function GET(request: Request) {
     .eq("match_id", matchId);
 
   const promptIds = [...new Set((bonusRows ?? []).map((b) => b.prompt_id as string))];
-  let promptText = new Map<string, string>();
+  let promptMeta = new Map<string, { prompt_text: string; display_order: number }>();
   if (promptIds.length > 0) {
     const { data: prompts } = await supabase
       .from("bonus_prompts")
-      .select("id, prompt_text")
+      .select("id, prompt_text, display_order")
       .in("id", promptIds)
       .eq("season_year", SEASON_YEAR);
-    promptText = new Map((prompts ?? []).map((p) => [p.id as string, p.prompt_text as string]));
+    promptMeta = new Map(
+      (prompts ?? []).map((p) => [
+        p.id as string,
+        {
+          prompt_text: p.prompt_text as string,
+          display_order: Number(p.display_order ?? 0),
+        },
+      ]),
+    );
   }
 
-  const bonusByUser = new Map<string, { prompt_text: string; answer_text: string }[]>();
+  const bonusByUser = new Map<
+    string,
+    { prompt_id: string; prompt_text: string; answer_text: string; display_order: number }[]
+  >();
   for (const row of bonusRows ?? []) {
     const uid = row.user_id as string;
     const pid = row.prompt_id as string;
-    const text = promptText.get(pid) ?? "Bonus";
+    const meta = promptMeta.get(pid);
+    const text = meta?.prompt_text ?? "Bonus";
     if (!bonusByUser.has(uid)) bonusByUser.set(uid, []);
     bonusByUser.get(uid)!.push({
+      prompt_id: pid,
       prompt_text: text,
       answer_text: (row.answer_text as string) ?? "",
+      display_order: meta?.display_order ?? 0,
     });
+  }
+  for (const [, lines] of bonusByUser) {
+    lines.sort((a, b) =>
+      a.display_order !== b.display_order
+        ? a.display_order - b.display_order
+        : a.prompt_text.localeCompare(b.prompt_text),
+    );
   }
 
   const entries = (preds ?? []).map((p) => {
     const uid = p.user_id as string;
+    const rawBonus = bonusByUser.get(uid) ?? [];
+    const bonus_answers = rawBonus.map((row) => ({
+      prompt_id: row.prompt_id,
+      prompt_text: row.prompt_text,
+      answer_text: row.answer_text,
+    }));
     return {
       user_id: uid,
       display_name: nameByUser.get(uid) ?? "Player",
       predicted_winner: p.predicted_winner as string,
       bonus_pick: (p.bonus_pick as string | null)?.trim() || null,
-      bonus_answers: bonusByUser.get(uid) ?? [],
+      bonus_answers,
     };
   });
 

@@ -191,7 +191,7 @@ export function BonusPromptsPanel({
           const m = p.match_id ? matchById.get(p.match_id) : undefined;
           const where =
             p.scope === "tournament"
-              ? "Season-wide (Season bonuses tab)"
+              ? "Season-wide (Mega Bonus tab)"
               : m
                 ? matchLabel(m)
                 : p.match_id

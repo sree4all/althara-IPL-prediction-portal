@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-function formatUtcNow(d: Date) {
-  return `${d.toISOString().replace("T", " ").slice(0, 19)} UTC`;
-}
+import { formatIstDateTime } from "@/lib/utils/time-format";
 
 export function UtcNowClock() {
   const [now, setNow] = useState<Date | null>(null);
@@ -17,20 +14,19 @@ export function UtcNowClock() {
 
   if (now === null) {
     return (
-      <p className="mb-4 text-sm tabular-nums text-muted-foreground" aria-hidden>
-        Current time (UTC): …
+      <p className="mb-4 text-sm font-bold tabular-nums text-red-600" aria-hidden>
+        Current time (IST): …
       </p>
     );
   }
 
   return (
     <p
-      className="mb-4 text-sm tabular-nums text-muted-foreground"
+      className="mb-4 text-sm font-bold tabular-nums text-red-600"
       aria-live="polite"
       aria-atomic="true"
     >
-      <span className="font-medium text-foreground">Current time (UTC):</span>{" "}
-      {formatUtcNow(now)}
+      <span>Current time (IST):</span> {formatIstDateTime(now)}
     </p>
   );
 }

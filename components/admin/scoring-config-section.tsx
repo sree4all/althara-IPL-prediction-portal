@@ -27,7 +27,7 @@ export function ScoringConfigSection() {
         setLoading(false);
         return;
       }
-      let slots: number[] = [2, 2, 2, 2, 2];
+      let slots: number[] = [2, 2, 2, 2, 3, 3, 5, 3, 3];
       try {
         const raw = c.tournament_slot_points;
         if (Array.isArray(raw)) slots = raw.map((n: number) => Number(n));
@@ -98,8 +98,8 @@ export function ScoringConfigSection() {
           />
         </label>
       </div>
-      <p className="mt-3 text-xs font-medium">Tournament slots (1–5)</p>
-      <div className="mt-1 grid grid-cols-5 gap-2">
+      <p className="mt-3 text-xs font-medium">Tournament slots (1–9)</p>
+      <div className="mt-1 grid grid-cols-3 gap-2 sm:grid-cols-5">
         {cfg.tournament_slot_points.map((p, i) => (
           <label key={i} className="text-xs">
             Slot {i + 1}

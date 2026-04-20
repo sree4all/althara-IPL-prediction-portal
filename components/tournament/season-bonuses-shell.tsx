@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { TournamentQuestionsForm } from "@/components/matches/tournament-questions-form";
 import { TournamentBonusPromptsForm } from "@/components/matches/tournament-bonus-prompts-form";
+import { formatIstDateTime } from "@/lib/utils/time-format";
 
 export function SeasonBonusesShell() {
   const [tabVisible, setTabVisible] = useState<boolean | null>(null);
@@ -30,13 +31,13 @@ export function SeasonBonusesShell() {
   if (!tabVisible) {
     return (
       <div className="rounded-md border border-border bg-muted/30 p-6 text-center">
-        <p className="text-sm font-medium">Season bonuses are not available yet</p>
+        <p className="text-sm font-medium">Mega Bonus is not available yet</p>
         <p className="mt-2 text-xs text-muted-foreground">
-          All season bonus questions are hidden until an admin reveals this tab for everyone at once.
+          All Mega Bonus questions are hidden until an admin reveals this tab for everyone at once.
           {unlockUtc ? (
             <>
               {" "}
-              Scheduled unlock (UTC): {new Date(unlockUtc).toISOString().replace("T", " ").slice(0, 19)}
+              Scheduled unlock (IST): {formatIstDateTime(unlockUtc)}
             </>
           ) : null}
         </p>

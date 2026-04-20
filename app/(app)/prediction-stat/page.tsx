@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 type MatchOpt = { id: string; label: string; status?: string | null };
 
-type BonusLine = { prompt_text: string; answer_text: string };
+type BonusLine = { prompt_id: string; prompt_text: string; answer_text: string };
 
 type Entry = {
   user_id: string;
@@ -143,7 +143,7 @@ export default function PredictionStatPage() {
                       <td className="px-3 py-2 align-top text-muted-foreground">
                         <ul className="list-inside list-disc space-y-1">
                           {e.bonus_answers.map((b) => (
-                            <li key={b.prompt_text}>
+                            <li key={b.prompt_id}>
                               <span className="text-foreground">{b.prompt_text}</span>: {b.answer_text}
                             </li>
                           ))}

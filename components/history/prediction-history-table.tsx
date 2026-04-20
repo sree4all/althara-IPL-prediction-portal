@@ -25,7 +25,7 @@ export function PredictionHistoryTable({ rows }: { rows: Row[] }) {
           {rows.map((r) => (
             <tr key={r.source_id} className="border-b border-border">
               <td className="px-3 py-2">{r.label}</td>
-              <td className="px-3 py-2">{r.prediction}</td>
+              <td className="px-3 py-2 whitespace-pre-line">{r.prediction}</td>
               <td className="px-3 py-2">{r.points_delta ?? "-"}</td>
               <td className="px-3 py-2">{r.status}</td>
             </tr>

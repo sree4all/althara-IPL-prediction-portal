@@ -58,14 +58,14 @@ export function TournamentBonusPromptsForm() {
       toastPredictionError(data.error);
       return;
     }
-    toast.success("Season bonus answers saved.");
+    toast.success("Mega Bonus answers saved.");
   }
 
   if (!prompts.length) return null;
 
   return (
     <div className="rounded-md border border-border p-4">
-      <p className="mb-2 text-sm font-semibold">Season-wide bonus prompts</p>
+      <p className="mb-2 text-sm font-semibold">Mega Bonus prompts</p>
       <p className="mb-3 text-xs text-muted-foreground">
         These apply to the whole season, not to individual matches.
       </p>
@@ -105,7 +105,7 @@ export function TournamentBonusPromptsForm() {
         })}
       </fieldset>
       <Button type="button" size="sm" className="mt-3" onClick={save} disabled={locked}>
-        Save season-wide bonus answers
+        Save Mega Bonus answers
       </Button>
     </div>
   );

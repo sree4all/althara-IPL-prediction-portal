@@ -633,12 +633,33 @@ async function seedMvp2Baseline(supabase: SupabaseClient) {
   }
   console.log("tournament_config: upserted season", seasonYear, "(lock far future for local testing).");
 
+  const megaSlotPoints = [2, 2, 2, 2, 3, 3, 5, 3, 3];
+  const { error: scoreErr } = await supabase.from("scoring_config").upsert(
+    {
+      season_year: seasonYear,
+      match_winner_points: 2,
+      match_bonus_points: 2,
+      tournament_slot_points: megaSlotPoints,
+      updated_at: now,
+    },
+    { onConflict: "season_year" },
+  );
+  if (scoreErr) {
+    console.error("scoring_config upsert:", scoreErr.message);
+    process.exit(1);
+  }
+  console.log("scoring_config: upserted Mega Bonus slot points (9 slots).");
+
   const slots = [
-    { slot_no: 1, question_text: "Who wins Orange Cap?" },
-    { slot_no: 2, question_text: "Who wins Purple Cap?" },
-    { slot_no: 3, question_text: "Which team tops the table?" },
-    { slot_no: 4, question_text: "Finalist 1?" },
-    { slot_no: 5, question_text: "IPL 2026 champion?" },
+    { slot_no: 1, question_text: "Name one team that will finish in the Top 4." },
+    { slot_no: 2, question_text: "Name a second team that will finish in the Top 4." },
+    { slot_no: 3, question_text: "Name a third team that will finish in the Top 4." },
+    { slot_no: 4, question_text: "Name a fourth team that will finish in the Top 4." },
+    { slot_no: 5, question_text: "Name the first finalist" },
+    { slot_no: 6, question_text: "Name the second finalist" },
+    { slot_no: 7, question_text: "Name the IPL 2026 Winner" },
+    { slot_no: 8, question_text: "Name the Orange Cap Winner of the Tournament" },
+    { slot_no: 9, question_text: "Name the Purple Cap Winner of the Tournament" },
   ];
   for (const s of slots) {
     const { error } = await supabase.from("tournament_questions").upsert(
@@ -657,7 +678,122 @@ async function seedMvp2Baseline(supabase: SupabaseClient) {
       process.exit(1);
     }
   }
-  console.log("tournament_questions: upserted 5 demo slots.");
+  console.log("tournament_questions: upserted 9 Mega Bonus slots.");
+
+  const { data: qrows, error: qErr } = await supabase
+    .from("tournament_questions")
+    .select("id, slot_no")
+    .eq("season_year", seasonYear)
+    .in(
+      "slot_no",
+      slots.map((s) => s.slot_no),
+    );
+  if (qErr || !qrows?.length) {
+    console.error("tournament_questions load:", qErr?.message ?? "empty");
+    process.exit(1);
+  }
+
+  const qidBySlot = new Map<number, string>(
+    qrows.map((q) => [Number(q.slot_no), String(q.id)]),
+  );
+
+  const teamOptions = [
+    "CSK",
+    "DC",
+    "GT",
+    "KKR",
+    "LSG",
+    "MI",
+    "PBKS",
+    "RCB",
+    "RR",
+    "SRH",
+  ];
+
+  const orangeCapOptions = [
+    "Shubhman Gill",
+    "Virat Kohli",
+    "Vaibhav Sooryavansi",
+    "Rajat Patidar",
+    "Shreyas Iyer",
+    "Yashasvi Jaiswal",
+    "Ishan Kishan",
+    "Priyansh Arya",
+    "Prabhsimran Singh",
+    "None of the above",
+  ];
+
+  const purpleCapOptions = [
+    "Anshul Kamboj",
+    "Prince Yadav",
+    "Prasidh Krishna",
+    "Bhuveneshwar Kumar",
+    "Joffra Archer",
+    "krunal Pandya",
+    "Kartik Tyagi",
+    "Jamie Overton",
+    "Ravi Bishnoi",
+    "None of the above",
+  ];
+
+  const optionRows: {
+    question_id: string;
+    label: string;
+    value: string;
+    sort_order: number;
+    updated_at: string;
+  }[] = [];
+  for (let slot = 1; slot <= 7; slot += 1) {
+    const qid = qidBySlot.get(slot);
+    if (!qid) continue;
+    teamOptions.forEach((opt, i) => {
+      optionRows.push({
+        question_id: qid,
+        label: opt,
+        value: opt,
+        sort_order: i,
+        updated_at: now,
+      });
+    });
+  }
+  for (const [slot, opts] of [
+    [8, orangeCapOptions],
+    [9, purpleCapOptions],
+  ] as const) {
+    const qid = qidBySlot.get(slot);
+    if (!qid) continue;
+    opts.forEach((opt, i) => {
+      optionRows.push({
+        question_id: qid,
+        label: opt,
+        value: opt,
+        sort_order: i,
+        updated_at: now,
+      });
+    });
+  }
+
+  const qids = [...qidBySlot.values()];
+  if (qids.length > 0) {
+    const { error: delOptErr } = await supabase
+      .from("tournament_question_options")
+      .delete()
+      .in("question_id", qids);
+    if (delOptErr) {
+      console.error("tournament_question_options delete:", delOptErr.message);
+      process.exit(1);
+    }
+  }
+  if (optionRows.length > 0) {
+    const { error: insOptErr } = await supabase
+      .from("tournament_question_options")
+      .insert(optionRows);
+    if (insOptErr) {
+      console.error("tournament_question_options insert:", insOptErr.message);
+      process.exit(1);
+    }
+  }
+  console.log("tournament_question_options: upserted Mega Bonus options.");
 
   const { data: existingBonus } = await supabase
     .from("bonus_prompts")

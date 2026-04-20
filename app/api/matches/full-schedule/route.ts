@@ -19,8 +19,8 @@ export async function GET() {
     onboarding: {
       title: "How predictions work",
       items: [
-        "Match picks lock 30 minutes before match start (UTC).",
-        "Tournament answers lock at configured UTC time.",
+        "Match picks lock 30 minutes before match start (IST).",
+        "Tournament answers lock at configured IST time.",
         "Bonus prompts can be match-specific or tournament-wide.",
       ],
     },

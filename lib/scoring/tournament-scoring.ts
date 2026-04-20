@@ -11,7 +11,7 @@ function slotPointsArray(raw: unknown): number[] {
   } catch {
     /* ignore */
   }
-  return [2, 2, 2, 2, 2];
+  return [2, 2, 2, 2, 3, 3, 5, 3, 3];
 }
 
 /**
