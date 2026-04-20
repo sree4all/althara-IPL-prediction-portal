@@ -1,0 +1,1000 @@
+timestamp	name	match_number	pred_winner	pred_bonus	player_key	match_dt	is_late	is_completed	pts_winner	pts_bonus	total_points	dup_rank											
+2026-03-25 14:40:04	Sree	M1 	RCB		Sree	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-25 21:41:48	Sumesh	M1 	SRH		Sumesh	28/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-26 06:55:32	Kuru	M1 	RCB		Kuru	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-26 07:01:28	Vis	M1 	SRH		Vis	28/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-26 07:46:31	Fahmi	M1 	RCB		Fahmi	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-26 07:47:28	DD	M1 	RCB		DD	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-26 10:26:42	Binu	M1 	RCB		Binu	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-26 10:59:35	Nani	M7 	CSK		Nani	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-03-26 11:00:39	Nani	M1 	RCB		Nani	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-26 13:25:25	Arya	M1 	RCB		Arya	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-26 17:24:47	Veena	M1 	RCB		Veena	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-26 18:11:08	Saji	M1 	RCB		Saji	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-27 02:08:12	Kichu	M1 	RCB		Kichu	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-27 04:39:58	Ani	M1 	SRH		Ani	28/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-27 04:47:56	CK	M1 	SRH		CK	28/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-27 06:31:55	Pathu	M1 	RCB		Pathu	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-28 00:33:01	Joychan	M2 	KKR		Joychan	29/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-28 00:35:27	Joychan	M3 	CSK		Joychan	30/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-28 00:36:15	Joychan	M4 	GT		Joychan	31/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-28 00:37:39	Joychan	M6 	KKR		Joychan	02/04/2026	FALSE	TRUE	0	0	0	1											
+2026-03-28 00:38:47	Joychan	M7 	CSK		Joychan	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-03-28 00:47:16	Joychan	M1 	RCB		Joychan	28/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-28 17:52:04	Nani	M2 	KKR	D	Nani	29/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-28 18:01:14	Kichu	M2 	MI	D	Kichu	29/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-28 18:08:16	DD	M2 	MI	E	DD	29/03/2026	FALSE	TRUE	2	2	4	1											
+2026-03-28 18:36:57	Vis	M2 	MI	E	Vis	29/03/2026	FALSE	TRUE	2	2	4	1											
+2026-03-28 19:11:36	Sree	M2 	MI	E	Sree	29/03/2026	FALSE	TRUE	2	2	4	1											
+2026-03-28 19:17:48	Veena	M2 	MI	E	Veena	29/03/2026	FALSE	TRUE	2	2	4	1											
+2026-03-28 19:46:33	Kuru	M2 	MI	D	Kuru	29/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-28 23:15:56	Sumesh	M2 	MI	E	Sumesh	29/03/2026	FALSE	TRUE	2	2	4	1											
+2026-03-28 23:51:20	Binu	M2 	MI	E	Binu	29/03/2026	FALSE	TRUE	2	2	4	1											
+2026-03-29 01:12:35	CK	M2 	KKR	A	CK	29/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-29 06:43:10	Fahmi	M2 	MI	D	Fahmi	29/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-29 11:18:55	Ani	M2 	MI	D	Ani	29/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-29 15:06:13	Sumesh	M3 	CSK		Sumesh	30/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-29 15:20:43	Veena	M3 	CSK		Veena	30/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-29 15:21:07	Vis	M3 	RR		Vis	30/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-29 15:21:55	Sree	M3 	CSK		Sree	30/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-29 15:22:23	Kichu	M3 	CSK		Kichu	30/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-29 15:53:32	Nani	M3 	CSK		Nani	30/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-29 16:22:56	Kuru	M3 	RR		Kuru	30/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-29 16:44:42	Pathu	M5 	LSG		Pathu	01/04/2026	FALSE	TRUE	0	0	0	1											
+2026-03-29 16:46:00	Pathu	M6 	KKR		Pathu	02/04/2026	FALSE	TRUE	0	0	0	1											
+2026-03-29 16:47:45	Pathu	M7 	CSK		Pathu	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-03-29 18:52:56	DD	M3 	CSK		DD	30/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-29 21:37:19	Binu	M3 	CSK		Binu	30/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-30 03:05:12	Fahmi	M3 	CSK		Fahmi	30/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-30 12:42:45	Ani	M3 	RR		Ani	30/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-30 14:44:34	Sumesh	M4 	GT		Sumesh	31/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-30 16:07:01	Kuru	M4 	PBKS		Kuru	31/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-30 16:09:22	Vis	M4 	PBKS		Vis	31/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-30 16:37:17	Nani	M4 	PBKS		Nani	31/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-30 18:49:43	Veena	M4 	GT		Veena	31/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-31 00:56:36	Sree	M4 	GT		Sree	31/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-31 01:15:03	Kichu	M4 	PBKS		Kichu	31/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-31 02:55:20	Arya	M4 	GT		Arya	31/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-31 03:06:16	CK	M4 	PBKS		CK	31/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-31 04:07:46	Binu	M4 	PBKS		Binu	31/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-31 11:06:13	Fahmi	M4 	GT		Fahmi	31/03/2026	FALSE	TRUE	0	0	0	1											
+2026-03-31 11:11:55	Fahmi	M5 	DC		Fahmi	01/04/2026	FALSE	TRUE	2	0	2	1											
+2026-03-31 11:17:50	Saji	M4 	PBKS		Saji	31/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-31 13:04:03	DD	M4 	PBKS		DD	31/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-31 13:24:39	Pathu	M4 	PBKS		Pathu	31/03/2026	FALSE	TRUE	2	0	2	1											
+2026-03-31 13:40:43	DD	M5 	DC		DD	01/04/2026	FALSE	TRUE	2	0	2	1											
+2026-03-31 13:42:56	Nani	M5 	LSG		Nani	01/04/2026	FALSE	TRUE	0	0	0	1											
+2026-03-31 13:45:25	Sumesh	M5 	LSG		Sumesh	01/04/2026	FALSE	TRUE	0	0	0	1											
+2026-03-31 15:26:03	Vis	M5 	DC		Vis	01/04/2026	FALSE	TRUE	2	0	2	1											
+2026-03-31 18:08:17	Veena	M5 	DC		Veena	01/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 01:23:12	Sree	M5 	DC		Sree	01/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 03:11:53	Kuru	M5 	DC		Kuru	01/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 11:23:29	CK	M5 	DC		CK	01/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 12:45:15	Ani	M5 	LSG		Ani	01/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-01 12:50:33	Binu	M5 	DC		Binu	01/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 13:17:16	Arya	M5 	DC		Arya	01/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 13:18:06	Arya	M6 	KKR		Arya	02/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-01 14:58:32	Vis	M6 	KKR		Vis	02/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-01 15:42:01	Kuru	M6 	SRH		Kuru	02/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 17:47:02	DD	M6 	KKR		DD	02/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-01 17:55:26	Nani	M6 	KKR		Nani	02/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-01 17:55:56	Nani	M8 	DC		Nani	04/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 17:56:32	Nani	M9 	RR		Nani	04/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 17:57:09	Nani	M10	LSG		Nani	05/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 17:57:36	Nani	M11	RCB		Nani	05/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 18:13:29	Kichu	M6 	SRH		Kichu	02/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-01 18:30:12	Sumesh	M6 	SRH		Sumesh	02/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-02 00:13:31	Sree	M6 	SRH		Sree	02/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-02 04:36:29	Veena	M6 	KKR		Veena	02/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-02 09:14:29	Fahmi	M6 	KKR		Fahmi	02/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-02 09:15:00	Fahmi	M7 	CSK		Fahmi	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-02 11:39:46	Ani	M6 	SRH		Ani	02/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-02 12:55:11	Binu	M6 	KKR		Binu	02/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-02 13:37:38	Vis	M7 	PBKS		Vis	03/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-02 13:45:30	Sumesh	M7 	CSK		Sumesh	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-02 14:16:45	Saji	M7 	CSK	A	Saji	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-02 14:20:28	Sree	M7 	CSK		Sree	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-02 16:20:02	Kuru	M7 	CSK		Kuru	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-02 22:14:53	CK	M7 	CSK		CK	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-03 01:52:36	Kichu	M7 	CSK		Kichu	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-03 08:51:16	Ani	M7 	CSK		Ani	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-03 08:55:25	Veena	M7 	CSK		Veena	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-03 11:01:52	Arya	M7 	CSK		Arya	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-03 11:02:24	Arya	M8 	DC		Arya	04/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-03 11:16:59	Binu	M7 	CSK		Binu	03/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-03 13:44:38	Vis	M8 	MI		Vis	04/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-03 13:45:15	Vis	M9 	RR	E	Vis	04/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-03 18:31:24	Sree	M8 	DC		Sree	04/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-03 18:34:36	Sree	M9 	RR	E	Sree	04/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-03 18:36:20	Sumesh	M8 	MI		Sumesh	04/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-03 18:37:38	Sumesh	M9 	RR	D	Sumesh	04/04/2026	FALSE	TRUE	2	2	4	1											
+2026-04-03 18:52:30	Veena	M8 	MI		Veena	04/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-03 18:53:08	Veena	M9 	RR	C	Veena	04/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-04 06:26:42	Kuru	M8 	MI		Kuru	04/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-04 06:27:18	Kuru	M9 	RR	E	Kuru	04/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-04 06:30:52	Ani	M8 	MI		Ani	04/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-04 06:31:32	Ani	M9 	RR	E	Ani	04/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-04 07:58:04	CK	M8 	MI		CK	04/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-04 07:59:32	CK	M12	PBKS		CK	06/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-04 08:31:41	Pathu	M8 	MI		Pathu	04/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-04 08:31:58	Pathu	M9 	GT		Pathu	04/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-04 09:33:12	Kichu	M8 	MI		Kichu	04/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-04 09:33:56	Kichu	M9 	RR		Kichu	04/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-04 10:16:09	Fahmi	M8 	MI		Fahmi	04/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-04 10:16:58	Fahmi	M9 	GT	D	Fahmi	04/04/2026	FALSE	TRUE	0	2	2	1											
+2026-04-04 11:37:50	Vis	M10	LSG		Vis	05/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-04 11:38:10	Vis	M11	CSK		Vis	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-04 12:12:04	CK	M9 	RR	E	CK	04/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-04 13:37:51	Sumesh	M10	SRH		Sumesh	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-04 13:38:22	Sumesh	M11	RCB		Sumesh	05/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-04 13:39:50	Arya	M9 	GT	A	Arya	04/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-04 13:42:43	Sree	M10	LSG		Sree	05/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-04 13:43:41	Sree	M11	RCB		Sree	05/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-04 13:48:08	Kuru	M10	SRH		Kuru	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-04 13:48:24	Kuru	M11	CSK		Kuru	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-04 17:03:13	Veena	M10	LSG		Veena	05/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-04 17:03:48	Veena	M11	CSK		Veena	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 05:33:37	CK	M10	SRH		CK	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 05:33:50	CK	M11	CSK		CK	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 05:34:07	Pathu	M10	SRH		Pathu	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 05:34:23	Pathu	M11	RCB		Pathu	05/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-05 06:38:34	DD	M10	SRH		DD	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 06:39:51	Binu	M10	LSG		Binu	05/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-05 06:40:31	DD	M11	CSK		DD	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 10:01:45	Ani	M10	SRH		Ani	05/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-05 10:02:08	Ani	M11	CSK		Ani	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 11:01:02	Arya	M11	RCB		Arya	05/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-05 11:01:44	Arya	M12	PBKS		Arya	06/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 12:01:24	Kichu	M10	LSG		Kichu	05/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-05 12:01:51	Kichu	M11	CSK		Kichu	05/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 12:17:15	Fahmi	M10	LSG		Fahmi	05/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-05 12:17:38	Fahmi	M11	RCB		Fahmi	05/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-05 13:45:06	Vis	M12	PBKS		Vis	06/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 14:08:42	Sumesh	M12	PBKS		Sumesh	06/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 16:26:27	Veena	M12	KKR		Veena	06/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 18:05:05	Sree	M12	PBKS		Sree	06/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-05 19:12:52	Kuru	M12	PBKS		Kuru	06/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-06 11:36:17	Fahmi	M12	PBKS		Fahmi	06/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-06 11:36:41	Fahmi	M13	MI		Fahmi	07/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-06 11:37:05	Fahmi	M14	GT		Fahmi	08/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-06 11:37:39	Fahmi	M15	LSG		Fahmi	09/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-06 11:38:01	Fahmi	M16	RCB		Fahmi	10/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-06 13:56:56	Vis	M13	RR		Vis	07/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-06 14:01:29	Veena	M13	RR		Veena	07/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-06 14:01:34	Ani	M12	KKR		Ani	06/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-06 14:02:05	Ani	M13	RR		Ani	07/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-06 14:07:08	Nani	M12	PBKS		Nani	06/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-06 14:07:25	Nani	M13	MI		Nani	07/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-06 14:37:29	CK	M13	RR		CK	07/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-06 14:37:59	Sumesh	M13	RR		Sumesh	07/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-06 14:39:39	Sree	M13	RR		Sree	07/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-06 14:55:58	Kichu	M13	RR		Kichu	07/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-06 15:27:07	Kuru	M13	RR		Kuru	07/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-07 13:24:53	Arya	M13	MI		Arya	07/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-07 13:25:17	Pathu	M13	MI		Pathu	07/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-07 13:26:06	Arya	M14	DC		Arya	08/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-07 13:29:53	Vis	M14	DC		Vis	08/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-07 13:52:12	DD	M13	MI		DD	07/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-07 16:05:30	Kuru	M14	DC		Kuru	08/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-08 01:53:16	Sree	M14	DC		Sree	08/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-08 04:39:46	DD	M14	DC		DD	08/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-08 04:40:08	Binu	M14	GT		Binu	08/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-08 05:16:36	CK	M14	DC		CK	08/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-08 05:16:49	Pathu	M14	DC		Pathu	08/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-08 12:08:49	Veena	M14	DC		Veena	08/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-08 13:25:52	Ani	M14	GT		Ani	08/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-08 13:32:54	Vis	M15	LSG		Vis	09/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-08 13:54:09	Sree	M15	LSG		Sree	09/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-08 15:49:33	Kuru	M15	LSG		Kuru	09/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-08 20:08:11	Nani	M15	KKR		Nani	09/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-08 20:08:28	Nani	M16	RCB		Nani	10/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-08 22:44:29	Sumesh	M15	LSG		Sumesh	09/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-09 09:02:50	DD	M15	KKR		DD	09/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-09 09:17:59	Binu	M15	LSG		Binu	09/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-09 13:20:18	Veena	M15	LSG		Veena	09/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-09 13:20:41	CK	M15	KKR		CK	09/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-09 13:20:56	Pathu	M15	LSG		Pathu	09/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-09 13:21:17	Nani	M17	PBKS		Nani	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-09 13:21:36	Kichu	M15	KKR		Kichu	09/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-09 13:21:36	Nani	M18	CSK	D	Nani	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-09 13:26:08	Arya	M15	KKR		Arya	09/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-09 13:27:30	Arya	M16	RR		Arya	10/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-09 13:28:01	Pathu	M16	RR		Pathu	10/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-09 13:35:29	Vis	M16	RR		Vis	10/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-09 13:44:52	Kuru	M16	RCB		Kuru	10/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-09 14:09:43	DD	M16	RR		DD	10/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-09 16:25:55	Ani	M16	RR		Ani	10/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-09 18:16:58	Sree	M16	RCB		Sree	10/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-10 01:25:22	Sumesh	M16	RR		Sumesh	10/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-10 10:38:04	Veena	M16	RCB		Veena	10/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-10 13:09:49	CK	M16	RR		CK	10/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-10 13:57:02	Vis	M17	PBKS		Vis	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-10 13:57:28	Vis	M18	CSK	F	Vis	11/04/2026	FALSE	TRUE	2	2	4	1											
+2026-04-10 14:23:43	Veena	M17	PBKS		Veena	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-10 14:24:09	Veena	M18	DC	C	Veena	11/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-10 15:11:07	Binu	M18	DC	C	Binu	11/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-10 15:12:58	DD	M17	PBKS		DD	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-10 15:13:25	Arya	M18	CSK	E	Arya	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-10 15:14:06	Pathu	M18	CSK	D	Pathu	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-10 15:14:17	DD	M18	DC	D	DD	11/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-10 15:14:41	Arya	M17	PBKS		Arya	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-10 15:15:01	Pathu	M17	PBKS		Pathu	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-10 17:37:01	Kuru	M17	PBKS		Kuru	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-10 17:37:37	Kuru	M18	CSK	E	Kuru	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-11 00:14:06	Sree	M17	PBKS		Sree	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-11 00:15:25	Sree	M18	DC	C	Sree	11/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 02:38:34	Sumesh	M17	SRH		Sumesh	11/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 02:39:04	Sumesh	M18	CSK	E	Sumesh	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-11 10:01:55	Fahmi	M17	PBKS		Fahmi	11/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-11 10:05:18	Fahmi	M18	CSK	D	Fahmi	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-11 11:44:55	Ani	M18	CSK	E	Ani	11/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-11 13:38:20	Vis	M19	GT		Vis	12/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-11 13:38:46	Vis	M20	MI		Vis	12/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 14:29:19	Nani	M19	LSG		Nani	12/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 14:29:39	Nani	M20	RCB		Nani	12/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-11 14:30:43	Nani	M21	RR		Nani	13/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 15:33:27	Veena	M19	LSG		Veena	12/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 15:33:45	Veena	M20	MI		Veena	12/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 20:47:51	DD	M19	LSG		DD	12/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 20:48:17	DD	M20	MI		DD	12/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 23:21:40	Sree	M19	LSG		Sree	12/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 23:21:54	Sumesh	M19	LSG		Sumesh	12/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 23:23:03	Sree	M20	MI		Sree	12/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-11 23:23:15	Sumesh	M20	MI		Sumesh	12/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-12 05:09:41	Ani	M19	GT		Ani	12/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-12 05:10:05	Ani	M20	RCB		Ani	12/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-12 08:53:06	Kuru	M20	RCB		Kuru	12/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-12 09:00:05	Kuru	M19	GT		Kuru	12/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-12 09:07:18	Fahmi	M19	GT		Fahmi	12/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-12 09:07:42	Fahmi	M20	RCB		Fahmi	12/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-12 09:08:10	Fahmi	M22	CSK		Fahmi	14/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-12 09:08:35	Fahmi	M23	RCB		Fahmi	15/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-12 09:09:54	Fahmi	M21	RR		Fahmi	13/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-12 13:38:14	Vis	M21	RR		Vis	13/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-12 13:44:59	CK	M20	MI		CK	12/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-12 13:45:16	Pathu	M20	RCB		Pathu	12/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-12 13:45:29	Arya	M20	RCB		Arya	12/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-12 13:51:59	Ani	M21	RR		Ani	13/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-12 23:49:58	Sumesh	M21	RR		Sumesh	13/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-12 23:50:13	Sree	M21	RR		Sree	13/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-13 06:40:38	Kuru	M21	SRH		Kuru	13/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-13 13:11:18	Veena	M21	SRH		Veena	13/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-13 13:13:01	CK	M21	SRH		CK	13/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-13 13:13:15	Arya	M21	RR		Arya	13/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-13 13:13:28	Pathu	M21	RR		Pathu	13/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-13 13:33:35	Vis	M22	CSK		Vis	14/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-13 13:44:44	Veena	M22	CSK		Veena	14/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-13 15:08:16	DD	M22	CSK	D	DD	14/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-13 21:21:42	Binu	M22	CSK		Binu	14/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-13 21:22:09	Binu	M23	RCB		Binu	15/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-13 22:28:34	Sree	M22	CSK		Sree	14/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-13 22:28:49	Sumesh	M22	CSK		Sumesh	14/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-14 03:35:40	Kuru	M22	CSK		Kuru	14/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-14 08:23:17	Arya	M22	CSK		Arya	14/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-14 08:23:43	Pathu	M22	CSK		Pathu	14/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-14 08:24:08	Arya	M23	RCB		Arya	15/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-14 08:25:51	Pathu	M23	RCB		Pathu	15/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-14 12:35:49	Ani	M22	CSK		Ani	14/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-14 12:36:06	Ani	M23	RCB		Ani	15/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-14 12:36:24	Ani	M24	PBKS		Ani	16/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-14 13:35:09	Vis	M23	LSG		Vis	15/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-14 13:39:46	Kuru	M23	RCB		Kuru	15/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-14 13:40:47	CK	M23	LSG		CK	15/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-14 13:46:15	Nani	M23	LSG		Nani	15/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-14 13:46:30	Nani	M24	PBKS		Nani	16/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-15 01:14:14	Sree	M23	RCB		Sree	15/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-15 01:14:28	Sumesh	M23	RCB		Sumesh	15/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-15 13:48:18	Vis	M24	MI		Vis	16/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-15 13:48:27	DD	M24	MI		DD	16/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-15 14:09:35	Veena	M24	PBKS		Veena	16/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-15 14:54:56	Nani	M25	KKR		Nani	17/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-15 17:21:50	Fahmi	M24	PBKS		Fahmi	16/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-15 17:22:16	Fahmi	M25	GT		Fahmi	17/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-15 17:22:38	Fahmi	M26	RCB		Fahmi	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-15 17:23:07	Fahmi	M27	CSK	C	Fahmi	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-15 17:23:51	Fahmi	M28	KKR		Fahmi	19/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-15 22:48:57	Sree	M24	MI		Sree	16/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-15 22:49:11	Sumesh	M24	MI		Sumesh	16/04/2026	FALSE	TRUE	0	0	0	1											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+2026-04-16 01:30:26	CK	M24	PBKS		CK	16/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-16 01:30:41	Pathu	M24	MI		Pathu	16/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-16 01:30:58	Arya	M24	MI		Arya	16/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-16 03:36:42	Kuru	M24	MI		Kuru	16/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-16 13:33:24	Vis	M25	GT		Vis	17/04/2026	FALSE	TRUE	2	0	2	1											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+2026-04-16 13:50:29	Binu	M25	GT		Binu	17/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-16 13:56:30	Veena	M25	GT		Veena	17/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-16 16:58:37	Kuru	M25	GT		Kuru	17/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-16 22:09:00	Sree	M25	GT		Sree	17/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-16 22:09:12	Sumesh	M25	KKR		Sumesh	17/04/2026	FALSE	TRUE	0	0	0	1											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+2026-04-17 03:57:05	DD	M25	GT		DD	17/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-17 09:15:09	Ani	M25	GT		Ani	17/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-17 13:39:10	Vis	M26	RCB		Vis	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-17 13:39:34	Vis	M27	SRH	C	Vis	18/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-17 13:45:30	Nani	M27	CSK	D	Nani	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-17 16:48:43	Ani	M26	RCB		Ani	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-17 16:50:14	Ani	M27	SRH	C	Ani	18/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-17 16:50:51	Ani	M28	RR		Ani	19/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-17 17:52:30	Veena	M26	DC		Veena	18/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-17 17:54:27	Veena	M27	CSK	C	Veena	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-17 18:39:31	Arya	M26	RCB		Arya	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-17 18:39:47	Pathu	M26	RCB		Pathu	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-17 18:43:11	Arya	M27	CSK	D	Arya	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-17 18:43:51	Pathu	M27	CSK	C	Pathu	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-17 18:44:28	Arya	M28	RR		Arya	19/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-17 18:45:09	Pathu	M28	RR		Pathu	19/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-18 03:29:01	Sree	M26	RCB		Sree	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-18 03:29:16	Sumesh	M26	RCB		Sumesh	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-18 03:31:09	Sree	M27	CSK	C	Sree	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-18 03:31:27	Sumesh	M27	CSK	B	Sumesh	18/04/2026	FALSE	TRUE	0	2	2	1											
+2026-04-18 03:43:24	Kuru	M26	RCB		Kuru	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-18 03:43:52	Kuru	M27	CSK	C	Kuru	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-18 10:53:25	DD	M27	CSK	C	DD	18/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-18 10:53:51	Binu	M27	SRH	C	Binu	18/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-18 13:58:19	CK	M27	CSK	B	CK	18/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-18 13:58:42	CK	M28	KKR		CK	19/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-18 13:59:03	CK	M29	LSG		CK	19/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-19 00:19:38	Sree	M28	RR		Sree	19/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-19 00:19:57	Sumesh	M28	RR		Sumesh	19/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-19 00:20:32	Sumesh	M29	PBKS		Sumesh	19/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-19 00:20:46	Sree	M29	PBKS		Sree	19/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-19 03:06:16	Vis	M28	RR		Vis	19/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-19 03:06:51	Vis	M29	PBKS		Vis	19/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-19 03:16:57	Ani	M29	PBKS		Ani	19/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-19 04:25:23	Fahmi	M29	PBKS		Fahmi	19/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-19 04:25:57	Fahmi	M30	MI		Fahmi	20/04/2026	FALSE	FALSE	0	0	0	1											
+2026-04-19 04:26:20	Fahmi	M31	SRH		Fahmi	21/04/2026	FALSE	FALSE	0	0	0	1											
+2026-04-19 04:26:49	Fahmi	M32	RR		Fahmi	22/04/2026	FALSE	FALSE	0	0	0	1											
+2026-04-19 04:27:12	Fahmi	M33	CSK		Fahmi	23/04/2026	FALSE	FALSE	0	0	0	1											
+2026-04-19 04:27:35	Fahmi	M34	RCB		Fahmi	24/04/2026	FALSE	FALSE	0	0	0	1											
+2026-04-19 04:29:26	Veena	M28	KKR		Veena	19/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-19 04:30:05	Veena	M29	LSG		Veena	19/04/2026	FALSE	TRUE	0	0	0	1											
+2026-04-19 09:31:00	Kuru	M28	RR		Kuru	19/04/2026	TRUE	TRUE	0	0	0	1											
+2026-04-19 09:31:17	Kuru	M29	PBKS		Kuru	19/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-19 10:10:51	Arya	M29	PBKS		Arya	19/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-19 10:11:17	Pathu	M29	PBKS		Pathu	19/04/2026	FALSE	TRUE	2	0	2	1											
+2026-04-19 10:11:52	Arya	M30	MI		Arya	20/04/2026	FALSE	FALSE	0	0	0	1											
+2026-04-19 10:12:22	Pathu	M30	GT		Pathu	20/04/2026	FALSE	FALSE	0	0	0	1											
+2026-04-19 13:50:34	Vis	M30	MI		Vis	20/04/2026	FALSE	FALSE	0	0	0	1											
+2026-04-19 14:29:29	Veena	M30	MI		Veena	20/04/2026	FALSE	FALSE	0	0	0	1											
+2026-04-19 14:43:51	DD	M30	GT		DD	20/04/2026	FALSE	FALSE	0	0	0	1											
+2026-04-19 20:43:30	Binu	M30	GT		Binu	20/04/2026	FALSE	FALSE	0	0	0	1											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											
+						#N/A	#N/A	#N/A	#N/A	#N/A	#N/A	0											

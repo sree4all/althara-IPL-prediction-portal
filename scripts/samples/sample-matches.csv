@@ -1,0 +1,5 @@
+external_key,home_team,away_team,match_time_utc,status
+2026-DEMO1,RCB,CSK,2026-05-10T14:00:00Z,scheduled
+2026-DEMO2,MI,KKR,2026-05-11T14:00:00Z,scheduled
+2026-DEMO3,SRH,DC,2026-05-12T14:00:00Z,scheduled
+2026-DEMO4,RR,LSG,2026-05-13T14:00:00Z,scheduled

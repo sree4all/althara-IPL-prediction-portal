@@ -1,0 +1,39 @@
+﻿---
+description: Project Development Guidelines
+globs: ["**/*"]
+alwaysApply: true
+---
+# althara-IPL-prediction-portal Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2026-04-19
+
+## Active Technologies
+- Supabase PostgreSQL (extend existing `matches`, `profiles`, `predictions`) with new tables for bonus prompts, tournament questions/answers, points ledger, alias claims (002-ipl-prediction-mvp2)
+- Supabase PostgreSQL (extend `bonus_prompts`, `tournament_questions`; new option tables) (002-ipl-prediction-mvp2)
+
+- TypeScript 5.x, Node.js 20 LTS + Next.js (App Router), React 19, Tailwind CSS, shadcn/ui, `@supabase/supabase-js`, `@supabase/ssr` (001-ipl-prediction-portal)
+
+## Project Structure
+
+```text
+backend/
+frontend/
+tests/
+```
+
+## Commands
+
+npm test; npm run lint
+
+## Code Style
+
+TypeScript 5.x, Node.js 20 LTS: Follow standard conventions
+
+## Recent Changes
+- 002-ipl-prediction-mvp2: Added TypeScript 5.x, Node.js 20 LTS + Next.js (App Router), React 19, Tailwind CSS, shadcn/ui, `@supabase/supabase-js`, `@supabase/ssr`
+- 002-ipl-prediction-mvp2: Added TypeScript 5.x, Node.js 20 LTS + Next.js (App Router), React 19, Tailwind CSS, shadcn/ui, `@supabase/supabase-js`, `@supabase/ssr`
+
+- 001-ipl-prediction-portal: Added TypeScript 5.x, Node.js 20 LTS + Next.js (App Router), React 19, Tailwind CSS, shadcn/ui, `@supabase/supabase-js`, `@supabase/ssr`
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->
