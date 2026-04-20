@@ -15,7 +15,9 @@ export default async function AdminPage() {
 
   const { data } = await supabase
     .from("tournament_config")
-    .select("answer_lock_utc, season_bonuses_visible_after_utc, season_bonuses_revealed_by_admin")
+    .select(
+      "answer_lock_utc, season_bonuses_visible_after_utc, season_bonuses_revealed_by_admin, maintenance_mode, maintenance_banner_text",
+    )
     .eq("season_year", 2026)
     .maybeSingle();
   const { data: bonus } = await supabase
@@ -64,6 +66,8 @@ export default async function AdminPage() {
           answer_lock_utc: data?.answer_lock_utc ?? null,
           season_bonuses_visible_after_utc: data?.season_bonuses_visible_after_utc ?? null,
           season_bonuses_revealed_by_admin: Boolean(data?.season_bonuses_revealed_by_admin),
+          maintenance_mode: Boolean(data?.maintenance_mode),
+          maintenance_banner_text: data?.maintenance_banner_text ?? "അടിമ പണിയിലാണ്",
           bonus_prompts: bonus ?? [],
           matches: adminMatches ?? [],
         }}

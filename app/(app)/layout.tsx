@@ -19,6 +19,23 @@ export default async function AppLayout({
   if (profile?.legacy_alias_onboarding_completed === false) {
     redirect("/login/legacy-alias");
   }
+  const { data: seasonConfig } = await supabase
+    .from("tournament_config")
+    .select("maintenance_mode, maintenance_banner_text")
+    .eq("season_year", 2026)
+    .maybeSingle();
+  const role = profile?.role ?? "user";
+  const maintenanceModeOn = Boolean(seasonConfig?.maintenance_mode);
+  const maintenanceText = seasonConfig?.maintenance_banner_text || "അടിമ പണിയിലാണ്";
+  if (maintenanceModeOn && role !== "admin") {
+    return (
+      <div className="min-h-screen bg-background grid place-items-center px-6">
+        <h1 className="text-center text-4xl font-extrabold tracking-tight text-red-600 sm:text-6xl">
+          {maintenanceText}
+        </h1>
+      </div>
+    );
+  }
   const showWelcome =
     profile != null &&
     profile.legacy_points != null &&

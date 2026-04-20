@@ -8,7 +8,7 @@ export async function GET() {
   const { data: config } = await supabase
     .from("tournament_config")
     .select(
-      "id, season_year, answer_lock_utc, season_bonuses_visible_after_utc, season_bonuses_revealed_by_admin",
+      "id, season_year, answer_lock_utc, season_bonuses_visible_after_utc, season_bonuses_revealed_by_admin, maintenance_mode, maintenance_banner_text",
     )
     .eq("season_year", 2026)
     .maybeSingle();
@@ -28,6 +28,8 @@ export async function GET() {
     answer_lock_utc: config?.answer_lock_utc ?? null,
     season_bonuses_visible_after_utc: config?.season_bonuses_visible_after_utc ?? null,
     season_bonuses_revealed_by_admin: Boolean(config?.season_bonuses_revealed_by_admin),
+    maintenance_mode: Boolean(config?.maintenance_mode),
+    maintenance_banner_text: config?.maintenance_banner_text ?? "അടിമ പണിയിലാണ്",
     questions: questions ?? [],
     bonus_prompts: bonus_prompts ?? [],
   });
@@ -42,6 +44,8 @@ export async function PATCH(request: Request) {
         season_year?: number;
         season_bonuses_visible_after_utc?: string | null;
         season_bonuses_revealed_by_admin?: boolean;
+        maintenance_mode?: boolean;
+        maintenance_banner_text?: string;
       }
     | null;
   if (!body) return NextResponse.json({ error: "VALIDATION" }, { status: 400 });
@@ -52,6 +56,8 @@ export async function PATCH(request: Request) {
     answer_lock_utc: body.answer_lock_utc ?? null,
     season_bonuses_visible_after_utc: body.season_bonuses_visible_after_utc ?? null,
     season_bonuses_revealed_by_admin: body.season_bonuses_revealed_by_admin ?? false,
+    maintenance_mode: body.maintenance_mode ?? false,
+    maintenance_banner_text: body.maintenance_banner_text ?? "അടിമ പണിയിലാണ്",
     updated_at: new Date().toISOString(),
   });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

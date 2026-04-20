@@ -17,6 +17,8 @@ type AdminConfig = {
   answer_lock_utc: string | null;
   season_bonuses_visible_after_utc: string | null;
   season_bonuses_revealed_by_admin: boolean;
+  maintenance_mode: boolean;
+  maintenance_banner_text: string;
   bonus_prompts: {
     id: string;
     scope: string;
@@ -38,6 +40,8 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
     answer_lock_utc: string | null;
     season_bonuses_visible_after_utc: string | null;
     season_bonuses_revealed_by_admin: boolean;
+    maintenance_mode: boolean;
+    maintenance_banner_text: string;
   }) {
     const res = await fetch("/api/admin/config", {
       method: "PATCH",
@@ -50,6 +54,8 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
         answer_lock_utc: patch.answer_lock_utc,
         season_bonuses_visible_after_utc: patch.season_bonuses_visible_after_utc,
         season_bonuses_revealed_by_admin: patch.season_bonuses_revealed_by_admin,
+        maintenance_mode: patch.maintenance_mode,
+        maintenance_banner_text: patch.maintenance_banner_text,
       }));
   }
 
@@ -59,6 +65,8 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
         lock={cfg.answer_lock_utc}
         seasonBonusesVisibleAfterUtc={cfg.season_bonuses_visible_after_utc}
         seasonBonusesRevealedByAdmin={cfg.season_bonuses_revealed_by_admin}
+        maintenanceMode={cfg.maintenance_mode}
+        maintenanceBannerText={cfg.maintenance_banner_text}
         onSave={saveTournamentSettings}
       />
       <BonusPromptsPanel initialPrompts={cfg.bonus_prompts} matches={cfg.matches} />
