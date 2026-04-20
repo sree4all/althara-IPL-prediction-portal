@@ -19,7 +19,14 @@ function slotPointsArray(raw: unknown): number[] {
  * Safe to call repeatedly; it exits after `scoring_bootstrapped_at` is set.
  */
 export async function ensureProfileScoringBootstrap(userId: string): Promise<void> {
-  const supabase = createServiceClient();
+  let supabase: ReturnType<typeof createServiceClient>;
+  try {
+    supabase = createServiceClient();
+  } catch (error) {
+    // Do not block app login if service-role creds are not configured in this environment.
+    console.warn("Skipping profile scoring bootstrap:", error);
+    return;
+  }
   const now = new Date().toISOString();
 
   const { data: profile } = await supabase
