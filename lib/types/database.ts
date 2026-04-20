@@ -45,6 +45,7 @@ export type TournamentConfig = {
   season_bonuses_revealed_by_admin?: boolean | null;
   maintenance_mode?: boolean | null;
   maintenance_banner_text?: string | null;
+  mega_bonus_all_answers_visible?: boolean | null;
   created_at: string;
   updated_at: string;
 };

@@ -32,6 +32,7 @@ export async function GET() {
       season_bonuses_unlock_utc: cfg?.season_bonuses_visible_after_utc ?? null,
       answer_lock_utc: lock,
       is_locked: isTournamentAnswersLocked(lock),
+      mega_bonus_all_answers_visible: Boolean(cfg?.mega_bonus_all_answers_visible),
       questions: [],
       answers: [],
     });
@@ -64,6 +65,7 @@ export async function GET() {
     season_bonuses_tab_visible: true,
     answer_lock_utc: lock,
     is_locked: isTournamentAnswersLocked(lock),
+    mega_bonus_all_answers_visible: Boolean(cfg?.mega_bonus_all_answers_visible),
     questions: questionsOut,
     answers: answers ?? [],
   });

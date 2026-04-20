@@ -4,7 +4,8 @@ export const DEFAULT_MAINTENANCE_BANNER_TEXT = "അടിമ പണിയില�
 
 const SELECT_BASE =
   "id, season_year, answer_lock_utc, season_bonuses_visible_after_utc, season_bonuses_revealed_by_admin";
-const SELECT_FULL = `${SELECT_BASE}, maintenance_mode, maintenance_banner_text`;
+const SELECT_WITH_MAINT = `${SELECT_BASE}, maintenance_mode, maintenance_banner_text`;
+const SELECT_FULL = `${SELECT_WITH_MAINT}, mega_bonus_all_answers_visible`;
 
 /** PostgREST / Postgres when `0022_tournament_maintenance_mode` is not applied yet. */
 export function isMissingMaintenanceColumnsError(err: { message?: string; code?: string } | null): boolean {
@@ -26,6 +27,7 @@ export type TournamentConfigRow = {
   season_bonuses_revealed_by_admin: boolean;
   maintenance_mode: boolean;
   maintenance_banner_text: string;
+  mega_bonus_all_answers_visible: boolean;
 };
 
 export async function fetchTournamentConfig2026(
@@ -44,9 +46,37 @@ export async function fetchTournamentConfig2026(
         season_bonuses_revealed_by_admin: Boolean(d.season_bonuses_revealed_by_admin),
         maintenance_mode: Boolean(d.maintenance_mode),
         maintenance_banner_text: (d.maintenance_banner_text as string | null) ?? DEFAULT_MAINTENANCE_BANNER_TEXT,
+        mega_bonus_all_answers_visible: Boolean(
+          (d as { mega_bonus_all_answers_visible?: boolean }).mega_bonus_all_answers_visible,
+        ),
       },
       error: null,
     };
+  }
+  if (full.error?.message?.includes("mega_bonus_all_answers_visible")) {
+    const mid = await supabase
+      .from("tournament_config")
+      .select(SELECT_WITH_MAINT)
+      .eq("season_year", 2026)
+      .maybeSingle();
+    if (!mid.error && mid.data) {
+      const d = mid.data;
+      return {
+        data: {
+          id: d.id as string | undefined,
+          season_year: Number(d.season_year ?? 2026),
+          answer_lock_utc: (d.answer_lock_utc as string | null) ?? null,
+          season_bonuses_visible_after_utc: (d.season_bonuses_visible_after_utc as string | null) ?? null,
+          season_bonuses_revealed_by_admin: Boolean(d.season_bonuses_revealed_by_admin),
+          maintenance_mode: Boolean((d as { maintenance_mode?: boolean }).maintenance_mode),
+          maintenance_banner_text:
+            (d as { maintenance_banner_text?: string | null }).maintenance_banner_text ??
+            DEFAULT_MAINTENANCE_BANNER_TEXT,
+          mega_bonus_all_answers_visible: false,
+        },
+        error: null,
+      };
+    }
   }
   if (!isMissingMaintenanceColumnsError(full.error)) {
     return { data: null, error: { message: full.error.message } };
@@ -66,6 +96,7 @@ export async function fetchTournamentConfig2026(
       season_bonuses_revealed_by_admin: Boolean(d.season_bonuses_revealed_by_admin),
       maintenance_mode: false,
       maintenance_banner_text: DEFAULT_MAINTENANCE_BANNER_TEXT,
+      mega_bonus_all_answers_visible: false,
     },
     error: null,
   };

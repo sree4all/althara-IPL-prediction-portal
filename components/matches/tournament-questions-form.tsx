@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { StructuredPromptChoice } from "@/components/matches/structured-prompt-choice";
 import { toastPredictionError } from "@/lib/toasts/prediction-feedback";
+import { toast } from "sonner";
 
 type QuestionOption = { label: string; value: string; sort_order?: number };
 
@@ -53,7 +54,9 @@ export function TournamentQuestionsForm({ standalone = false }: Props) {
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
       toastPredictionError(data.error);
+      return;
     }
+    toast.success("Mega Bonus answers saved successfully.");
   }
 
   if (!questions.length) {

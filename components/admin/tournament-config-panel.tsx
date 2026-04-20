@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 function isoToDatetimeLocalValue(iso: string | null | undefined): string {
@@ -17,6 +17,7 @@ export function TournamentConfigPanel({
   seasonBonusesRevealedByAdmin,
   maintenanceMode,
   maintenanceBannerText,
+  megaBonusAllAnswersVisible,
   onSave,
 }: {
   lock: string | null;
@@ -24,12 +25,14 @@ export function TournamentConfigPanel({
   seasonBonusesRevealedByAdmin: boolean;
   maintenanceMode: boolean;
   maintenanceBannerText: string;
+  megaBonusAllAnswersVisible: boolean;
   onSave: (patch: {
     answer_lock_utc: string | null;
     season_bonuses_visible_after_utc: string | null;
     season_bonuses_revealed_by_admin: boolean;
     maintenance_mode: boolean;
     maintenance_banner_text: string;
+    mega_bonus_all_answers_visible: boolean;
   }) => Promise<void>;
 }) {
   const [lockVal, setLockVal] = useState(lock ?? "");
@@ -39,6 +42,11 @@ export function TournamentConfigPanel({
   const [maintenanceText, setMaintenanceText] = useState(
     maintenanceBannerText || "അടിമ പണിയിലാണ്",
   );
+  const [allAnswersPublic, setAllAnswersPublic] = useState(megaBonusAllAnswersVisible);
+
+  useEffect(() => {
+    setAllAnswersPublic(megaBonusAllAnswersVisible);
+  }, [megaBonusAllAnswersVisible]);
 
   return (
     <div className="rounded-md border border-border p-3 space-y-4">
@@ -102,6 +110,19 @@ export function TournamentConfigPanel({
             onChange={(e) => setTabAfter(e.target.value)}
           />
         </label>
+        <label className="mt-3 flex items-start gap-2 text-sm">
+          <input
+            type="checkbox"
+            className="mt-0.5"
+            checked={allAnswersPublic}
+            onChange={(e) => setAllAnswersPublic(e.target.checked)}
+          />
+          <span>
+            Let everyone see the &quot;All player answers&quot; grid on Mega Bonus (slot picks). Admins
+            always see it; others only when this is on. The same setting appears on the Mega Bonus page
+            for everyone (only admins can change it there).
+          </span>
+        </label>
       </div>
 
       <Button
@@ -116,6 +137,7 @@ export function TournamentConfigPanel({
             season_bonuses_revealed_by_admin: tabRevealed,
             maintenance_mode: isMaintenanceOn,
             maintenance_banner_text: maintenanceText.trim() || "അടിമ പണിയിലാണ്",
+            mega_bonus_all_answers_visible: allAnswersPublic,
           })
         }
       >

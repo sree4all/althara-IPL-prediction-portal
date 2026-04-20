@@ -58,7 +58,7 @@ export function TournamentBonusPromptsForm() {
       toastPredictionError(data.error);
       return;
     }
-    toast.success("Mega Bonus answers saved.");
+    toast.success("Mega Bonus answers saved successfully.");
   }
 
   if (!prompts.length) return null;

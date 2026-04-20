@@ -5,13 +5,27 @@ export async function getSeasonConfig(
   supabase: SupabaseClient,
   seasonYear = 2026,
 ): Promise<TournamentConfig | null> {
-  const { data } = await supabase
+  const fullSel =
+    "id, season_year, answer_lock_utc, season_bonuses_visible_after_utc, season_bonuses_revealed_by_admin, mega_bonus_all_answers_visible";
+  const baseSel =
+    "id, season_year, answer_lock_utc, season_bonuses_visible_after_utc, season_bonuses_revealed_by_admin";
+
+  const { data, error } = await supabase
     .from("tournament_config")
-    .select(
-      "id, season_year, answer_lock_utc, season_bonuses_visible_after_utc, season_bonuses_revealed_by_admin",
-    )
+    .select(fullSel)
     .eq("season_year", seasonYear)
     .maybeSingle();
+
+  if (error?.message?.includes("mega_bonus_all_answers_visible")) {
+    const { data: d2 } = await supabase
+      .from("tournament_config")
+      .select(baseSel)
+      .eq("season_year", seasonYear)
+      .maybeSingle();
+    if (!d2) return null;
+    return { ...d2, mega_bonus_all_answers_visible: false } as TournamentConfig;
+  }
+  if (error) return null;
   return data as TournamentConfig | null;
 }
 

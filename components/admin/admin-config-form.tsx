@@ -19,6 +19,7 @@ type AdminConfig = {
   season_bonuses_revealed_by_admin: boolean;
   maintenance_mode: boolean;
   maintenance_banner_text: string;
+  mega_bonus_all_answers_visible: boolean;
   bonus_prompts: {
     id: string;
     scope: string;
@@ -56,6 +57,7 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
         season_bonuses_revealed_by_admin: patch.season_bonuses_revealed_by_admin,
         maintenance_mode: patch.maintenance_mode,
         maintenance_banner_text: patch.maintenance_banner_text,
+        mega_bonus_all_answers_visible: patch.mega_bonus_all_answers_visible,
       }));
   }
 
@@ -67,6 +69,7 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
         seasonBonusesRevealedByAdmin={cfg.season_bonuses_revealed_by_admin}
         maintenanceMode={cfg.maintenance_mode}
         maintenanceBannerText={cfg.maintenance_banner_text}
+        megaBonusAllAnswersVisible={cfg.mega_bonus_all_answers_visible}
         onSave={saveTournamentSettings}
       />
       <BonusPromptsPanel initialPrompts={cfg.bonus_prompts} matches={cfg.matches} />

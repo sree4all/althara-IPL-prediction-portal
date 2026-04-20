@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/require-user";
 import { getProfileForUser } from "@/lib/data/profile";
@@ -58,7 +59,15 @@ export default async function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold tracking-tight">Admin</h1>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h1 className="text-2xl font-bold tracking-tight">Admin</h1>
+        <Link
+          href="/admin/mega-bonus-answers"
+          className="text-sm font-medium text-muted-foreground underline underline-offset-4 hover:text-foreground"
+        >
+          Mega Bonus answers (all players)
+        </Link>
+      </div>
       <AdminConfigForm
         initial={{
           answer_lock_utc: cfg?.answer_lock_utc ?? null,
@@ -66,6 +75,7 @@ export default async function AdminPage() {
           season_bonuses_revealed_by_admin: Boolean(cfg?.season_bonuses_revealed_by_admin),
           maintenance_mode: Boolean(cfg?.maintenance_mode),
           maintenance_banner_text: cfg?.maintenance_banner_text ?? DEFAULT_MAINTENANCE_BANNER_TEXT,
+          mega_bonus_all_answers_visible: Boolean(cfg?.mega_bonus_all_answers_visible),
           bonus_prompts: bonus ?? [],
           matches: adminMatches ?? [],
         }}

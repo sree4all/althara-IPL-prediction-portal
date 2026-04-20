@@ -33,6 +33,7 @@ export async function GET() {
     season_bonuses_revealed_by_admin: config?.season_bonuses_revealed_by_admin ?? false,
     maintenance_mode: config?.maintenance_mode ?? false,
     maintenance_banner_text: config?.maintenance_banner_text ?? DEFAULT_MAINTENANCE_BANNER_TEXT,
+    mega_bonus_all_answers_visible: config?.mega_bonus_all_answers_visible ?? false,
     questions: questions ?? [],
     bonus_prompts: bonus_prompts ?? [],
   });
@@ -49,6 +50,7 @@ export async function PATCH(request: Request) {
         season_bonuses_revealed_by_admin?: boolean;
         maintenance_mode?: boolean;
         maintenance_banner_text?: string;
+        mega_bonus_all_answers_visible?: boolean;
       }
     | null;
   if (!body) return NextResponse.json({ error: "VALIDATION" }, { status: 400 });
@@ -64,6 +66,7 @@ export async function PATCH(request: Request) {
     season_bonuses_revealed_by_admin: body.season_bonuses_revealed_by_admin ?? false,
     maintenance_mode: body.maintenance_mode ?? false,
     maintenance_banner_text: banner,
+    mega_bonus_all_answers_visible: body.mega_bonus_all_answers_visible ?? false,
     updated_at: new Date().toISOString(),
   };
 
@@ -77,6 +80,7 @@ export async function PATCH(request: Request) {
       answer_lock_utc: fullPayload.answer_lock_utc,
       season_bonuses_visible_after_utc: fullPayload.season_bonuses_visible_after_utc,
       season_bonuses_revealed_by_admin: fullPayload.season_bonuses_revealed_by_admin,
+      mega_bonus_all_answers_visible: fullPayload.mega_bonus_all_answers_visible,
       updated_at: fullPayload.updated_at,
     };
     ({ error } = await supabase.from("tournament_config").upsert(withoutMaint, upsertOpts));
