@@ -67,7 +67,9 @@ export async function PATCH(request: Request) {
     updated_at: new Date().toISOString(),
   };
 
-  let { error } = await supabase.from("tournament_config").upsert(fullPayload);
+  const upsertOpts = { onConflict: "season_year" as const };
+
+  let { error } = await supabase.from("tournament_config").upsert(fullPayload, upsertOpts);
 
   if (error && isMissingMaintenanceColumnsError(error)) {
     const withoutMaint = {
@@ -77,12 +79,20 @@ export async function PATCH(request: Request) {
       season_bonuses_revealed_by_admin: fullPayload.season_bonuses_revealed_by_admin,
       updated_at: fullPayload.updated_at,
     };
-    ({ error } = await supabase.from("tournament_config").upsert(withoutMaint));
+    ({ error } = await supabase.from("tournament_config").upsert(withoutMaint, upsertOpts));
   }
 
   if (error) {
     return NextResponse.json(
-      { error: error.message, hint: "If this mentions maintenance columns, apply migration 0022_tournament_maintenance_mode.sql" },
+      {
+        error: error.message,
+        code: error.code,
+        details: error.details,
+        hint:
+          error.message.includes("duplicate") || error.code === "23505"
+            ? "Upsert must use onConflict=season_year (fixed in app). If you still see this, check tournament_config rows for the season."
+            : "If this mentions maintenance columns, apply migration 0022_tournament_maintenance_mode.sql",
+      },
       { status: 500 },
     );
   }
