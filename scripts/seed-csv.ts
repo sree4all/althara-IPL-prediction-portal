@@ -28,6 +28,7 @@ import { parse } from "csv-parse/sync";
 import * as fs from "fs";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
+import { applyMatchScoring } from "@/lib/scoring/match-scoring";
 
 // tsx does not load .env.local (Next.js does); mirror Next precedence: .env then .env.local
 for (const name of [".env", ".env.local"] as const) {
@@ -201,6 +202,8 @@ async function seedMatchesWithClient(supabase: SupabaseClient, file: string) {
   }) as Record<string, string>[];
 
   let ok = 0;
+  let scored = 0;
+  let scoreErrors = 0;
   for (const r of rows) {
     const payload = mapRowToMatchPayload(r);
     if (!payload) continue;
@@ -217,10 +220,31 @@ async function seedMatchesWithClient(supabase: SupabaseClient, file: string) {
       console.error("Upsert error:", payload.external_key, error.message);
     } else {
       ok += 1;
+      if (payload.status === "completed") {
+        const { data: mRow } = await supabase
+          .from("matches")
+          .select("id")
+          .eq("external_key", payload.external_key)
+          .maybeSingle();
+        if (mRow?.id) {
+          const sc = await applyMatchScoring(supabase, mRow.id as string, 2026);
+          if (!sc.ok) {
+            console.warn(`Scoring failed for ${payload.external_key}:`, sc.error);
+            scoreErrors += 1;
+          } else {
+            scored += 1;
+          }
+        }
+      }
     }
   }
 
-  console.log(`Matches: upserted ${ok} rows from ${file} (delimiter="${delimiter === "\t" ? "tab" : "comma"}").`);
+  console.log(
+    `Matches: upserted ${ok} rows from ${file} (delimiter="${delimiter === "\t" ? "tab" : "comma"}").`,
+  );
+  if (scored > 0 || scoreErrors > 0) {
+    console.log(`Match scoring: ${scored} ok, ${scoreErrors} failed.`);
+  }
 }
 
 async function seedMatches(file: string) {

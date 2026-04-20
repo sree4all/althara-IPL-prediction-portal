@@ -12,6 +12,31 @@ export type MatchScoreOutcome =
   | { ok: true; ledgerRows: number }
   | { ok: false; error: string };
 
+type LedgerInsert = {
+  user_id: string;
+  source_type: "match" | "bonus";
+  source_id: string;
+  points_delta: number;
+  reason: string | null;
+  awarded_at: string;
+};
+
+const LEDGER_BATCH = 500;
+/** Profile `.in()` chunk size (PostgREST URL limits). */
+const PROFILE_ID_CHUNK = 150;
+/** Parallel profile point updates per batch (reduces latency vs strict sequential). */
+const PROFILE_UPDATE_CONCURRENCY = 40;
+
+function sumByUser(rows: { user_id: string; points_delta: number }[]): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const row of rows) {
+    const uid = row.user_id;
+    const d = Number(row.points_delta ?? 0);
+    m.set(uid, (m.get(uid) ?? 0) + d);
+  }
+  return m;
+}
+
 export async function applyMatchScoring(
   supabase: SupabaseClient,
   matchId: string,
@@ -100,42 +125,10 @@ export async function applyMatchScoring(
     .eq("source_id", matchId)
     .in("source_type", ["match", "bonus"]);
 
-  const refundByUser = new Map<string, number>();
-  for (const row of oldLedger ?? []) {
-    const uid = row.user_id as string;
-    const d = Number(row.points_delta ?? 0);
-    refundByUser.set(uid, (refundByUser.get(uid) ?? 0) + d);
-  }
-
-  if (oldLedger?.length) {
-    const { error: delErr } = await supabase
-      .from("points_ledger")
-      .delete()
-      .eq("source_id", matchId)
-      .in("source_type", ["match", "bonus"]);
-    if (delErr) {
-      return { ok: false, error: delErr.message };
-    }
-  }
-
-  for (const [uid, sum] of refundByUser) {
-    const { data: prof } = await supabase
-      .from("profiles")
-      .select("current_points")
-      .eq("id", uid)
-      .maybeSingle();
-    const cur = Number(prof?.current_points ?? 0);
-    await supabase
-      .from("profiles")
-      .update({
-        current_points: cur - sum,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", uid);
-  }
+  const refundByUser = sumByUser(oldLedger ?? []);
 
   const now = new Date().toISOString();
-  let insertCount = 0;
+  const toInsert: LedgerInsert[] = [];
 
   for (const pred of predictions ?? []) {
     const userId = pred.user_id as string;
@@ -148,8 +141,6 @@ export async function applyMatchScoring(
       wDelta = normAnswer(predictedWinner) === normAnswer(actualWinner) ? winnerPts : 0;
     }
 
-    let bonusTotalDelta = 0;
-
     if (usePerPromptBonus) {
       for (const pr of promptsOrdered) {
         const pid = pr.id as string;
@@ -157,8 +148,7 @@ export async function applyMatchScoring(
         if (!official) continue;
         const userAns = answersByUserPrompt.get(`${userId}\t${pid}`)?.trim() ?? "";
         if (userAns && normAnswer(userAns) === normAnswer(official)) {
-          bonusTotalDelta += bonusPts;
-          const { error: bErr } = await supabase.from("points_ledger").insert({
+          toInsert.push({
             user_id: userId,
             source_type: "bonus",
             source_id: matchId,
@@ -166,10 +156,6 @@ export async function applyMatchScoring(
             reason: `match_bonus:${pid}`,
             awarded_at: now,
           });
-          if (bErr) {
-            return { ok: false, error: bErr.message };
-          }
-          insertCount += 1;
         }
       }
     } else if (legacyBonusResult) {
@@ -185,8 +171,7 @@ export async function applyMatchScoring(
       }
       const userBonus = legacyPick || fromPrompts;
       if (userBonus && normAnswer(userBonus) === normAnswer(legacyBonusResult)) {
-        bonusTotalDelta = bonusPts;
-        const { error: bErr } = await supabase.from("points_ledger").insert({
+        toInsert.push({
           user_id: userId,
           source_type: "bonus",
           source_id: matchId,
@@ -194,50 +179,91 @@ export async function applyMatchScoring(
           reason: "match_bonus",
           awarded_at: now,
         });
-        if (bErr) {
-          return { ok: false, error: bErr.message };
-        }
-        insertCount += 1;
       }
     }
 
     if (wDelta > 0) {
-      const { error: iErr } = await supabase.from("points_ledger").upsert(
-        {
-          user_id: userId,
-          source_type: "match",
-          source_id: matchId,
-          points_delta: wDelta,
-          reason: "match_winner",
-          awarded_at: now,
-        },
-        { onConflict: "user_id,source_type,source_id" },
-      );
-      if (iErr) {
-        return { ok: false, error: iErr.message };
-      }
-      insertCount += 1;
+      toInsert.push({
+        user_id: userId,
+        source_type: "match",
+        source_id: matchId,
+        points_delta: wDelta,
+        reason: "match_winner",
+        awarded_at: now,
+      });
     }
+  }
 
-    const add = wDelta + bonusTotalDelta;
-    if (add !== 0) {
-      const { data: prof } = await supabase
+  const awardByUser = sumByUser(toInsert);
+
+  // Replace ledger rows for this match in one shot (audit lines vary by bonus prompts).
+  // Profile points use net delta (award − refund), not full strip/re-add.
+  if (oldLedger?.length) {
+    const { error: delErr } = await supabase
+      .from("points_ledger")
+      .delete()
+      .eq("source_id", matchId)
+      .in("source_type", ["match", "bonus"]);
+    if (delErr) {
+      return { ok: false, error: delErr.message };
+    }
+  }
+
+  for (let i = 0; i < toInsert.length; i += LEDGER_BATCH) {
+    const chunk = toInsert.slice(i, i + LEDGER_BATCH);
+    const { error: insErr } = await supabase.from("points_ledger").insert(chunk);
+    if (insErr) {
+      return { ok: false, error: insErr.message };
+    }
+  }
+
+  const userIdsForNet = new Set<string>([...refundByUser.keys(), ...awardByUser.keys()]);
+  const nets = new Map<string, number>();
+  for (const uid of userIdsForNet) {
+    const net = (awardByUser.get(uid) ?? 0) - (refundByUser.get(uid) ?? 0);
+    if (net !== 0) nets.set(uid, net);
+  }
+
+  if (nets.size > 0) {
+    const ids = [...nets.keys()];
+    const byId = new Map<string, number>();
+    for (let i = 0; i < ids.length; i += PROFILE_ID_CHUNK) {
+      const slice = ids.slice(i, i + PROFILE_ID_CHUNK);
+      const { data: profs, error: profErr } = await supabase
         .from("profiles")
-        .select("current_points")
-        .eq("id", userId)
-        .maybeSingle();
-      const cur = Number(prof?.current_points ?? 0);
-      await supabase
-        .from("profiles")
-        .update({
-          current_points: cur + add,
-          updated_at: now,
-        })
-        .eq("id", userId);
+        .select("id, current_points")
+        .in("id", slice);
+      if (profErr) {
+        return { ok: false, error: profErr.message };
+      }
+      for (const p of profs ?? []) {
+        byId.set(p.id as string, Number(p.current_points ?? 0));
+      }
+    }
+    for (let i = 0; i < ids.length; i += PROFILE_UPDATE_CONCURRENCY) {
+      const slice = ids.slice(i, i + PROFILE_UPDATE_CONCURRENCY);
+      const results = await Promise.all(
+        slice.map((uid) => {
+          const net = nets.get(uid)!;
+          const cur = byId.get(uid) ?? 0;
+          return supabase
+            .from("profiles")
+            .update({
+              current_points: cur + net,
+              updated_at: now,
+            })
+            .eq("id", uid);
+        }),
+      );
+      for (const r of results) {
+        if (r.error) {
+          return { ok: false, error: r.error.message };
+        }
+      }
     }
   }
 
   await supabase.from("matches").update({ scored_at: now, updated_at: now }).eq("id", matchId);
 
-  return { ok: true, ledgerRows: insertCount };
+  return { ok: true, ledgerRows: toInsert.length };
 }
