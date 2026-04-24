@@ -22,6 +22,18 @@ export function TournamentQuestionsForm({ standalone = false }: Props) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [locked, setLocked] = useState(false);
 
+  const top4Answers = questions
+    .filter((q) => q.slot_no >= 1 && q.slot_no <= 4)
+    .map((q) => (answers[q.id] ?? "").trim())
+    .filter(Boolean);
+  const finalistsAnswers = questions
+    .filter((q) => q.slot_no >= 5 && q.slot_no <= 6)
+    .map((q) => (answers[q.id] ?? "").trim())
+    .filter(Boolean);
+  const hasTop4Duplicates = new Set(top4Answers.map((s) => s.toLowerCase())).size < top4Answers.length;
+  const hasFinalistDuplicates =
+    new Set(finalistsAnswers.map((s) => s.toLowerCase())).size < finalistsAnswers.length;
+
   useEffect(() => {
     (async () => {
       const res = await fetch("/api/tournament/questions");
@@ -71,6 +83,16 @@ export function TournamentQuestionsForm({ standalone = false }: Props) {
   return (
     <div className={standalone ? "rounded-md border border-border p-4" : "mt-3 rounded-md border border-border p-3"}>
       <p className="mb-2 text-sm font-semibold">Mega Bonus</p>
+      {hasTop4Duplicates ? (
+        <p className="mb-2 text-xs text-amber-700 dark:text-amber-400">
+          Warning: Q1–Q4 should be 4 unique teams. Duplicate teams score only once.
+        </p>
+      ) : null}
+      {hasFinalistDuplicates ? (
+        <p className="mb-2 text-xs text-amber-700 dark:text-amber-400">
+          Warning: Q5–Q6 should be 2 unique finalists. Duplicate teams score only once.
+        </p>
+      ) : null}
       <fieldset disabled={locked} className="space-y-3">
         {questions.map((q) => {
           const opts = q.options ?? [];

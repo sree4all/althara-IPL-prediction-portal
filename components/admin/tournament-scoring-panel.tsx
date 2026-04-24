@@ -26,6 +26,15 @@ export function TournamentScoringPanel({
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
+  const top4Group = questions.filter((q) => q.slot_no >= 1 && q.slot_no <= 4);
+  const finalistsGroup = questions.filter((q) => q.slot_no >= 5 && q.slot_no <= 6);
+  const [top4Shared, setTop4Shared] = useState(
+    top4Group.find((q) => (q.correct_answer ?? "").trim())?.correct_answer ?? "",
+  );
+  const [finalistsShared, setFinalistsShared] = useState(
+    finalistsGroup.find((q) => (q.correct_answer ?? "").trim())?.correct_answer ?? "",
+  );
+
   async function saveAnswer(id: string, correct_answer: string) {
     const res = await fetch(`/api/admin/tournament-questions/${id}`, {
       method: "PATCH",
@@ -41,6 +50,14 @@ export function TournamentScoringPanel({
       prev.map((q) => (q.id === id ? { ...q, correct_answer: correct_answer.trim() || null } : q)),
     );
     setMsg(null);
+  }
+
+  async function saveSharedAnswers(ids: string[], raw: string) {
+    for (const id of ids) {
+      // Keep one shared list persisted on each grouped slot to simplify scoring reads.
+      // API supports per-question update only, so submit sequentially.
+      await saveAnswer(id, raw);
+    }
   }
 
   async function saveOptions(id: string, raw: string) {
@@ -97,6 +114,43 @@ export function TournamentScoringPanel({
         Player-facing visibility for the whole Mega Bonus tab is set under Tournament lock (Admin).
         Here: allowed answers (one line: label | value), then the correct answer for scoring.
       </p>
+      <div className="mb-4 space-y-3 rounded border border-border p-3">
+        <p className="text-xs font-semibold text-foreground">Set-based grouped scoring answers</p>
+        <label className="block text-xs text-muted-foreground">
+          Top 4 teams (applies to Q1–Q4; one team scores once only)
+          <textarea
+            className="mt-1 min-h-[4rem] w-full rounded-md border border-input px-2 py-1 text-sm"
+            placeholder="One team per line, e.g. PBKS"
+            value={top4Shared}
+            onChange={(e) => setTop4Shared(e.target.value)}
+          />
+        </label>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => void saveSharedAnswers(top4Group.map((q) => q.id), top4Shared)}
+        >
+          Save Top 4 list to Q1–Q4
+        </Button>
+        <label className="block text-xs text-muted-foreground">
+          Finalists (applies to Q5–Q6; one team scores once only)
+          <textarea
+            className="mt-1 min-h-[3rem] w-full rounded-md border border-input px-2 py-1 text-sm"
+            placeholder="One team per line, e.g. RCB"
+            value={finalistsShared}
+            onChange={(e) => setFinalistsShared(e.target.value)}
+          />
+        </label>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => void saveSharedAnswers(finalistsGroup.map((q) => q.id), finalistsShared)}
+        >
+          Save Finalists list to Q5–Q6
+        </Button>
+      </div>
       {msg ? <p className="mb-2 text-xs text-muted-foreground">{msg}</p> : null}
       <ul className="space-y-3">
         {questions.map((q) => {
