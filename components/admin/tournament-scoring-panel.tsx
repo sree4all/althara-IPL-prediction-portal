@@ -154,6 +154,7 @@ export function TournamentScoringPanel({
       {msg ? <p className="mb-2 text-xs text-muted-foreground">{msg}</p> : null}
       <ul className="space-y-3">
         {questions.map((q) => {
+          const isGroupedSlot = q.slot_no >= 1 && q.slot_no <= 6;
           const optLines =
             (optionsByQuestion[q.id] ?? [])
               .map((o) => `${o.label} | ${o.value}`)
@@ -187,25 +188,31 @@ export function TournamentScoringPanel({
                   Save options
                 </Button>
               </div>
-              <div className="mt-2 flex flex-wrap gap-2 border-t border-border pt-2">
-                <input
-                  className="min-w-[12rem] flex-1 rounded-md border border-input px-2 py-1 text-sm"
-                  placeholder="Correct answer"
-                  defaultValue={q.correct_answer ?? ""}
-                  id={`ta-${q.id}`}
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    const el = document.getElementById(`ta-${q.id}`) as HTMLInputElement | null;
-                    void saveAnswer(q.id, el?.value ?? "");
-                  }}
-                >
-                  Save answer
-                </Button>
-              </div>
+              {isGroupedSlot ? (
+                <p className="mt-2 border-t border-border pt-2 text-xs text-muted-foreground">
+                  Correct-answer input is managed by shared sets above for this slot group.
+                </p>
+              ) : (
+                <div className="mt-2 flex flex-wrap gap-2 border-t border-border pt-2">
+                  <input
+                    className="min-w-[12rem] flex-1 rounded-md border border-input px-2 py-1 text-sm"
+                    placeholder="Correct answer"
+                    defaultValue={q.correct_answer ?? ""}
+                    id={`ta-${q.id}`}
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      const el = document.getElementById(`ta-${q.id}`) as HTMLInputElement | null;
+                      void saveAnswer(q.id, el?.value ?? "");
+                    }}
+                  >
+                    Save answer
+                  </Button>
+                </div>
+              )}
             </li>
           );
         })}
