@@ -41,7 +41,8 @@ From your sheet, export a tab as **CSV or TSV** (tab is auto-detected) with colu
 | Match id / Match no | `external_key` (or `match_number`) |
 | Home | `home_team` (or `team_home`) |
 | Away | `away_team` (or `team_away`) |
-| GMT / UTC start | `match_time_utc` (**ISO 8601 UTC**, e.g. `2026-05-10T14:00:00Z`) **or** `GMT Match Time` as `DD/MM/YYYY HH:mm:ss` interpreted as UTC |
+| Match date + time (preferred) | `match_date` (`DD/MM/YYYY`) + `match_time` (`HH:mm:ss`) parsed as **IST** and converted to UTC |
+| GMT / UTC start (fallback) | `match_time_utc` (**ISO 8601 UTC**, e.g. `2026-05-10T14:00:00Z`) **or** `GMT Match Time` as `DD/MM/YYYY HH:mm:ss` interpreted as UTC |
 | Status (optional) | `match_status` or `status` — `COMPLETED`, `ABANDONED…`, empty → scheduled |
 | Winner (optional) | `result_winner` or `winner` — team code when completed; abandon text → `abandoned`, no winner |
 | Bonus letter (optional) | `result_bonus` or `bonus_result` — stored as `bonus_result` on completed rows only |

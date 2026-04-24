@@ -130,6 +130,23 @@ function parseGmtCellToIsoUtc(cell: string): string {
   return new Date(Date.UTC(y, mo - 1, d, hh, mi, ss)).toISOString();
 }
 
+/** Parses sheet local IST columns (`match_date` + `match_time`) into UTC ISO instant. */
+function parseIstDateTimeToIsoUtc(dateCell: string, timeCell: string): string {
+  const d = dateCell.trim();
+  const t = timeCell.trim();
+  const mDate = d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  const mTime = t.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/);
+  if (!mDate || !mTime) throw new Error(`bad IST date/time: "${dateCell}" "${timeCell}"`);
+  const day = Number(mDate[1]);
+  const month = Number(mDate[2]);
+  const year = Number(mDate[3]);
+  const hour = Number(mTime[1]);
+  const minute = Number(mTime[2]);
+  const second = Number(mTime[3] ?? "0");
+  const istOffsetMs = (5 * 60 + 30) * 60 * 1000;
+  return new Date(Date.UTC(year, month - 1, day, hour, minute, second) - istOffsetMs).toISOString();
+}
+
 function mapRowToMatchPayload(r: Record<string, string>): {
   external_key: string;
   home_team: string;
@@ -145,14 +162,20 @@ function mapRowToMatchPayload(r: Record<string, string>): {
   const away_team = (row.away_team ?? row.team_away ?? "").trim();
   if (!external_key || !home_team || !away_team) return null;
 
-  const gmtCell = (row["GMT Match Time"] ?? row.match_time_utc ?? "").trim();
-  if (!gmtCell) return null;
-
   let match_time_utc: string;
   try {
-    match_time_utc = parseGmtCellToIsoUtc(gmtCell);
+    const dateCell = (row.match_date ?? "").trim();
+    const timeCell = (row.match_time ?? "").trim();
+    if (dateCell && timeCell) {
+      // Prefer explicit local fixture columns; this avoids accidental lock-time imports.
+      match_time_utc = parseIstDateTimeToIsoUtc(dateCell, timeCell);
+    } else {
+      const gmtCell = (row["GMT Match Time"] ?? row.match_time_utc ?? "").trim();
+      if (!gmtCell) return null;
+      match_time_utc = parseGmtCellToIsoUtc(gmtCell);
+    }
   } catch {
-    console.warn(`Skip ${external_key}: bad match time "${gmtCell}"`);
+    console.warn(`Skip ${external_key}: bad match date/time payload`);
     return null;
   }
 
