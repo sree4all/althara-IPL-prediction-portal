@@ -42,14 +42,24 @@ export async function getHistoryRows(supabase: SupabaseClient, userId: string) {
     matches = data ?? [];
   }
 
-  const questionsScored = new Map<string, string | null>();
+  const questionMeta = new Map<
+    string,
+    { scored_at: string | null; question_text: string; slot_no: number | null }
+  >();
   if (questionIds.length > 0) {
     const { data: qs } = await supabase
       .from("tournament_questions")
-      .select("id, scored_at")
+      .select("id, scored_at, question_text, slot_no")
       .in("id", questionIds);
     for (const q of qs ?? []) {
-      questionsScored.set(q.id as string, (q.scored_at as string | null) ?? null);
+      questionMeta.set(q.id as string, {
+        scored_at: (q.scored_at as string | null) ?? null,
+        question_text: String((q as { question_text?: string }).question_text ?? "").trim(),
+        slot_no:
+          (q as { slot_no?: number | null }).slot_no == null
+            ? null
+            : Number((q as { slot_no?: number | null }).slot_no),
+      });
     }
   }
 
@@ -161,15 +171,22 @@ export async function getHistoryRows(supabase: SupabaseClient, userId: string) {
 
   const answerRows = (answers ?? []).map((a) => {
     const qid = a.question_id as string;
+    const meta = questionMeta.get(qid);
     const ledgerPts = sumLedger(
       ledger,
       (l) => l.source_type === "tournament_question" && l.source_id === qid,
     );
-    const qFinal = questionsScored.has(qid) && questionsScored.get(qid) != null;
+    const qFinal = meta?.scored_at != null;
+    const questionLabel = meta?.question_text || "Mega Bonus question";
+    const slot = meta?.slot_no;
+    const label =
+      slot != null && Number.isFinite(slot)
+        ? `Q${slot}: ${questionLabel}`
+        : questionLabel;
     return {
       type: "tournament_question" as const,
       source_id: a.id as string,
-      label: `Question ${qid}`,
+      label,
       prediction: a.answer_text as string,
       points_delta: qFinal ? ledgerPts : null,
       status: qFinal ? ("final" as const) : ("pending" as const),
