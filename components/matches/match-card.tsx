@@ -11,6 +11,7 @@ export type MatchApiRow = {
   status: string;
   client_lock_hint: boolean;
   winner: string | null;
+  has_prediction?: boolean;
 };
 
 type Props = {
@@ -34,7 +35,7 @@ export function MatchCard({ match }: Props) {
             </span>
           ) : (
             <span className="rounded-full bg-green-600/15 px-2 py-0.5 text-xs font-semibold text-green-700 dark:text-green-400">
-              Open
+              {match.has_prediction ? "Open · Predicted" : "Open"}
             </span>
           )}
         </div>

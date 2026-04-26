@@ -29,6 +29,16 @@ export async function GET() {
   const openWindow = (matches ?? []).filter(
     (m) => !isMatchLocked(new Date(m.match_time_utc as string), now),
   );
+  const openMatchIds = openWindow.map((m) => m.id as string);
+  const { data: predictionRows } =
+    openMatchIds.length > 0
+      ? await supabase
+          .from("predictions")
+          .select("match_id")
+          .eq("user_id", user.id)
+          .in("match_id", openMatchIds)
+      : { data: [] };
+  const predictedMatchIds = new Set((predictionRows ?? []).map((r) => r.match_id as string));
 
   const payload = openWindow.map((m) => {
     const matchTimeUtc = new Date(m.match_time_utc as string);
@@ -45,6 +55,7 @@ export async function GET() {
       status: m.status,
       client_lock_hint: locked,
       winner: m.winner,
+      has_prediction: predictedMatchIds.has(m.id as string),
     };
   });
 

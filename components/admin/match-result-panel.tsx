@@ -28,6 +28,7 @@ function label(m: AdminMatchRow) {
 }
 
 export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
+  const unscoredMatches = matches.filter((m) => !m.scored_at);
   const [matchId, setMatchId] = useState("");
   const [winner, setWinner] = useState("");
   const [legacyBonus, setLegacyBonus] = useState("");
@@ -36,7 +37,7 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const selected = matches.find((m) => m.id === matchId);
+  const selected = unscoredMatches.find((m) => m.id === matchId);
 
   useEffect(() => {
     if (!matchId) {
@@ -130,16 +131,15 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
           value={matchId}
           onChange={(e) => {
             setMatchId(e.target.value);
-            const m = matches.find((x) => x.id === e.target.value);
+            const m = unscoredMatches.find((x) => x.id === e.target.value);
             setWinner(m?.winner ?? "");
             setLegacyBonus(m?.bonus_result ?? "");
           }}
         >
           <option value="">Select…</option>
-          {matches.map((m) => (
+          {unscoredMatches.map((m) => (
             <option key={m.id} value={m.id}>
               {label(m)} — {m.status}
-              {m.scored_at ? " (scored)" : ""}
             </option>
           ))}
         </select>
