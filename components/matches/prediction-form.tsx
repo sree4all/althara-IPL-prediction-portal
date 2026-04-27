@@ -15,6 +15,7 @@ type Props = {
   awayTeam: string;
   locked: boolean;
   matchLabel: string;
+  initialWinner?: string | null;
 };
 
 export function PredictionForm({
@@ -23,8 +24,11 @@ export function PredictionForm({
   awayTeam,
   locked,
   matchLabel,
+  initialWinner,
 }: Props) {
-  const [winner, setWinner] = useState(homeTeam);
+  const defaultWinner =
+    initialWinner === homeTeam || initialWinner === awayTeam ? initialWinner : homeTeam;
+  const [winner, setWinner] = useState(defaultWinner);
   const [bonusByPrompt, setBonusByPrompt] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 

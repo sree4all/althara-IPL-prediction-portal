@@ -12,6 +12,7 @@ export type MatchApiRow = {
   client_lock_hint: boolean;
   winner: string | null;
   has_prediction?: boolean;
+  predicted_winner?: string | null;
 };
 
 type Props = {
@@ -34,9 +35,20 @@ export function MatchCard({ match }: Props) {
               Locked
             </span>
           ) : (
-            <span className="rounded-full bg-green-600/15 px-2 py-0.5 text-xs font-semibold text-green-700 dark:text-green-400">
-              {match.has_prediction ? "Open · Predicted" : "Open"}
-            </span>
+            <div className="flex flex-wrap gap-1">
+              <span className="rounded-full bg-green-600/15 px-2 py-0.5 text-xs font-semibold text-green-700 dark:text-green-400">
+                Open
+              </span>
+              {match.has_prediction ? (
+                <span className="rounded-full bg-green-600/15 px-2 py-0.5 text-xs font-semibold text-green-700 dark:text-green-400">
+                  Already Predicted
+                </span>
+              ) : (
+                <span className="rounded-full bg-red-600/15 px-2 py-0.5 text-xs font-semibold text-red-700 dark:text-red-400">
+                  Prediction Due
+                </span>
+              )}
+            </div>
           )}
         </div>
         <p className="text-xs text-muted-foreground">Start (IST): {timeLabel}</p>
@@ -51,6 +63,7 @@ export function MatchCard({ match }: Props) {
           awayTeam={match.away_team}
           locked={locked}
           matchLabel={match.label}
+          initialWinner={match.predicted_winner}
         />
       </CardContent>
     </Card>

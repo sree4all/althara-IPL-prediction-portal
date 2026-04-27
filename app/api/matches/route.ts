@@ -34,11 +34,16 @@ export async function GET() {
     openMatchIds.length > 0
       ? await supabase
           .from("predictions")
-          .select("match_id")
+          .select("match_id, predicted_winner")
           .eq("user_id", user.id)
           .in("match_id", openMatchIds)
       : { data: [] };
-  const predictedMatchIds = new Set((predictionRows ?? []).map((r) => r.match_id as string));
+  const predictedByMatchId = new Map(
+    (predictionRows ?? []).map((r) => [
+      r.match_id as string,
+      (r.predicted_winner as string | null) ?? null,
+    ]),
+  );
 
   const payload = openWindow.map((m) => {
     const matchTimeUtc = new Date(m.match_time_utc as string);
@@ -55,7 +60,8 @@ export async function GET() {
       status: m.status,
       client_lock_hint: locked,
       winner: m.winner,
-      has_prediction: predictedMatchIds.has(m.id as string),
+      has_prediction: predictedByMatchId.has(m.id as string),
+      predicted_winner: predictedByMatchId.get(m.id as string) ?? null,
     };
   });
 
