@@ -29,6 +29,8 @@ export function PredictionForm({
   const defaultWinner =
     initialWinner === homeTeam || initialWinner === awayTeam ? initialWinner : homeTeam;
   const [winner, setWinner] = useState(defaultWinner);
+  const hasExistingPrediction =
+    initialWinner === homeTeam || initialWinner === awayTeam;
   const [bonusByPrompt, setBonusByPrompt] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
@@ -111,7 +113,7 @@ export function PredictionForm({
         disabled={locked || loading}
         onClick={save}
       >
-        Save prediction
+        {hasExistingPrediction ? "Update prediction" : "Save prediction"}
       </Button>
     </div>
   );
