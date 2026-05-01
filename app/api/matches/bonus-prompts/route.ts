@@ -20,5 +20,15 @@ export async function GET(request: Request) {
   }
 
   const prompts = await getBonusPromptsForMatch(supabase, matchId, 2026);
-  return NextResponse.json({ match_id: matchId, prompts });
+  const { data: answers, error: answersError } = await supabase
+    .from("prediction_bonus_answers")
+    .select("prompt_id, answer_text")
+    .eq("user_id", user.id)
+    .eq("match_id", matchId);
+
+  if (answersError) {
+    return NextResponse.json({ error: answersError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ match_id: matchId, prompts, answers: answers ?? [] });
 }

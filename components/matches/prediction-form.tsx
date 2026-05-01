@@ -105,6 +105,17 @@ export function PredictionForm({
       <BonusPromptsForm
         matchId={matchId}
         answers={bonusByPrompt}
+        onAnswersLoaded={(loadedAnswers) =>
+          setBonusByPrompt((prev) => {
+            const next = { ...prev };
+            for (const [promptId, value] of Object.entries(loadedAnswers)) {
+              if (!next[promptId]?.trim()) {
+                next[promptId] = value;
+              }
+            }
+            return next;
+          })
+        }
         onAnswerChange={(promptId, value) =>
           setBonusByPrompt((prev) => ({ ...prev, [promptId]: value }))
         }

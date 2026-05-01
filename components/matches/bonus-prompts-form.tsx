@@ -17,9 +17,10 @@ type Props = {
   matchId: string;
   answers: Record<string, string>;
   onAnswerChange: (promptId: string, value: string) => void;
+  onAnswersLoaded?: (loadedAnswers: Record<string, string>) => void;
 };
 
-export function BonusPromptsForm({ matchId, answers, onAnswerChange }: Props) {
+export function BonusPromptsForm({ matchId, answers, onAnswerChange, onAnswersLoaded }: Props) {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
 
   useEffect(() => {
@@ -33,6 +34,11 @@ export function BonusPromptsForm({ matchId, answers, onAnswerChange }: Props) {
       const data = await res.json();
       if (!cancelled) {
         setPrompts((data.prompts ?? []) as Prompt[]);
+        const loadedMap: Record<string, string> = {};
+        (data.answers ?? []).forEach((a: { prompt_id: string; answer_text: string }) => {
+          loadedMap[a.prompt_id] = a.answer_text;
+        });
+        onAnswersLoaded?.(loadedMap);
       }
     })();
     return () => {
