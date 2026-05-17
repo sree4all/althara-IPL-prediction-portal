@@ -11,6 +11,10 @@
     "seed:demo": "tsx scripts/seed-csv.ts demo",
     "seed:ipl2026": "tsx scripts/seed-csv.ts ipl2026",
     "recompute:matches": "tsx scripts/recompute-match-scoring.ts",
+    "audit:points": "tsx scripts/audit-points.ts",
+    "sync:points": "tsx scripts/sync-profile-points-from-ledger.ts",
+    "audit:match-bonus": "tsx scripts/audit-match-bonus-answers.ts",
+    "reapply:match": "tsx scripts/reapply-match-scoring.ts",
     "db:link": "npx supabase link",
     "db:push": "npx supabase db push",
     "db:migration-list": "npx supabase migration list"

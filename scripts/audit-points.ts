@@ -1,0 +1,84 @@
+/**
+ * Compare profiles.current_points vs legacy_points + ledger sum.
+ *
+ *   npm run audit:points
+ */
+import { createClient } from "@supabase/supabase-js";
+import { config as loadEnv } from "dotenv";
+import { resolve } from "path";
+
+for (const name of [".env", ".env.local"] as const) {
+  loadEnv({ path: resolve(process.cwd(), name), override: name === ".env.local" });
+}
+
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+async function main() {
+  if (!url || !key) {
+    console.error("Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.");
+    process.exit(1);
+  }
+  const supabase = createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  const { data: profiles, error: pErr } = await supabase
+    .from("profiles")
+    .select("id, display_name, legacy_points, current_points");
+  if (pErr) {
+    console.error(pErr.message);
+    process.exit(1);
+  }
+
+  const { data: ledger, error: lErr } = await supabase
+    .from("points_ledger")
+    .select("user_id, points_delta");
+  if (lErr) {
+    console.error(lErr.message);
+    process.exit(1);
+  }
+
+  const sumByUser = new Map<string, number>();
+  for (const row of ledger ?? []) {
+    const uid = row.user_id as string;
+    sumByUser.set(uid, (sumByUser.get(uid) ?? 0) + Number(row.points_delta ?? 0));
+  }
+
+  let driftCount = 0;
+  const drifts: { name: string; current: number; expected: number; diff: number }[] = [];
+
+  for (const p of profiles ?? []) {
+    const legacy = Number(p.legacy_points ?? 0);
+    const ledgerSum = sumByUser.get(p.id as string) ?? 0;
+    const expected = legacy + ledgerSum;
+    const current = Number(p.current_points ?? 0);
+    const diff = current - expected;
+    if (diff !== 0) {
+      driftCount += 1;
+      drifts.push({
+        name: (p.display_name as string) || p.id as string,
+        current,
+        expected,
+        diff,
+      });
+    }
+  }
+
+  drifts.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+
+  console.log(`Profiles: ${profiles?.length ?? 0}`);
+  console.log(`Ledger rows: ${ledger?.length ?? 0}`);
+  console.log(`Profiles with drift (current != legacy + ledger): ${driftCount}`);
+  console.log("\nTop 15 drifts:");
+  for (const d of drifts.slice(0, 15)) {
+    console.log(
+      `  ${d.name}: current=${d.current} expected=${d.expected} diff=${d.diff > 0 ? "+" : ""}${d.diff}`,
+    );
+  }
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
