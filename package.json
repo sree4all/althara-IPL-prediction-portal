@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "check:migrations": "tsx scripts/check-supabase-migration-grants.ts",
+    "build": "npm run check:migrations && next build",
     "start": "next start",
     "lint": "eslint .",
     "seed": "tsx scripts/seed-csv.ts",
