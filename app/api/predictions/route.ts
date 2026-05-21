@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { normAnswer } from "@/lib/scoring/normalize";
+import { isKnockoutMatchReadyForPredictions } from "@/lib/knockout/placeholders";
 import { isMatchLocked } from "@/lib/utils/match-lock";
 
 const LOCK_MSG =
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
 
   const { data: match, error: mErr } = await supabase
     .from("matches")
-    .select("id, match_time_utc, home_team, away_team, status")
+    .select("id, match_time_utc, home_team, away_team, status, knockout_stage")
     .eq("id", match_id)
     .maybeSingle();
 
@@ -57,6 +58,21 @@ export async function POST(request: Request) {
       { error: "MATCH_LOCKED", message: LOCK_MSG },
       { status: 403 },
     );
+  }
+
+  if (match.knockout_stage) {
+    const home = match.home_team as string;
+    const away = match.away_team as string;
+    if (!isKnockoutMatchReadyForPredictions(home, away)) {
+      return NextResponse.json(
+        {
+          error: "KNOCKOUT_TEAMS_PENDING",
+          message:
+            "Teams for this knockout match are not set yet. Check back after the previous knockout results.",
+        },
+        { status: 403 },
+      );
+    }
   }
 
   const winners = [match.home_team, match.away_team];
@@ -100,7 +116,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: pErr.message }, { status: 500 });
   }
 
-  if (bonus_answers?.length) {
+  if (!match.knockout_stage && bonus_answers?.length) {
     const promptIds = [...new Set(bonus_answers.map((b) => b.prompt_id))];
     const { data: prompts, error: prErr } = await supabase
       .from("bonus_prompts")

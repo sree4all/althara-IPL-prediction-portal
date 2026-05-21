@@ -17,6 +17,10 @@ Use [`_TEMPLATE_new_public_table.sql`](./_TEMPLATE_new_public_table.sql) as a st
 
 Migration `0025_explicit_data_api_grants.sql` grants access on all existing tables. When you add a new table in `0026+`, include grants in that migration (do not rely on 0025 alone).
 
+### Knockout (M71–M74)
+
+Migration `0026_knockout_matches.sql` adds knockout fixtures. Use **Admin → Knockout phase** to set Teams 1–4 and score results (bracket updates automatically).
+
 ### Bump baseline
 
 After adding a migration that only backfills grants (no new tables), you may raise the number in `supabase/.migration-grant-check-baseline` so older files stay exempt. Do **not** bump the baseline to skip grants on new tables.

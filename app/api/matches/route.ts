@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isKnockoutMatchReadyForPredictions } from "@/lib/knockout/placeholders";
+import { KNOCKOUT_SCORING_HINT } from "@/lib/knockout/constants";
+import { parseKnockoutStage } from "@/lib/knockout/scoring";
 import { isMatchLocked } from "@/lib/utils/match-lock";
 
 export async function GET() {
@@ -14,7 +17,7 @@ export async function GET() {
   const { data: matches, error } = await supabase
     .from("matches")
     .select(
-      "id, external_key, home_team, away_team, match_time_utc, status, winner",
+      "id, external_key, home_team, away_team, match_time_utc, status, winner, knockout_stage",
     )
     .order("match_time_utc", { ascending: true });
 
@@ -48,6 +51,10 @@ export async function GET() {
   const payload = openWindow.map((m) => {
     const matchTimeUtc = new Date(m.match_time_utc as string);
     const locked = isMatchLocked(matchTimeUtc, now);
+    const koStage = parseKnockoutStage(m.knockout_stage as string | null);
+    const teamsPending =
+      !!koStage &&
+      !isKnockoutMatchReadyForPredictions(m.home_team as string, m.away_team as string);
     const label = m.external_key
       ? `${m.external_key} — ${m.home_team} vs ${m.away_team}`
       : `${m.home_team} vs ${m.away_team}`;
@@ -58,10 +65,13 @@ export async function GET() {
       away_team: m.away_team,
       match_time_utc: m.match_time_utc,
       status: m.status,
-      client_lock_hint: locked,
+      client_lock_hint: locked || teamsPending,
       winner: m.winner,
       has_prediction: predictedByMatchId.has(m.id as string),
       predicted_winner: predictedByMatchId.get(m.id as string) ?? null,
+      knockout_stage: koStage,
+      knockout_teams_pending: teamsPending,
+      knockout_scoring_hint: koStage ? KNOCKOUT_SCORING_HINT[koStage] : null,
     };
   });
 

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminOrResponse } from "@/lib/auth/require-admin";
+import { advanceKnockoutBracket } from "@/lib/knockout/bracket";
+import { parseKnockoutStage } from "@/lib/knockout/scoring";
 import { applyMatchScoring } from "@/lib/scoring/match-scoring";
 
 export async function POST(
@@ -22,7 +24,7 @@ export async function POST(
 
   const { data: match, error: mErr } = await supabase
     .from("matches")
-    .select("id, home_team, away_team, status")
+    .select("id, home_team, away_team, status, knockout_stage")
     .eq("id", matchId)
     .maybeSingle();
   if (mErr || !match) {
@@ -41,7 +43,8 @@ export async function POST(
     .eq("scope", "match")
     .eq("match_id", matchId);
   const promptIdsForMatch = new Set((matchPrompts ?? []).map((p) => p.id as string));
-  const hasMatchPrompts = promptIdsForMatch.size > 0;
+  const knockoutStage = parseKnockoutStage(match.knockout_stage as string | null);
+  const hasMatchPrompts = !knockoutStage && promptIdsForMatch.size > 0;
 
   const now = new Date().toISOString();
 
@@ -87,10 +90,36 @@ export async function POST(
     return NextResponse.json({ error: result.error, match_id: matchId }, { status: 500 });
   }
 
+  let bracket_updates: string[] = [];
+  if (knockoutStage) {
+    const winner = body.winner.trim();
+    const home = match.home_team as string;
+    const away = match.away_team as string;
+    const loser = winner === home ? away : home;
+    const adv = await advanceKnockoutBracket(supabase, knockoutStage, winner, loser);
+    if (!adv.ok) {
+      return NextResponse.json(
+        {
+          error: `Scored, but bracket update failed: ${adv.error}`,
+          match_id: matchId,
+          ledger_rows: result.ledgerRows,
+        },
+        { status: 500 },
+      );
+    }
+    bracket_updates = adv.updates;
+  }
+
+  const bracketNote =
+    bracket_updates.length > 0
+      ? ` Next fixtures updated: ${bracket_updates.join("; ")}.`
+      : "";
+
   return NextResponse.json({
     ok: true,
-    message: `Match scored. ${result.ledgerRows} ledger row(s) written.`,
+    message: `Match scored. ${result.ledgerRows} ledger row(s) written.${bracketNote}`,
     match_id: matchId,
     ledger_rows: result.ledgerRows,
+    bracket_updates,
   });
 }

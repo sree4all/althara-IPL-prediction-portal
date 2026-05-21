@@ -16,6 +16,8 @@ type Props = {
   locked: boolean;
   matchLabel: string;
   initialWinner?: string | null;
+  teamsPending?: boolean;
+  isKnockout?: boolean;
 };
 
 export function PredictionForm({
@@ -25,6 +27,8 @@ export function PredictionForm({
   locked,
   matchLabel,
   initialWinner,
+  teamsPending = false,
+  isKnockout = false,
 }: Props) {
   const defaultWinner =
     initialWinner === homeTeam || initialWinner === awayTeam ? initialWinner : homeTeam;
@@ -36,6 +40,9 @@ export function PredictionForm({
   const [loading, setLoading] = useState(false);
 
   async function save() {
+    if (teamsPending) {
+      return;
+    }
     if (locked) {
       toastPredictionLocked();
       return;
@@ -75,6 +82,10 @@ export function PredictionForm({
     }
   }
 
+  if (teamsPending) {
+    return null;
+  }
+
   return (
     <div className="mt-3 space-y-3 border-t border-border pt-3">
       <fieldset disabled={locked} className="space-y-2">
@@ -102,24 +113,26 @@ export function PredictionForm({
           </label>
         </div>
       </fieldset>
-      <BonusPromptsForm
-        matchId={matchId}
-        answers={bonusByPrompt}
-        onAnswersLoaded={(loadedAnswers) =>
-          setBonusByPrompt((prev) => {
-            const next = { ...prev };
-            for (const [promptId, value] of Object.entries(loadedAnswers)) {
-              if (!next[promptId]?.trim()) {
-                next[promptId] = value;
+      {!isKnockout ? (
+        <BonusPromptsForm
+          matchId={matchId}
+          answers={bonusByPrompt}
+          onAnswersLoaded={(loadedAnswers) =>
+            setBonusByPrompt((prev) => {
+              const next = { ...prev };
+              for (const [promptId, value] of Object.entries(loadedAnswers)) {
+                if (!next[promptId]?.trim()) {
+                  next[promptId] = value;
+                }
               }
-            }
-            return next;
-          })
-        }
-        onAnswerChange={(promptId, value) =>
-          setBonusByPrompt((prev) => ({ ...prev, [promptId]: value }))
-        }
-      />
+              return next;
+            })
+          }
+          onAnswerChange={(promptId, value) =>
+            setBonusByPrompt((prev) => ({ ...prev, [promptId]: value }))
+          }
+        />
+      ) : null}
       <Button
         type="button"
         className="w-full sm:w-auto"

@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth/require-user";
 import { getProfileForUser } from "@/lib/data/profile";
 import { AdminConfigForm } from "@/components/admin/admin-config-form";
 import { ScoringConfigSection } from "@/components/admin/scoring-config-section";
+import { KnockoutPanel } from "@/components/admin/knockout-panel";
 import { MatchResultPanel } from "@/components/admin/match-result-panel";
 import { TournamentScoringPanel } from "@/components/admin/tournament-scoring-panel";
 import { DEFAULT_MAINTENANCE_BANNER_TEXT, fetchTournamentConfig2026 } from "@/lib/data/tournament-config";
@@ -27,7 +28,7 @@ export default async function AdminPage() {
   const { data: adminMatches } = await supabase
     .from("matches")
     .select(
-      "id, external_key, home_team, away_team, match_time_utc, status, winner, bonus_result, scored_at",
+      "id, external_key, home_team, away_team, match_time_utc, status, winner, bonus_result, scored_at, knockout_stage",
     )
     .order("match_time_utc", { ascending: true });
   const { data: tournamentQuestions } = await supabase
@@ -81,6 +82,7 @@ export default async function AdminPage() {
         }}
       />
       <ScoringConfigSection />
+      <KnockoutPanel />
       <MatchResultPanel matches={adminMatches ?? []} />
       <TournamentScoringPanel
         questions={tournamentQuestions ?? []}

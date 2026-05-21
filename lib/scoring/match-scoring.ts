@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { knockoutWinnerPoints, parseKnockoutStage } from "@/lib/knockout/scoring";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { isLegacyLateExcluded } from "@/lib/scoring/legacy-late-exclusions";
 
@@ -53,7 +54,9 @@ export async function applyMatchScoring(
 
   const { data: match, error: mErr } = await supabase
     .from("matches")
-    .select("id, external_key, status, winner, bonus_result, home_team, away_team")
+    .select(
+      "id, external_key, status, winner, bonus_result, home_team, away_team, knockout_stage",
+    )
     .eq("id", matchId)
     .maybeSingle();
   if (mErr || !match) {
@@ -66,6 +69,8 @@ export async function applyMatchScoring(
 
   const winnerPts = Number(cfg.match_winner_points ?? 0);
   const bonusPts = Number(cfg.match_bonus_points ?? 0);
+  const knockoutStage = parseKnockoutStage(match.knockout_stage as string | null);
+  const knockoutPts = knockoutStage ? knockoutWinnerPoints(knockoutStage) : null;
 
   const actualWinner = match.winner as string | null;
   const legacyBonusResult = match.bonus_result as string | null;
@@ -138,10 +143,17 @@ export async function applyMatchScoring(
 
     let wDelta = 0;
     if (actualWinner) {
-      wDelta = normAnswer(predictedWinner) === normAnswer(actualWinner) ? winnerPts : 0;
+      if (knockoutPts) {
+        const correct =
+          normAnswer(predictedWinner) === normAnswer(actualWinner);
+        wDelta = correct ? knockoutPts.correct : knockoutPts.wrong;
+      } else {
+        wDelta =
+          normAnswer(predictedWinner) === normAnswer(actualWinner) ? winnerPts : 0;
+      }
     }
 
-    if (usePerPromptBonus) {
+    if (!knockoutStage && usePerPromptBonus) {
       for (const pr of promptsOrdered) {
         const pid = pr.id as string;
         const official = (pr.correct_answer as string | null)?.trim();
@@ -158,7 +170,7 @@ export async function applyMatchScoring(
           });
         }
       }
-    } else if (legacyBonusResult) {
+    } else if (!knockoutStage && legacyBonusResult) {
       const legacyPick = (pred.bonus_pick as string | null)?.trim();
       let fromPrompts = "";
       if (promptIds.length > 0) {
@@ -182,13 +194,17 @@ export async function applyMatchScoring(
       }
     }
 
-    if (wDelta > 0) {
+    const writeWinnerLedger =
+      knockoutStage !== null
+        ? actualWinner !== null && actualWinner !== undefined
+        : wDelta > 0;
+    if (writeWinnerLedger) {
       toInsert.push({
         user_id: userId,
         source_type: "match",
         source_id: matchId,
         points_delta: wDelta,
-        reason: "match_winner",
+        reason: knockoutStage ? `knockout_winner:${knockoutStage}` : "match_winner",
         awarded_at: now,
       });
     }

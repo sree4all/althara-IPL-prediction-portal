@@ -13,6 +13,9 @@ export type MatchApiRow = {
   winner: string | null;
   has_prediction?: boolean;
   predicted_winner?: string | null;
+  knockout_stage?: string | null;
+  knockout_teams_pending?: boolean;
+  knockout_scoring_hint?: string | null;
 };
 
 type Props = {
@@ -20,6 +23,7 @@ type Props = {
 };
 
 export function MatchCard({ match }: Props) {
+  const teamsPending = Boolean(match.knockout_teams_pending);
   const locked = match.client_lock_hint;
   const timeLabel = formatIstDateTime(match.match_time_utc);
 
@@ -30,7 +34,11 @@ export function MatchCard({ match }: Props) {
           <CardTitle className="text-base font-semibold leading-tight">
             {match.label}
           </CardTitle>
-          {locked ? (
+          {teamsPending ? (
+            <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:text-amber-300">
+              Teams pending
+            </span>
+          ) : locked ? (
             <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Locked
             </span>
@@ -52,8 +60,17 @@ export function MatchCard({ match }: Props) {
           )}
         </div>
         <p className="text-xs text-muted-foreground">Start (IST): {timeLabel}</p>
+        {match.knockout_scoring_hint ? (
+          <p className="text-xs text-muted-foreground">{match.knockout_scoring_hint}</p>
+        ) : null}
       </CardHeader>
       <CardContent>
+        {teamsPending ? (
+          <p className="text-sm text-muted-foreground">
+            Knockout teams will appear here after earlier knockout results (or once admin sets
+            Teams 1–4).
+          </p>
+        ) : null}
         {match.winner ? (
           <p className="text-sm text-muted-foreground">Result: {match.winner}</p>
         ) : null}
@@ -64,6 +81,8 @@ export function MatchCard({ match }: Props) {
           locked={locked}
           matchLabel={match.label}
           initialWinner={match.predicted_winner}
+          teamsPending={teamsPending}
+          isKnockout={Boolean(match.knockout_stage)}
         />
       </CardContent>
     </Card>

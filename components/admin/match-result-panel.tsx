@@ -13,6 +13,7 @@ export type AdminMatchRow = {
   winner: string | null;
   bonus_result: string | null;
   scored_at: string | null;
+  knockout_stage?: string | null;
 };
 
 type MatchBonusPrompt = {
@@ -28,7 +29,7 @@ function label(m: AdminMatchRow) {
 }
 
 export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
-  const unscoredMatches = matches.filter((m) => !m.scored_at);
+  const unscoredMatches = matches.filter((m) => !m.scored_at && !m.knockout_stage);
   const [matchId, setMatchId] = useState("");
   const [winner, setWinner] = useState("");
   const [legacyBonus, setLegacyBonus] = useState("");
