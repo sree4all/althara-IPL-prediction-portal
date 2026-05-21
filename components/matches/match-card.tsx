@@ -67,7 +67,7 @@ export function MatchCard({ match }: Props) {
       <CardContent>
         {teamsPending ? (
           <p className="text-sm text-muted-foreground">
-            Knockout teams will appear here after earlier knockout results (or once admin sets
+            Knockout teams will appear here after all playoff results (or once admin sets
             Teams 1–4).
           </p>
         ) : null}
