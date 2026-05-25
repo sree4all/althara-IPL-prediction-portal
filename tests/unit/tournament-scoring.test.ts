@@ -79,15 +79,47 @@ test("Top 4 scoring is not positional and scores each slot independently", () =>
   assert.equal(pointsByUser.get("user-b"), 8);
 });
 
+test("Top 4 scoring uses the fixed team list and two points per matching answer", () => {
+  const questions: TournamentQuestionForScoring[] = [
+    { id: "q1", slot_no: 1, correct_answer: null },
+    { id: "q2", slot_no: 2, correct_answer: "MI" },
+    { id: "q3", slot_no: 3, correct_answer: null },
+    { id: "q4", slot_no: 4, correct_answer: "CSK" },
+  ];
+  const scoringQuestions = tournamentQuestionsToScore(questions, [9, 9, 9, 9]);
+  const answers: TournamentAnswerForScoring[] = [
+    { user_id: "user-a", question_id: "q1", answer_text: "RCB" },
+    { user_id: "user-a", question_id: "q2", answer_text: "Gujarat Titans (GT)" },
+    { user_id: "user-a", question_id: "q3", answer_text: "Sunrisers Hyderabad - SRH" },
+    { user_id: "user-a", question_id: "q4", answer_text: "MI" },
+    { user_id: "user-b", question_id: "q4", answer_text: "rr" },
+  ];
 
-test("2026 Top 4 fallback scores three correct teams as six points", () => {
+  const ledgerRows = scoreTournamentAnswers(scoringQuestions, answers, AWARDED_AT);
+
+  assert.deepEqual(
+    ledgerRows.map((row) => ({
+      user_id: row.user_id,
+      source_id: row.source_id,
+      points_delta: row.points_delta,
+    })),
+    [
+      { user_id: "user-a", source_id: "q1", points_delta: 2 },
+      { user_id: "user-a", source_id: "q2", points_delta: 2 },
+      { user_id: "user-a", source_id: "q3", points_delta: 2 },
+      { user_id: "user-b", source_id: "q4", points_delta: 2 },
+    ],
+  );
+});
+
+test("Top 4 scoring accepts full-name aliases from the fixed team list", () => {
   const questions: TournamentQuestionForScoring[] = [
     { id: "q1", slot_no: 1, correct_answer: null },
     { id: "q2", slot_no: 2, correct_answer: null },
     { id: "q3", slot_no: 3, correct_answer: null },
     { id: "q4", slot_no: 4, correct_answer: null },
   ];
-  const scoringQuestions = tournamentQuestionsToScore(questions, SLOT_POINTS, 2026);
+  const scoringQuestions = tournamentQuestionsToScore(questions, SLOT_POINTS);
   const answers: TournamentAnswerForScoring[] = [
     { user_id: "sumesh-raj", question_id: "q1", answer_text: "Royal Challengers Bengaluru" },
     { user_id: "sumesh-raj", question_id: "q2", answer_text: "Rajasthan Royals" },

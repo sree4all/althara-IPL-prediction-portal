@@ -1,6 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { normAnswer } from "@/lib/scoring/normalize";
 
+const TOP4_SCORING_ANSWERS = ["RCB", "GT", "SRH", "RR"] as const;
+const TOP4_SCORING_ANSWER_TEXT = TOP4_SCORING_ANSWERS.join("\n");
+const TOP4_SCORING_ANSWER_SET = new Set(
+  TOP4_SCORING_ANSWERS.map((answer) => normAnswer(answer)),
+);
+
 function slotPointsArray(raw: unknown): number[] {
   if (Array.isArray(raw)) {
     return raw.map((n) => Number(n ?? 2));
@@ -13,10 +19,6 @@ function slotPointsArray(raw: unknown): number[] {
   }
   return [2, 2, 2, 2, 3, 3, 5, 3, 3];
 }
-
-const DEFAULT_TOP4_CORRECT_BY_SEASON: Record<number, string> = {
-  2026: "RCB\nRR\nGT\nSRH",
-};
 
 const TEAM_ANSWER_ALIASES = new Map<string, string>([
   ["CHENNAI SUPER KINGS", "CSK"],
@@ -37,14 +39,9 @@ function canonicalTournamentAnswer(raw: string | null | undefined): string {
   return TEAM_ANSWER_ALIASES.get(normalized) ?? normalized;
 }
 
-function defaultCorrectAnswerForSlot(seasonYear: number | undefined, slotNo: number): string | null {
-  if (seasonYear === undefined || slotNo < 1 || slotNo > 4) return null;
-  return DEFAULT_TOP4_CORRECT_BY_SEASON[seasonYear] ?? null;
-}
-
 /**
- * Awards points for each tournament question where `correct_answer` is set,
- * comparing `tournament_answers.answer_text` (same normalization as match bonus).
+ * Awards points for scorable tournament questions by comparing
+ * `tournament_answers.answer_text` with slot-specific answer rules.
  */
 export type TournamentScoreOutcome =
   | { ok: true; ledgerRows: number }
@@ -91,35 +88,48 @@ function hasAnswer(raw: string | null | undefined): boolean {
   return parseAnswerSet(raw).size > 0;
 }
 
+function isTop4Slot(slotNo: number): boolean {
+  return slotNo >= 1 && slotNo <= 4;
+}
+
+function isFinalistsSlot(slotNo: number): boolean {
+  return slotNo >= 5 && slotNo <= 6;
+}
+
+export function isTop4ScoringAnswer(raw: string | null | undefined): boolean {
+  const normalized = normAnswer(raw);
+  if (!normalized) return false;
+  if (TOP4_SCORING_ANSWER_SET.has(normalized)) return true;
+
+  return normalized
+    .split(/[^A-Z0-9]+/)
+    .some((part) => TOP4_SCORING_ANSWER_SET.has(part));
+}
+
 export function tournamentQuestionsToScore(
   questions: TournamentQuestionForScoring[],
   slotPts: number[],
-  seasonYear?: number,
 ): TournamentScoringQuestion[] {
   const rows = questions
     .map((q) => {
       const slotNo = Number(q.slot_no ?? 0);
+      const top4Slot = isTop4Slot(slotNo);
       return {
         id: q.id,
         slotNo,
-        pts: Number(slotPts[slotNo - 1] ?? 2),
-        correctRaw:
-          ((q.correct_answer as string | null) ?? null) ||
-          defaultCorrectAnswerForSlot(seasonYear, slotNo),
+        pts: top4Slot ? 2 : Number(slotPts[slotNo - 1] ?? 2),
+        correctRaw: top4Slot
+          ? TOP4_SCORING_ANSWER_TEXT
+          : (q.correct_answer as string | null) ?? null,
       };
     })
     .filter((q) => q.id && q.slotNo > 0);
 
-  const top4Active = rows.some(
-    (q) => q.slotNo >= 1 && q.slotNo <= 4 && hasAnswer(q.correctRaw),
-  );
-  const finalistsActive = rows.some(
-    (q) => q.slotNo >= 5 && q.slotNo <= 6 && hasAnswer(q.correctRaw),
-  );
+  const finalistsActive = rows.some((q) => isFinalistsSlot(q.slotNo) && hasAnswer(q.correctRaw));
 
   return rows.filter((q) => {
-    if (q.slotNo >= 1 && q.slotNo <= 4) return top4Active;
-    if (q.slotNo >= 5 && q.slotNo <= 6) return finalistsActive;
+    if (isTop4Slot(q.slotNo)) return true;
+    if (isFinalistsSlot(q.slotNo)) return finalistsActive;
     return hasAnswer(q.correctRaw);
   });
 }
@@ -132,16 +142,11 @@ export function scoreTournamentAnswers(
   const qById = new Map(questions.map((q) => [q.id, q]));
 
   // Group scoring rules:
-  // - Slots 1..4: each slot scores independently against the same Top-4 set.
+  // - Slots 1..4: fixed Top-4 set; each slot scores independently.
   // - Slots 5..6: unique overlap vs Finalists set (one team can score only once across these slots)
-  const top4Correct = new Set<string>();
   const finalistsCorrect = new Set<string>();
   for (const q of questions) {
-    const target = q.slotNo >= 1 && q.slotNo <= 4
-      ? top4Correct
-      : q.slotNo >= 5 && q.slotNo <= 6
-        ? finalistsCorrect
-        : null;
+    const target = isFinalistsSlot(q.slotNo) ? finalistsCorrect : null;
     if (!target) continue;
     for (const v of parseAnswerSet(q.correctRaw)) target.add(v);
   }
@@ -170,9 +175,9 @@ export function scoreTournamentAnswers(
       const q = qById.get(r.questionId);
       if (!q) continue;
       let matched = false;
-      if (r.slotNo >= 1 && r.slotNo <= 4 && top4Correct.size > 0) {
-        matched = top4Correct.has(r.guess);
-      } else if (r.slotNo >= 5 && r.slotNo <= 6 && finalistsCorrect.size > 0) {
+      if (isTop4Slot(r.slotNo)) {
+        matched = isTop4ScoringAnswer(r.guess);
+      } else if (isFinalistsSlot(r.slotNo) && finalistsCorrect.size > 0) {
         if (finalistsCorrect.has(r.guess) && !usedFinalists.has(r.guess)) {
           matched = true;
           usedFinalists.add(r.guess);
@@ -220,7 +225,7 @@ export async function applyTournamentScoring(
     return { ok: false, error: qErr.message };
   }
 
-  const toScore = tournamentQuestionsToScore(questions ?? [], slotPts, seasonYear);
+  const toScore = tournamentQuestionsToScore(questions ?? [], slotPts);
   if (toScore.length === 0) {
     return { ok: false, error: "Set correct_answer on at least one tournament question." };
   }

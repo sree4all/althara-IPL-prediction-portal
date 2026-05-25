@@ -26,11 +26,7 @@ export function TournamentScoringPanel({
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const top4Group = questions.filter((q) => q.slot_no >= 1 && q.slot_no <= 4);
   const finalistsGroup = questions.filter((q) => q.slot_no >= 5 && q.slot_no <= 6);
-  const [top4Shared, setTop4Shared] = useState(
-    top4Group.find((q) => (q.correct_answer ?? "").trim())?.correct_answer ?? "",
-  );
   const [finalistsShared, setFinalistsShared] = useState(
     finalistsGroup.find((q) => (q.correct_answer ?? "").trim())?.correct_answer ?? "",
   );
@@ -116,23 +112,10 @@ export function TournamentScoringPanel({
       </p>
       <div className="mb-4 space-y-3 rounded border border-border p-3">
         <p className="text-xs font-semibold text-foreground">Set-based grouped scoring answers</p>
-        <label className="block text-xs text-muted-foreground">
-          Top 4 teams (applies to each of Q1–Q4 independently)
-          <textarea
-            className="mt-1 min-h-[4rem] w-full rounded-md border border-input px-2 py-1 text-sm"
-            placeholder="One team per line, e.g. PBKS"
-            value={top4Shared}
-            onChange={(e) => setTop4Shared(e.target.value)}
-          />
-        </label>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={() => void saveSharedAnswers(top4Group.map((q) => q.id), top4Shared)}
-        >
-          Save Top 4 list to Q1–Q4
-        </Button>
+        <p className="text-xs text-muted-foreground">
+          Top 4 teams for Q1–Q4 are fixed to RCB, GT, SRH, and RR. Each matching Q1–Q4
+          answer earns 2 points.
+        </p>
         <label className="block text-xs text-muted-foreground">
           Finalists (applies to Q5–Q6; one team scores once only)
           <textarea
@@ -190,7 +173,9 @@ export function TournamentScoringPanel({
               </div>
               {isGroupedSlot ? (
                 <p className="mt-2 border-t border-border pt-2 text-xs text-muted-foreground">
-                  Correct-answer input is managed by shared sets above for this slot group.
+                  {q.slot_no >= 1 && q.slot_no <= 4
+                    ? "Top 4 scoring is fixed to RCB, GT, SRH, and RR for this slot."
+                    : "Correct-answer input is managed by the shared finalists set above for this slot group."}
                 </p>
               ) : (
                 <div className="mt-2 flex flex-wrap gap-2 border-t border-border pt-2">
