@@ -16,6 +16,8 @@
     "audit:points": "tsx scripts/audit-points.ts",
     "sync:points": "tsx scripts/sync-profile-points-from-ledger.ts",
     "audit:match-bonus": "tsx scripts/audit-match-bonus-answers.ts",
+    "diagnose:supabase": "tsx scripts/diagnose-supabase.ts",
+    "fix:mega-bonus-top4": "tsx scripts/fix-mega-bonus-top4.ts",
     "reapply:match": "tsx scripts/reapply-match-scoring.ts",
     "db:link": "npx supabase link",
     "db:push": "npx supabase db push",

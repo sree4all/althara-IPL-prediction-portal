@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StructuredPromptChoice } from "@/components/matches/structured-prompt-choice";
 
 type PromptOption = { label: string; value: string; sort_order?: number };
@@ -22,6 +22,8 @@ type Props = {
 
 export function BonusPromptsForm({ matchId, answers, onAnswerChange, onAnswersLoaded }: Props) {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const onAnswersLoadedRef = useRef(onAnswersLoaded);
+  onAnswersLoadedRef.current = onAnswersLoaded;
 
   useEffect(() => {
     let cancelled = false;
@@ -38,7 +40,7 @@ export function BonusPromptsForm({ matchId, answers, onAnswerChange, onAnswersLo
         (data.answers ?? []).forEach((a: { prompt_id: string; answer_text: string }) => {
           loadedMap[a.prompt_id] = a.answer_text;
         });
-        onAnswersLoaded?.(loadedMap);
+        onAnswersLoadedRef.current?.(loadedMap);
       }
     })();
     return () => {
