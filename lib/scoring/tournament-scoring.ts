@@ -97,7 +97,7 @@ function isFinalistsSlot(slotNo: number): boolean {
 }
 
 export function isTop4ScoringAnswer(raw: string | null | undefined): boolean {
-  const normalized = normAnswer(raw);
+  const normalized = canonicalTournamentAnswer(raw);
   if (!normalized) return false;
   if (TOP4_SCORING_ANSWER_SET.has(normalized)) return true;
 
