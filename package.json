@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "test": "tsx --test \"tests/**/*.test.ts\"",
     "check:migrations": "tsx scripts/check-supabase-migration-grants.ts",
     "build": "npm run check:migrations && next build",
     "start": "next start",

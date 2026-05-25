@@ -22,6 +22,33 @@ export type TournamentScoreOutcome =
   | { ok: true; ledgerRows: number }
   | { ok: false; error: string };
 
+export type TournamentQuestionForScoring = {
+  id: string;
+  slot_no: unknown;
+  correct_answer: unknown;
+};
+
+export type TournamentAnswerForScoring = {
+  user_id: unknown;
+  question_id: unknown;
+  answer_text: unknown;
+};
+
+export type TournamentScoringQuestion = {
+  id: string;
+  slotNo: number;
+  pts: number;
+  correctRaw: string | null;
+};
+
+export type TournamentLedgerRow = {
+  user_id: string;
+  source_id: string;
+  points_delta: number;
+  reason: string;
+  awarded_at: string;
+};
+
 function parseAnswerSet(raw: string | null | undefined): Set<string> {
   const src = String(raw ?? "").trim();
   if (!src) return new Set();
@@ -30,6 +57,117 @@ function parseAnswerSet(raw: string | null | undefined): Set<string> {
     .map((s) => normAnswer(s))
     .filter(Boolean);
   return new Set(parts);
+}
+
+function hasAnswer(raw: string | null | undefined): boolean {
+  return parseAnswerSet(raw).size > 0;
+}
+
+export function tournamentQuestionsToScore(
+  questions: TournamentQuestionForScoring[],
+  slotPts: number[],
+): TournamentScoringQuestion[] {
+  const rows = questions
+    .map((q) => {
+      const slotNo = Number(q.slot_no ?? 0);
+      return {
+        id: q.id,
+        slotNo,
+        pts: Number(slotPts[slotNo - 1] ?? 2),
+        correctRaw: (q.correct_answer as string | null) ?? null,
+      };
+    })
+    .filter((q) => q.id && q.slotNo > 0);
+
+  const top4Active = rows.some(
+    (q) => q.slotNo >= 1 && q.slotNo <= 4 && hasAnswer(q.correctRaw),
+  );
+  const finalistsActive = rows.some(
+    (q) => q.slotNo >= 5 && q.slotNo <= 6 && hasAnswer(q.correctRaw),
+  );
+
+  return rows.filter((q) => {
+    if (q.slotNo >= 1 && q.slotNo <= 4) return top4Active;
+    if (q.slotNo >= 5 && q.slotNo <= 6) return finalistsActive;
+    return hasAnswer(q.correctRaw);
+  });
+}
+
+export function scoreTournamentAnswers(
+  questions: TournamentScoringQuestion[],
+  answers: TournamentAnswerForScoring[],
+  awardedAt: string,
+): TournamentLedgerRow[] {
+  const qById = new Map(questions.map((q) => [q.id, q]));
+
+  // Group scoring rules:
+  // - Slots 1..4: unique overlap vs Top-4 set (one team can score only once across these slots)
+  // - Slots 5..6: unique overlap vs Finalists set (one team can score only once across these slots)
+  const top4Correct = new Set<string>();
+  const finalistsCorrect = new Set<string>();
+  for (const q of questions) {
+    const target = q.slotNo >= 1 && q.slotNo <= 4
+      ? top4Correct
+      : q.slotNo >= 5 && q.slotNo <= 6
+        ? finalistsCorrect
+        : null;
+    if (!target) continue;
+    for (const v of parseAnswerSet(q.correctRaw)) target.add(v);
+  }
+
+  const answersByUser = new Map<
+    string,
+    { questionId: string; slotNo: number; guess: string }[]
+  >();
+  for (const a of answers) {
+    const questionId = a.question_id as string;
+    const q = qById.get(questionId);
+    if (!q) continue;
+    const guess = normAnswer(a.answer_text as string);
+    if (!guess) continue;
+    const uid = a.user_id as string;
+    if (!answersByUser.has(uid)) answersByUser.set(uid, []);
+    answersByUser.get(uid)!.push({ questionId, slotNo: q.slotNo, guess });
+  }
+
+  const ledgerRows: TournamentLedgerRow[] = [];
+  for (const [uid, rows] of answersByUser) {
+    const bySlot = [...rows].sort((a, b) => a.slotNo - b.slotNo);
+    const usedTop4 = new Set<string>();
+    const usedFinalists = new Set<string>();
+
+    for (const r of bySlot) {
+      const q = qById.get(r.questionId);
+      if (!q) continue;
+      let matched = false;
+      if (r.slotNo >= 1 && r.slotNo <= 4 && top4Correct.size > 0) {
+        if (top4Correct.has(r.guess) && !usedTop4.has(r.guess)) {
+          matched = true;
+          usedTop4.add(r.guess);
+        }
+      } else if (r.slotNo >= 5 && r.slotNo <= 6 && finalistsCorrect.size > 0) {
+        if (finalistsCorrect.has(r.guess) && !usedFinalists.has(r.guess)) {
+          matched = true;
+          usedFinalists.add(r.guess);
+        }
+      } else {
+        // Non-group slots keep direct equality behavior.
+        const single = [...parseAnswerSet(q.correctRaw)][0] ?? "";
+        matched = Boolean(single) && r.guess === single;
+      }
+      if (!matched) continue;
+
+      ledgerRows.push({
+        user_id: uid,
+        source_id: r.questionId,
+        points_delta: q.pts,
+        reason: `tournament_slot_${r.slotNo}`,
+        awarded_at: awardedAt,
+      });
+    }
+  }
+
+  return ledgerRows;
 }
 
 export async function applyTournamentScoring(
@@ -55,13 +193,13 @@ export async function applyTournamentScoring(
     return { ok: false, error: qErr.message };
   }
 
-  const toScore = (questions ?? []).filter((q) => (q.correct_answer as string)?.trim());
+  const toScore = tournamentQuestionsToScore(questions ?? [], slotPts);
   if (toScore.length === 0) {
     return { ok: false, error: "Set correct_answer on at least one tournament question." };
   }
 
   const now = new Date().toISOString();
-  const toScoreIds = new Set(toScore.map((q) => q.id as string));
+  const toScoreIds = new Set(toScore.map((q) => q.id));
   const toScoreIdList = [...toScoreIds];
 
   const { data: oldLedger, error: oldErr } = await supabase
@@ -96,100 +234,9 @@ export async function applyTournamentScoring(
     .in("question_id", toScoreIdList);
   if (aErr) return { ok: false, error: aErr.message };
 
-  const qById = new Map(
-    toScore.map((q) => [
-      q.id as string,
-      {
-        slotNo: Number(q.slot_no ?? 0),
-        pts: Number(slotPts[Number(q.slot_no ?? 1) - 1] ?? 2),
-        correctRaw: (q.correct_answer as string | null) ?? null,
-      },
-    ]),
-  );
-
-  // Group scoring rules:
-  // - Slots 1..4: unique overlap vs Top-4 set (one team can score only once across these slots)
-  // - Slots 5..6: unique overlap vs Finalists set (one team can score only once across these slots)
-  const top4QuestionIds = toScore
-    .filter((q) => {
-      const s = Number(q.slot_no ?? 0);
-      return s >= 1 && s <= 4;
-    })
-    .map((q) => q.id as string);
-  const finalistsQuestionIds = toScore
-    .filter((q) => {
-      const s = Number(q.slot_no ?? 0);
-      return s >= 5 && s <= 6;
-    })
-    .map((q) => q.id as string);
-
-  const top4Correct = new Set<string>();
-  for (const qid of top4QuestionIds) {
-    for (const v of parseAnswerSet(qById.get(qid)?.correctRaw)) top4Correct.add(v);
-  }
-  const finalistsCorrect = new Set<string>();
-  for (const qid of finalistsQuestionIds) {
-    for (const v of parseAnswerSet(qById.get(qid)?.correctRaw)) finalistsCorrect.add(v);
-  }
-
-  const answersByUser = new Map<
-    string,
-    { questionId: string; slotNo: number; guess: string }[]
-  >();
-  for (const a of allAnswers ?? []) {
-    const questionId = a.question_id as string;
-    const q = qById.get(questionId);
-    if (!q) continue;
-    const guess = normAnswer(a.answer_text as string);
-    if (!guess) continue;
-    const uid = a.user_id as string;
-    if (!answersByUser.has(uid)) answersByUser.set(uid, []);
-    answersByUser.get(uid)!.push({ questionId, slotNo: q.slotNo, guess });
-  }
-
-  const ledgerRows: {
-    user_id: string;
-    source_id: string;
-    points_delta: number;
-    reason: string;
-    awarded_at: string;
-  }[] = [];
-
-  for (const [uid, rows] of answersByUser) {
-    const bySlot = [...rows].sort((a, b) => a.slotNo - b.slotNo);
-    const usedTop4 = new Set<string>();
-    const usedFinalists = new Set<string>();
-
-    for (const r of bySlot) {
-      const q = qById.get(r.questionId);
-      if (!q) continue;
-      let matched = false;
-      if (r.slotNo >= 1 && r.slotNo <= 4 && top4Correct.size > 0) {
-        if (top4Correct.has(r.guess) && !usedTop4.has(r.guess)) {
-          matched = true;
-          usedTop4.add(r.guess);
-        }
-      } else if (r.slotNo >= 5 && r.slotNo <= 6 && finalistsCorrect.size > 0) {
-        if (finalistsCorrect.has(r.guess) && !usedFinalists.has(r.guess)) {
-          matched = true;
-          usedFinalists.add(r.guess);
-        }
-      } else {
-        // Non-group slots keep direct equality behavior.
-        const single = [...parseAnswerSet(q.correctRaw)][0] ?? "";
-        matched = Boolean(single) && r.guess === single;
-      }
-      if (!matched) continue;
-
-      ledgerRows.push({
-        user_id: uid,
-        source_id: r.questionId,
-        points_delta: q.pts,
-        reason: `tournament_slot_${r.slotNo}`,
-        awarded_at: now,
-      });
-      profileDelta.set(uid, (profileDelta.get(uid) ?? 0) + q.pts);
-    }
+  const ledgerRows = scoreTournamentAnswers(toScore, allAnswers ?? [], now);
+  for (const row of ledgerRows) {
+    profileDelta.set(row.user_id, (profileDelta.get(row.user_id) ?? 0) + row.points_delta);
   }
 
   if (ledgerRows.length > 0) {
