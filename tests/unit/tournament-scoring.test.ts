@@ -50,7 +50,7 @@ test("Top 4 scoring treats Q1-Q4 as a shared set even when stored on one questio
   );
 });
 
-test("Top 4 scoring is not positional and scores each slot independently", () => {
+test("Top 4 scoring is not positional and allows any slot order", () => {
   const questions: TournamentQuestionForScoring[] = [
     { id: "q1", slot_no: 1, correct_answer: "RCB" },
     { id: "q2", slot_no: 2, correct_answer: "RR" },
@@ -76,7 +76,42 @@ test("Top 4 scoring is not positional and scores each slot independently", () =>
   }
 
   assert.equal(pointsByUser.get("user-a"), 8);
-  assert.equal(pointsByUser.get("user-b"), 8);
+  assert.equal(pointsByUser.get("user-b"), 6);
+});
+
+test("Top 4 scoring awards each correct team at most once when duplicated across Q1-Q4", () => {
+  const questions: TournamentQuestionForScoring[] = [
+    { id: "q1", slot_no: 1, correct_answer: null },
+    { id: "q2", slot_no: 2, correct_answer: null },
+    { id: "q3", slot_no: 3, correct_answer: null },
+    { id: "q4", slot_no: 4, correct_answer: null },
+  ];
+  const scoringQuestions = tournamentQuestionsToScore(questions, SLOT_POINTS);
+  const answers: TournamentAnswerForScoring[] = [
+    { user_id: "user-a", question_id: "q1", answer_text: "RR" },
+    { user_id: "user-a", question_id: "q2", answer_text: "RR" },
+    { user_id: "user-a", question_id: "q3", answer_text: "RCB" },
+    { user_id: "user-a", question_id: "q4", answer_text: "GT" },
+  ];
+
+  const ledgerRows = scoreTournamentAnswers(scoringQuestions, answers, AWARDED_AT);
+
+  assert.deepEqual(
+    ledgerRows.map((row) => ({
+      source_id: row.source_id,
+      points_delta: row.points_delta,
+      reason: row.reason,
+    })),
+    [
+      { source_id: "q1", points_delta: 2, reason: "tournament_slot_1" },
+      { source_id: "q3", points_delta: 2, reason: "tournament_slot_3" },
+      { source_id: "q4", points_delta: 2, reason: "tournament_slot_4" },
+    ],
+  );
+  assert.equal(
+    ledgerRows.reduce((sum, row) => sum + row.points_delta, 0),
+    6,
+  );
 });
 
 test("Top 4 scoring uses the fixed team list and two points per matching answer", () => {
