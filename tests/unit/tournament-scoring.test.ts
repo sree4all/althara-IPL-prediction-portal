@@ -78,3 +78,28 @@ test("Top 4 scoring is not positional and scores each slot independently", () =>
   assert.equal(pointsByUser.get("user-a"), 8);
   assert.equal(pointsByUser.get("user-b"), 8);
 });
+
+
+test("2026 Top 4 fallback scores three correct teams as six points", () => {
+  const questions: TournamentQuestionForScoring[] = [
+    { id: "q1", slot_no: 1, correct_answer: null },
+    { id: "q2", slot_no: 2, correct_answer: null },
+    { id: "q3", slot_no: 3, correct_answer: null },
+    { id: "q4", slot_no: 4, correct_answer: null },
+  ];
+  const scoringQuestions = tournamentQuestionsToScore(questions, SLOT_POINTS, 2026);
+  const answers: TournamentAnswerForScoring[] = [
+    { user_id: "sumesh-raj", question_id: "q1", answer_text: "Royal Challengers Bengaluru" },
+    { user_id: "sumesh-raj", question_id: "q2", answer_text: "Rajasthan Royals" },
+    { user_id: "sumesh-raj", question_id: "q3", answer_text: "Gujarat Titans" },
+    { user_id: "sumesh-raj", question_id: "q4", answer_text: "Mumbai Indians" },
+  ];
+
+  const ledgerRows = scoreTournamentAnswers(scoringQuestions, answers, AWARDED_AT);
+
+  assert.equal(ledgerRows.length, 3);
+  assert.equal(
+    ledgerRows.reduce((sum, row) => sum + row.points_delta, 0),
+    6,
+  );
+});

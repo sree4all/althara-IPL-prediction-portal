@@ -14,6 +14,34 @@ function slotPointsArray(raw: unknown): number[] {
   return [2, 2, 2, 2, 3, 3, 5, 3, 3];
 }
 
+const DEFAULT_TOP4_CORRECT_BY_SEASON: Record<number, string> = {
+  2026: "RCB\nRR\nGT\nSRH",
+};
+
+const TEAM_ANSWER_ALIASES = new Map<string, string>([
+  ["CHENNAI SUPER KINGS", "CSK"],
+  ["DELHI CAPITALS", "DC"],
+  ["GUJARAT TITANS", "GT"],
+  ["KOLKATA KNIGHT RIDERS", "KKR"],
+  ["LUCKNOW SUPER GIANTS", "LSG"],
+  ["MUMBAI INDIANS", "MI"],
+  ["PUNJAB KINGS", "PBKS"],
+  ["ROYAL CHALLENGERS BANGALORE", "RCB"],
+  ["ROYAL CHALLENGERS BENGALURU", "RCB"],
+  ["RAJASTHAN ROYALS", "RR"],
+  ["SUNRISERS HYDERABAD", "SRH"],
+]);
+
+function canonicalTournamentAnswer(raw: string | null | undefined): string {
+  const normalized = normAnswer(raw);
+  return TEAM_ANSWER_ALIASES.get(normalized) ?? normalized;
+}
+
+function defaultCorrectAnswerForSlot(seasonYear: number | undefined, slotNo: number): string | null {
+  if (seasonYear === undefined || slotNo < 1 || slotNo > 4) return null;
+  return DEFAULT_TOP4_CORRECT_BY_SEASON[seasonYear] ?? null;
+}
+
 /**
  * Awards points for each tournament question where `correct_answer` is set,
  * comparing `tournament_answers.answer_text` (same normalization as match bonus).
@@ -54,7 +82,7 @@ function parseAnswerSet(raw: string | null | undefined): Set<string> {
   if (!src) return new Set();
   const parts = src
     .split(/\r?\n|,/)
-    .map((s) => normAnswer(s))
+    .map((s) => canonicalTournamentAnswer(s))
     .filter(Boolean);
   return new Set(parts);
 }
@@ -66,6 +94,7 @@ function hasAnswer(raw: string | null | undefined): boolean {
 export function tournamentQuestionsToScore(
   questions: TournamentQuestionForScoring[],
   slotPts: number[],
+  seasonYear?: number,
 ): TournamentScoringQuestion[] {
   const rows = questions
     .map((q) => {
@@ -74,7 +103,9 @@ export function tournamentQuestionsToScore(
         id: q.id,
         slotNo,
         pts: Number(slotPts[slotNo - 1] ?? 2),
-        correctRaw: (q.correct_answer as string | null) ?? null,
+        correctRaw:
+          ((q.correct_answer as string | null) ?? null) ||
+          defaultCorrectAnswerForSlot(seasonYear, slotNo),
       };
     })
     .filter((q) => q.id && q.slotNo > 0);
@@ -123,7 +154,7 @@ export function scoreTournamentAnswers(
     const questionId = a.question_id as string;
     const q = qById.get(questionId);
     if (!q) continue;
-    const guess = normAnswer(a.answer_text as string);
+    const guess = canonicalTournamentAnswer(a.answer_text as string);
     if (!guess) continue;
     const uid = a.user_id as string;
     if (!answersByUser.has(uid)) answersByUser.set(uid, []);
@@ -189,7 +220,7 @@ export async function applyTournamentScoring(
     return { ok: false, error: qErr.message };
   }
 
-  const toScore = tournamentQuestionsToScore(questions ?? [], slotPts);
+  const toScore = tournamentQuestionsToScore(questions ?? [], slotPts, seasonYear);
   if (toScore.length === 0) {
     return { ok: false, error: "Set correct_answer on at least one tournament question." };
   }
