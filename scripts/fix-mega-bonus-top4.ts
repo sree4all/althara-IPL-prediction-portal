@@ -5,7 +5,7 @@
  *   npm run fix:mega-bonus-top4
  *   npm run fix:mega-bonus-top4 -- --sync-points
  */
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { config as loadEnv } from "dotenv";
 import { resolve } from "path";
 import { applyTournamentScoring } from "@/lib/scoring/tournament-scoring";
@@ -21,7 +21,7 @@ const syncPoints = process.argv.includes("--sync-points");
 
 const TOP4_CORRECT = "RCB\nRR\nGT\nSRH";
 
-async function syncProfilePointsFromLedger(supabase: ReturnType<typeof createClient>) {
+async function syncProfilePointsFromLedger(supabase: SupabaseClient) {
   const { data: profiles, error: pErr } = await supabase
     .from("profiles")
     .select("id, legacy_points, current_points");
