@@ -101,7 +101,7 @@ export function scoreTournamentAnswers(
   const qById = new Map(questions.map((q) => [q.id, q]));
 
   // Group scoring rules:
-  // - Slots 1..4: unique overlap vs Top-4 set (one team can score only once across these slots)
+  // - Slots 1..4: each slot scores independently against the same Top-4 set.
   // - Slots 5..6: unique overlap vs Finalists set (one team can score only once across these slots)
   const top4Correct = new Set<string>();
   const finalistsCorrect = new Set<string>();
@@ -133,7 +133,6 @@ export function scoreTournamentAnswers(
   const ledgerRows: TournamentLedgerRow[] = [];
   for (const [uid, rows] of answersByUser) {
     const bySlot = [...rows].sort((a, b) => a.slotNo - b.slotNo);
-    const usedTop4 = new Set<string>();
     const usedFinalists = new Set<string>();
 
     for (const r of bySlot) {
@@ -141,10 +140,7 @@ export function scoreTournamentAnswers(
       if (!q) continue;
       let matched = false;
       if (r.slotNo >= 1 && r.slotNo <= 4 && top4Correct.size > 0) {
-        if (top4Correct.has(r.guess) && !usedTop4.has(r.guess)) {
-          matched = true;
-          usedTop4.add(r.guess);
-        }
+        matched = top4Correct.has(r.guess);
       } else if (r.slotNo >= 5 && r.slotNo <= 6 && finalistsCorrect.size > 0) {
         if (finalistsCorrect.has(r.guess) && !usedFinalists.has(r.guess)) {
           matched = true;
