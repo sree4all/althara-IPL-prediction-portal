@@ -13,7 +13,7 @@ const AWARDED_AT = "2026-05-25T00:00:00.000Z";
 
 test("Top 4 scoring treats Q1-Q4 as a shared set even when stored on one question", () => {
   const questions: TournamentQuestionForScoring[] = [
-    { id: "q1", slot_no: 1, correct_answer: "PBKS\nRCB\nGT\nMI" },
+    { id: "q1", slot_no: 1, correct_answer: "RCB\nRR\nGT\nSRH" },
     { id: "q2", slot_no: 2, correct_answer: null },
     { id: "q3", slot_no: 3, correct_answer: null },
     { id: "q4", slot_no: 4, correct_answer: null },
@@ -29,9 +29,9 @@ test("Top 4 scoring treats Q1-Q4 as a shared set even when stored on one questio
 
   const answers: TournamentAnswerForScoring[] = [
     { user_id: "user-a", question_id: "q1", answer_text: "RCB" },
-    { user_id: "user-a", question_id: "q2", answer_text: "PBKS" },
-    { user_id: "user-a", question_id: "q3", answer_text: "SRH" },
-    { user_id: "user-a", question_id: "q4", answer_text: "MI" },
+    { user_id: "user-a", question_id: "q2", answer_text: "RR" },
+    { user_id: "user-a", question_id: "q3", answer_text: "MI" },
+    { user_id: "user-a", question_id: "q4", answer_text: "SRH" },
   ];
 
   const ledgerRows = scoreTournamentAnswers(scoringQuestions, answers, AWARDED_AT);
@@ -50,23 +50,23 @@ test("Top 4 scoring treats Q1-Q4 as a shared set even when stored on one questio
   );
 });
 
-test("Top 4 scoring is not positional and counts each correct team once", () => {
+test("Top 4 scoring is not positional and scores each slot independently", () => {
   const questions: TournamentQuestionForScoring[] = [
-    { id: "q1", slot_no: 1, correct_answer: "PBKS" },
-    { id: "q2", slot_no: 2, correct_answer: "RCB" },
+    { id: "q1", slot_no: 1, correct_answer: "RCB" },
+    { id: "q2", slot_no: 2, correct_answer: "RR" },
     { id: "q3", slot_no: 3, correct_answer: "GT" },
-    { id: "q4", slot_no: 4, correct_answer: "MI" },
+    { id: "q4", slot_no: 4, correct_answer: "SRH" },
   ];
   const scoringQuestions = tournamentQuestionsToScore(questions, SLOT_POINTS);
   const answers: TournamentAnswerForScoring[] = [
-    { user_id: "user-a", question_id: "q1", answer_text: "MI" },
+    { user_id: "user-a", question_id: "q1", answer_text: "SRH" },
     { user_id: "user-a", question_id: "q2", answer_text: "GT" },
-    { user_id: "user-a", question_id: "q3", answer_text: "RCB" },
-    { user_id: "user-a", question_id: "q4", answer_text: "PBKS" },
+    { user_id: "user-a", question_id: "q3", answer_text: "RR" },
+    { user_id: "user-a", question_id: "q4", answer_text: "RCB" },
     { user_id: "user-b", question_id: "q1", answer_text: "RCB" },
     { user_id: "user-b", question_id: "q2", answer_text: "RCB" },
     { user_id: "user-b", question_id: "q3", answer_text: "GT" },
-    { user_id: "user-b", question_id: "q4", answer_text: "MI" },
+    { user_id: "user-b", question_id: "q4", answer_text: "SRH" },
   ];
 
   const ledgerRows = scoreTournamentAnswers(scoringQuestions, answers, AWARDED_AT);
@@ -76,5 +76,5 @@ test("Top 4 scoring is not positional and counts each correct team once", () => 
   }
 
   assert.equal(pointsByUser.get("user-a"), 8);
-  assert.equal(pointsByUser.get("user-b"), 6);
+  assert.equal(pointsByUser.get("user-b"), 8);
 });

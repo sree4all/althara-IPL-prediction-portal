@@ -117,7 +117,7 @@ export function TournamentScoringPanel({
       <div className="mb-4 space-y-3 rounded border border-border p-3">
         <p className="text-xs font-semibold text-foreground">Set-based grouped scoring answers</p>
         <label className="block text-xs text-muted-foreground">
-          Top 4 teams (applies to Q1–Q4; one team scores once only)
+          Top 4 teams (applies to each of Q1–Q4 independently)
           <textarea
             className="mt-1 min-h-[4rem] w-full rounded-md border border-input px-2 py-1 text-sm"
             placeholder="One team per line, e.g. PBKS"
