@@ -135,3 +135,37 @@ test("Top 4 scoring accepts full-name aliases from the fixed team list", () => {
     6,
   );
 });
+
+test("Top 4 scoring awards Sumesh's RCB and RR answers four points", () => {
+  const questions: TournamentQuestionForScoring[] = [
+    { id: "q1", slot_no: 1, correct_answer: null },
+    { id: "q2", slot_no: 2, correct_answer: null },
+    { id: "q3", slot_no: 3, correct_answer: null },
+    { id: "q4", slot_no: 4, correct_answer: null },
+  ];
+  const scoringQuestions = tournamentQuestionsToScore(questions, SLOT_POINTS);
+  const answers: TournamentAnswerForScoring[] = [
+    { user_id: "sumesh-raj", question_id: "q1", answer_text: "PBKS" },
+    { user_id: "sumesh-raj", question_id: "q2", answer_text: "RCB" },
+    { user_id: "sumesh-raj", question_id: "q3", answer_text: "RR" },
+    { user_id: "sumesh-raj", question_id: "q4", answer_text: "CSK" },
+  ];
+
+  const ledgerRows = scoreTournamentAnswers(scoringQuestions, answers, AWARDED_AT);
+
+  assert.deepEqual(
+    ledgerRows.map((row) => ({
+      source_id: row.source_id,
+      points_delta: row.points_delta,
+      reason: row.reason,
+    })),
+    [
+      { source_id: "q2", points_delta: 2, reason: "tournament_slot_2" },
+      { source_id: "q3", points_delta: 2, reason: "tournament_slot_3" },
+    ],
+  );
+  assert.equal(
+    ledgerRows.reduce((sum, row) => sum + row.points_delta, 0),
+    4,
+  );
+});
