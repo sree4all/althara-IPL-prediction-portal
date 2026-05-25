@@ -20,6 +20,25 @@ function slotPointsArray(raw: unknown): number[] {
   return [2, 2, 2, 2, 3, 3, 5, 3, 3];
 }
 
+const TEAM_ANSWER_ALIASES = new Map<string, string>([
+  ["CHENNAI SUPER KINGS", "CSK"],
+  ["DELHI CAPITALS", "DC"],
+  ["GUJARAT TITANS", "GT"],
+  ["KOLKATA KNIGHT RIDERS", "KKR"],
+  ["LUCKNOW SUPER GIANTS", "LSG"],
+  ["MUMBAI INDIANS", "MI"],
+  ["PUNJAB KINGS", "PBKS"],
+  ["ROYAL CHALLENGERS BANGALORE", "RCB"],
+  ["ROYAL CHALLENGERS BENGALURU", "RCB"],
+  ["RAJASTHAN ROYALS", "RR"],
+  ["SUNRISERS HYDERABAD", "SRH"],
+]);
+
+function canonicalTournamentAnswer(raw: string | null | undefined): string {
+  const normalized = normAnswer(raw);
+  return TEAM_ANSWER_ALIASES.get(normalized) ?? normalized;
+}
+
 /**
  * Awards points for scorable tournament questions by comparing
  * `tournament_answers.answer_text` with slot-specific answer rules.
@@ -60,7 +79,7 @@ function parseAnswerSet(raw: string | null | undefined): Set<string> {
   if (!src) return new Set();
   const parts = src
     .split(/\r?\n|,/)
-    .map((s) => normAnswer(s))
+    .map((s) => canonicalTournamentAnswer(s))
     .filter(Boolean);
   return new Set(parts);
 }
@@ -140,7 +159,7 @@ export function scoreTournamentAnswers(
     const questionId = a.question_id as string;
     const q = qById.get(questionId);
     if (!q) continue;
-    const guess = normAnswer(a.answer_text as string);
+    const guess = canonicalTournamentAnswer(a.answer_text as string);
     if (!guess) continue;
     const uid = a.user_id as string;
     if (!answersByUser.has(uid)) answersByUser.set(uid, []);
