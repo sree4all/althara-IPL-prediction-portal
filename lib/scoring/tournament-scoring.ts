@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { normAnswer } from "@/lib/scoring/normalize";
+import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
 
 const TOP4_SCORING_ANSWERS = ["RCB", "GT", "SRH", "RR"] as const;
 const TOP4_SCORING_ANSWER_TEXT = TOP4_SCORING_ANSWERS.join("\n");
@@ -254,44 +255,39 @@ export async function applyTournamentScoring(
   }
 
   const now = new Date().toISOString();
-  const toScoreIds = new Set(toScore.map((q) => q.id));
-  const toScoreIdList = [...toScoreIds];
+  const toScoreIdList = toScore.map((q) => q.id);
 
-  const { data: oldLedger, error: oldErr } = await supabase
-    .from("points_ledger")
-    .select("user_id, source_id, points_delta")
-    .eq("source_type", "tournament_question")
-    .in("source_id", toScoreIdList);
-  if (oldErr) return { ok: false, error: oldErr.message };
+  const slotToCurrentId = new Map(toScore.map((q) => [q.slotNo, q.id]));
 
-  const refundByUser = new Map<string, number>();
-  for (const row of oldLedger ?? []) {
-    const uid = row.user_id as string;
-    const d = Number(row.points_delta ?? 0);
-    refundByUser.set(uid, (refundByUser.get(uid) ?? 0) + d);
+  const { data: answerRows, error: aErr } = await supabase
+    .from("tournament_answers")
+    .select("user_id, question_id, answer_text, tournament_questions!inner(slot_no, season_year)")
+    .eq("tournament_questions.season_year", seasonYear);
+  if (aErr) return { ok: false, error: aErr.message };
+
+  const allAnswers: TournamentAnswerForScoring[] = [];
+  for (const row of answerRows ?? []) {
+    const slotNo = Number(
+      (row as { tournament_questions?: { slot_no?: unknown } }).tournament_questions?.slot_no ?? 0,
+    );
+    const currentId = slotToCurrentId.get(slotNo);
+    if (!currentId) continue;
+    allAnswers.push({
+      user_id: row.user_id,
+      question_id: currentId,
+      answer_text: row.answer_text,
+    });
   }
 
-  if ((oldLedger ?? []).length > 0) {
+  const ledgerRows = scoreTournamentAnswers(toScore, allAnswers, now);
+
+  if (toScoreIdList.length > 0) {
     const { error: delErr } = await supabase
       .from("points_ledger")
       .delete()
       .eq("source_type", "tournament_question")
       .in("source_id", toScoreIdList);
     if (delErr) return { ok: false, error: delErr.message };
-  }
-
-  const profileDelta = new Map<string, number>();
-  for (const [uid, sum] of refundByUser) profileDelta.set(uid, (profileDelta.get(uid) ?? 0) - sum);
-
-  const { data: allAnswers, error: aErr } = await supabase
-    .from("tournament_answers")
-    .select("user_id, question_id, answer_text")
-    .in("question_id", toScoreIdList);
-  if (aErr) return { ok: false, error: aErr.message };
-
-  const ledgerRows = scoreTournamentAnswers(toScore, allAnswers ?? [], now);
-  for (const row of ledgerRows) {
-    profileDelta.set(row.user_id, (profileDelta.get(row.user_id) ?? 0) + row.points_delta);
   }
 
   if (ledgerRows.length > 0) {
@@ -308,19 +304,7 @@ export async function applyTournamentScoring(
     if (insErr) return { ok: false, error: insErr.message };
   }
 
-  for (const [uid, delta] of profileDelta) {
-    if (!delta) continue;
-    const { data: prof } = await supabase
-      .from("profiles")
-      .select("current_points")
-      .eq("id", uid)
-      .maybeSingle();
-    const cur = Number(prof?.current_points ?? 0);
-    await supabase
-      .from("profiles")
-      .update({ current_points: cur + delta, updated_at: now })
-      .eq("id", uid);
-  }
+  await syncProfilePointsFromLedger(supabase);
 
   const { error: scoreStampErr } = await supabase
     .from("tournament_questions")

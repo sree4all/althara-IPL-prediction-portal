@@ -183,6 +183,55 @@ test("Finalists Q5-Q6 use fixed RCB and RR list for 3 points per slot", () => {
   assert.equal(isFinalistsScoringAnswer("Royal Challengers Bengaluru"), true);
 });
 
+test("Top-4 points are preserved when Q5-Q6 finalists scoring is active", () => {
+  const questions: TournamentQuestionForScoring[] = [
+    { id: "q1", slot_no: 1, correct_answer: "RCB\nRR\nGT\nSRH" },
+    { id: "q2", slot_no: 2, correct_answer: "RCB\nRR\nGT\nSRH" },
+    { id: "q3", slot_no: 3, correct_answer: "RCB\nRR\nGT\nSRH" },
+    { id: "q4", slot_no: 4, correct_answer: "RCB\nRR\nGT\nSRH" },
+    { id: "q5", slot_no: 5, correct_answer: "RCB\nRR" },
+    { id: "q6", slot_no: 6, correct_answer: "RCB\nRR" },
+  ];
+  const scoringQuestions = tournamentQuestionsToScore(questions, SLOT_POINTS);
+  const answers: TournamentAnswerForScoring[] = [
+    { user_id: "vis", question_id: "q1", answer_text: "RCB" },
+    { user_id: "vis", question_id: "q2", answer_text: "GT" },
+    { user_id: "vis", question_id: "q3", answer_text: "SRH" },
+    { user_id: "vis", question_id: "q4", answer_text: "RR" },
+    { user_id: "vis", question_id: "q5", answer_text: "RCB" },
+    { user_id: "vis", question_id: "q6", answer_text: "RR" },
+  ];
+
+  const ledgerRows = scoreTournamentAnswers(scoringQuestions, answers, AWARDED_AT);
+  const top4 = ledgerRows.filter((r) => Number(r.reason.replace("tournament_slot_", "")) <= 4);
+  const fin = ledgerRows.filter((r) => {
+    const s = Number(r.reason.replace("tournament_slot_", ""));
+    return s >= 5 && s <= 6;
+  });
+
+  assert.equal(top4.reduce((s, r) => s + r.points_delta, 0), 8);
+  assert.equal(fin.reduce((s, r) => s + r.points_delta, 0), 6);
+  assert.equal(ledgerRows.reduce((s, r) => s + r.points_delta, 0), 14);
+});
+
+test("RCB on Q1 and Q5 awards Top-4 and finalists points independently", () => {
+  const questions: TournamentQuestionForScoring[] = [
+    { id: "q1", slot_no: 1, correct_answer: null },
+    { id: "q5", slot_no: 5, correct_answer: "RCB\nRR" },
+    { id: "q6", slot_no: 6, correct_answer: null },
+  ];
+  const scoringQuestions = tournamentQuestionsToScore(questions, SLOT_POINTS);
+  const answers: TournamentAnswerForScoring[] = [
+    { user_id: "u1", question_id: "q1", answer_text: "RCB" },
+    { user_id: "u1", question_id: "q5", answer_text: "RCB" },
+  ];
+  const ledgerRows = scoreTournamentAnswers(scoringQuestions, answers, AWARDED_AT);
+  assert.equal(
+    ledgerRows.reduce((s, r) => s + r.points_delta, 0),
+    5,
+  );
+});
+
 test("Finalists scoring stays inactive until an admin answer is saved on Q5 or Q6", () => {
   const questions: TournamentQuestionForScoring[] = [
     { id: "q5", slot_no: 5, correct_answer: null },
