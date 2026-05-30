@@ -7,6 +7,12 @@ const TOP4_SCORING_ANSWER_SET = new Set(
   TOP4_SCORING_ANSWERS.map((answer) => normAnswer(answer)),
 );
 
+const FINALISTS_SCORING_ANSWERS = ["RCB", "RR"] as const;
+const FINALISTS_SCORING_ANSWER_TEXT = FINALISTS_SCORING_ANSWERS.join("\n");
+const FINALISTS_SCORING_ANSWER_SET = new Set(
+  FINALISTS_SCORING_ANSWERS.map((answer) => normAnswer(answer)),
+);
+
 function slotPointsArray(raw: unknown): number[] {
   if (Array.isArray(raw)) {
     return raw.map((n) => Number(n ?? 2));
@@ -96,36 +102,56 @@ function isFinalistsSlot(slotNo: number): boolean {
   return slotNo >= 5 && slotNo <= 6;
 }
 
-export function isTop4ScoringAnswer(raw: string | null | undefined): boolean {
-  const normalized = normAnswer(raw);
-  if (!normalized) return false;
-  if (TOP4_SCORING_ANSWER_SET.has(normalized)) return true;
+function isAnswerInSet(
+  raw: string | null | undefined,
+  allowed: Set<string>,
+): boolean {
+  const canonical = canonicalTournamentAnswer(raw);
+  if (!canonical) return false;
+  if (allowed.has(canonical)) return true;
 
-  return normalized
+  return canonical
     .split(/[^A-Z0-9]+/)
-    .some((part) => TOP4_SCORING_ANSWER_SET.has(part));
+    .some((part) => allowed.has(part));
+}
+
+export function isTop4ScoringAnswer(raw: string | null | undefined): boolean {
+  return isAnswerInSet(raw, TOP4_SCORING_ANSWER_SET);
+}
+
+export function isFinalistsScoringAnswer(raw: string | null | undefined): boolean {
+  return isAnswerInSet(raw, FINALISTS_SCORING_ANSWER_SET);
 }
 
 export function tournamentQuestionsToScore(
   questions: TournamentQuestionForScoring[],
   slotPts: number[],
 ): TournamentScoringQuestion[] {
+  const finalistsActive = questions.some(
+    (q) => isFinalistsSlot(Number(q.slot_no ?? 0)) && hasAnswer(q.correct_answer as string),
+  );
+
   const rows = questions
     .map((q) => {
       const slotNo = Number(q.slot_no ?? 0);
       const top4Slot = isTop4Slot(slotNo);
+      const finalistsSlot = isFinalistsSlot(slotNo);
       return {
         id: q.id,
         slotNo,
-        pts: top4Slot ? 2 : Number(slotPts[slotNo - 1] ?? 2),
+        pts: top4Slot
+          ? 2
+          : finalistsSlot
+            ? 3
+            : Number(slotPts[slotNo - 1] ?? 2),
         correctRaw: top4Slot
           ? TOP4_SCORING_ANSWER_TEXT
-          : (q.correct_answer as string | null) ?? null,
+          : finalistsSlot && finalistsActive
+            ? FINALISTS_SCORING_ANSWER_TEXT
+            : (q.correct_answer as string | null) ?? null,
       };
     })
     .filter((q) => q.id && q.slotNo > 0);
-
-  const finalistsActive = rows.some((q) => isFinalistsSlot(q.slotNo) && hasAnswer(q.correctRaw));
 
   return rows.filter((q) => {
     if (isTop4Slot(q.slotNo)) return true;
@@ -143,14 +169,7 @@ export function scoreTournamentAnswers(
 
   // Group scoring rules:
   // - Slots 1..4: fixed Top-4 set; each correct team scores at most once per user (first matching slot).
-  // - Slots 5..6: unique overlap vs Finalists set (one team can score only once across these slots)
-  const finalistsCorrect = new Set<string>();
-  for (const q of questions) {
-    const target = isFinalistsSlot(q.slotNo) ? finalistsCorrect : null;
-    if (!target) continue;
-    for (const v of parseAnswerSet(q.correctRaw)) target.add(v);
-  }
-
+  // - Slots 5..6: fixed Finalists set (RCB, RR); 3 pts per slot; each team at most once per user.
   const answersByUser = new Map<
     string,
     { questionId: string; slotNo: number; guess: string }[]
@@ -181,8 +200,8 @@ export function scoreTournamentAnswers(
           matched = true;
           usedTop4.add(r.guess);
         }
-      } else if (isFinalistsSlot(r.slotNo) && finalistsCorrect.size > 0) {
-        if (finalistsCorrect.has(r.guess) && !usedFinalists.has(r.guess)) {
+      } else if (isFinalistsSlot(r.slotNo)) {
+        if (isFinalistsScoringAnswer(r.guess) && !usedFinalists.has(r.guess)) {
           matched = true;
           usedFinalists.add(r.guess);
         }

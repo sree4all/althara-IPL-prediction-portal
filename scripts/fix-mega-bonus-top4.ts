@@ -20,6 +20,7 @@ const seasonYear = Number(process.env.SEASON_YEAR ?? 2026);
 const syncPoints = process.argv.includes("--sync-points");
 
 const TOP4_CORRECT = "RCB\nRR\nGT\nSRH";
+const FINALISTS_CORRECT = "RCB\nRR";
 
 async function syncProfilePointsFromLedger(supabase: SupabaseClient) {
   const { data: profiles, error: pErr } = await supabase
@@ -76,7 +77,20 @@ async function main() {
     console.error("Update failed:", upErr.message);
     process.exit(1);
   }
-  console.log(`  Updated ${updated?.length ?? 0} question row(s).`);
+  console.log(`  Updated ${updated?.length ?? 0} Top-4 question row(s).`);
+
+  const { data: finalistsUpdated, error: finErr } = await supabase
+    .from("tournament_questions")
+    .update({ correct_answer: FINALISTS_CORRECT, updated_at: new Date().toISOString() })
+    .eq("season_year", seasonYear)
+    .gte("slot_no", 5)
+    .lte("slot_no", 6)
+    .select("id, slot_no");
+  if (finErr) {
+    console.error("Finalists update failed:", finErr.message);
+    process.exit(1);
+  }
+  console.log(`  Updated ${finalistsUpdated?.length ?? 0} Finalists question row(s) (Q5–Q6).`);
 
   console.log("Applying tournament scoring...");
   const result = await applyTournamentScoring(supabase, seasonYear);
