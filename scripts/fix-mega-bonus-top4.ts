@@ -20,7 +20,7 @@ const seasonYear = Number(process.env.SEASON_YEAR ?? 2026);
 const syncPoints = process.argv.includes("--sync-points");
 
 const TOP4_CORRECT = "RCB\nRR\nGT\nSRH";
-const FINALISTS_CORRECT = "RCB\nRR";
+const FINALISTS_CORRECT = "RCB\nGT";
 
 async function syncProfilePointsFromLedger(supabase: SupabaseClient) {
   const { data: profiles, error: pErr } = await supabase

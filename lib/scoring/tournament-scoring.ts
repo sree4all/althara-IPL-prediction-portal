@@ -8,7 +8,7 @@ const TOP4_SCORING_ANSWER_SET = new Set(
   TOP4_SCORING_ANSWERS.map((answer) => normAnswer(answer)),
 );
 
-const FINALISTS_SCORING_ANSWERS = ["RCB", "RR"] as const;
+const FINALISTS_SCORING_ANSWERS = ["RCB", "GT"] as const;
 const FINALISTS_SCORING_ANSWER_TEXT = FINALISTS_SCORING_ANSWERS.join("\n");
 const FINALISTS_SCORING_ANSWER_SET = new Set(
   FINALISTS_SCORING_ANSWERS.map((answer) => normAnswer(answer)),
@@ -170,7 +170,7 @@ export function scoreTournamentAnswers(
 
   // Group scoring rules:
   // - Slots 1..4: fixed Top-4 set; each correct team scores at most once per user (first matching slot).
-  // - Slots 5..6: fixed Finalists set (RCB, RR); 3 pts per slot; each team at most once per user.
+  // - Slots 5..6: fixed Finalists set (RCB, GT); 3 pts per slot; each team at most once per user.
   const answersByUser = new Map<
     string,
     { questionId: string; slotNo: number; guess: string }[]
