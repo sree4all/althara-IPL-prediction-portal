@@ -138,9 +138,17 @@ async function main() {
   const preview = scoreTournamentAnswers(toScore, answers ?? [], new Date().toISOString());
   console.log(`\nDry-run tournament scoring: ${preview.length} ledger row(s) would be written.`);
 
-  const top4Preview = preview.filter((r) => r.reason.startsWith("tournament_slot_") && Number(r.reason.replace("tournament_slot_", "")) <= 4);
+  const slotN = (reason: string) => Number(reason.replace("tournament_slot_", ""));
+  const top4Preview = preview.filter((r) => slotN(r.reason) <= 4);
+  const finPreview = preview.filter((r) => {
+    const s = slotN(r.reason);
+    return s >= 5 && s <= 6;
+  });
   const top4Points = top4Preview.reduce((s, r) => s + r.points_delta, 0);
-  console.log(`  Top-4 slot points in preview: ${top4Points} (${top4Preview.length} rows)`);
+  const finPoints = finPreview.reduce((s, r) => s + r.points_delta, 0);
+  console.log(`  Top-4 preview: ${top4Points} pts (${top4Preview.length} rows)`);
+  console.log(`  Finalists preview: ${finPoints} pts (${finPreview.length} rows)`);
+  console.log("  (Run npm run audit:mega-bonus for per-player breakdown)");
 
   const { data: ledgerSample } = await supabase
     .from("points_ledger")

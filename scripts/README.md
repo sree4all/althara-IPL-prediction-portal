@@ -20,7 +20,7 @@ npm run fix:mega-bonus-top4
 npm run fix:mega-bonus-top4 -- --sync-points
 ```
 
-`diagnose:supabase` reports table counts, Top-4 `correct_answer` alignment, and a dry-run of tournament ledger rows. `fix:mega-bonus-top4` sets Q1–Q4 answers to the fixed list (RCB, RR, GT, SRH) and re-runs the same scoring logic as **Admin → Apply tournament scoring**.
+`diagnose:supabase` reports table counts, Top-4 `correct_answer` alignment, and a dry-run of tournament ledger rows. `audit:mega-bonus` compares each player’s expected Q1–4 / Q5–6 points vs the ledger and flags profile drift. `fix:mega-bonus-top4` sets Q1–Q4 and Q5–Q6 answer keys, then re-runs the same scoring logic as **Admin → Apply tournament scoring**.
 
 ---
 
