@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  isFinalistsScoringAnswer,
   scoreTournamentAnswers,
   tournamentQuestionsToScore,
   type TournamentAnswerForScoring,
@@ -144,6 +145,54 @@ test("Top 4 scoring uses the fixed team list and two points per matching answer"
       { user_id: "user-a", source_id: "q3", points_delta: 2 },
       { user_id: "user-b", source_id: "q4", points_delta: 2 },
     ],
+  );
+});
+
+test("Finalists Q5-Q6 use fixed RCB and RR list for 3 points per slot", () => {
+  const questions: TournamentQuestionForScoring[] = [
+    { id: "q5", slot_no: 5, correct_answer: "RCB" },
+    { id: "q6", slot_no: 6, correct_answer: null },
+  ];
+  const scoringQuestions = tournamentQuestionsToScore(questions, SLOT_POINTS);
+  assert.deepEqual(
+    scoringQuestions.map((q) => ({ id: q.id, pts: q.pts })),
+    [
+      { id: "q5", pts: 3 },
+      { id: "q6", pts: 3 },
+    ],
+  );
+
+  const answers: TournamentAnswerForScoring[] = [
+    { user_id: "user-a", question_id: "q5", answer_text: "RR" },
+    { user_id: "user-a", question_id: "q6", answer_text: "RCB" },
+    { user_id: "user-b", question_id: "q5", answer_text: "RCB" },
+    { user_id: "user-b", question_id: "q6", answer_text: "RCB" },
+    { user_id: "user-c", question_id: "q5", answer_text: "MI" },
+    { user_id: "user-c", question_id: "q6", answer_text: "RR" },
+  ];
+
+  const ledgerRows = scoreTournamentAnswers(scoringQuestions, answers, AWARDED_AT);
+  const pointsByUser = new Map<string, number>();
+  for (const row of ledgerRows) {
+    pointsByUser.set(row.user_id, (pointsByUser.get(row.user_id) ?? 0) + row.points_delta);
+  }
+
+  assert.equal(pointsByUser.get("user-a"), 6);
+  assert.equal(pointsByUser.get("user-b"), 3);
+  assert.equal(pointsByUser.get("user-c"), 3);
+  assert.equal(isFinalistsScoringAnswer("Royal Challengers Bengaluru"), true);
+});
+
+test("Finalists scoring stays inactive until an admin answer is saved on Q5 or Q6", () => {
+  const questions: TournamentQuestionForScoring[] = [
+    { id: "q5", slot_no: 5, correct_answer: null },
+    { id: "q6", slot_no: 6, correct_answer: null },
+    { id: "q7", slot_no: 7, correct_answer: "CSK" },
+  ];
+  const scoringQuestions = tournamentQuestionsToScore(questions, SLOT_POINTS);
+  assert.deepEqual(
+    scoringQuestions.map((q) => q.slotNo),
+    [7],
   );
 });
 

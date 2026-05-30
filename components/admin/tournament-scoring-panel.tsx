@@ -114,10 +114,14 @@ export function TournamentScoringPanel({
         <p className="text-xs font-semibold text-foreground">Set-based grouped scoring answers</p>
         <p className="text-xs text-muted-foreground">
           Top 4 teams for Q1–Q4 are fixed to RCB, GT, SRH, and RR. Each matching Q1–Q4
-          answer earns 2 points.
+          answer earns 2 points (each team once).
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Finalists for Q5–Q6 are fixed to RCB and RR. Each matching answer earns 3 points
+          (each team once). Save the list below, then Apply tournament scoring.
         </p>
         <label className="block text-xs text-muted-foreground">
-          Finalists (applies to Q5–Q6; one team scores once only)
+          Finalists (applies to Q5–Q6; stored for activation — scoring uses RCB + RR)
           <textarea
             className="mt-1 min-h-[3rem] w-full rounded-md border border-input px-2 py-1 text-sm"
             placeholder="One team per line, e.g. RCB"
@@ -175,7 +179,7 @@ export function TournamentScoringPanel({
                 <p className="mt-2 border-t border-border pt-2 text-xs text-muted-foreground">
                   {q.slot_no >= 1 && q.slot_no <= 4
                     ? "Top 4 scoring is fixed to RCB, GT, SRH, and RR for this slot."
-                    : "Correct-answer input is managed by the shared finalists set above for this slot group."}
+                    : "Finalists scoring is fixed to RCB and RR (3 pts per slot, each team once)."}
                 </p>
               ) : (
                 <div className="mt-2 flex flex-wrap gap-2 border-t border-border pt-2">
