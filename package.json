@@ -19,6 +19,7 @@
     "diagnose:supabase": "tsx scripts/diagnose-supabase.ts",
     "audit:mega-bonus": "tsx scripts/audit-mega-bonus-scoring.ts",
     "fix:mega-bonus-top4": "tsx scripts/fix-mega-bonus-top4.ts",
+    "fix:vis-q789": "tsx scripts/fix-vis-q789-and-rescore.ts",
     "reapply:match": "tsx scripts/reapply-match-scoring.ts",
     "db:link": "npx supabase link",
     "db:push": "npx supabase db push",
