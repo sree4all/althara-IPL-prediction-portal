@@ -4,6 +4,17 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 
+function friendlyAuthError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("rate limit")) {
+    return "Too many magic-link emails sent recently. Wait about an hour, or use Continue with Google instead.";
+  }
+  if (lower.includes("database error saving new user")) {
+    return "Sign-up is temporarily unavailable. Please try again shortly or use Continue with Google.";
+  }
+  return message;
+}
+
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,7 +34,7 @@ export function LoginForm() {
       },
     });
     setLoading(false);
-    if (error) setMessage(error.message);
+    if (error) setMessage(friendlyAuthError(error.message));
   }
 
   async function signInWithEmail(e: React.FormEvent) {
@@ -38,7 +49,7 @@ export function LoginForm() {
     });
     setLoading(false);
     if (error) {
-      setMessage(error.message);
+      setMessage(friendlyAuthError(error.message));
       return;
     }
     setMessage("Check your email for the magic link.");
