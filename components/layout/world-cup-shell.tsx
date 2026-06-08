@@ -12,12 +12,12 @@ type Props = {
 };
 
 const accentGlow: Record<Exclude<PageBackgroundVariant, "default">, string> = {
-  welcome:
-    "bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(255,112,68,0.22),transparent),radial-gradient(ellipse_60%_40%_at_80%_20%,rgba(89,23,255,0.18),transparent)]",
-  prediction:
-    "bg-[radial-gradient(ellipse_70%_50%_at_50%_100%,rgba(79,184,76,0.14),transparent),radial-gradient(ellipse_50%_40%_at_10%_30%,rgba(57,75,255,0.16),transparent)]",
-  standings:
-    "bg-[radial-gradient(ellipse_60%_45%_at_20%_20%,rgba(0,180,216,0.18),transparent),radial-gradient(ellipse_55%_40%_at_90%_60%,rgba(230,57,155,0.14),transparent)]",
+  heroA:
+    "bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(255,112,68,0.2),transparent),radial-gradient(ellipse_60%_40%_at_80%_20%,rgba(89,23,255,0.16),transparent)]",
+  heroB:
+    "bg-[radial-gradient(ellipse_70%_50%_at_50%_100%,rgba(79,184,76,0.12),transparent),radial-gradient(ellipse_50%_40%_at_10%_30%,rgba(57,75,255,0.14),transparent)]",
+  heroC:
+    "bg-[radial-gradient(ellipse_60%_45%_at_20%_20%,rgba(0,180,216,0.16),transparent),radial-gradient(ellipse_55%_40%_at_90%_60%,rgba(230,57,155,0.12),transparent)]",
 };
 
 export function WorldCupShell({ variant, children, className }: Props) {
@@ -28,10 +28,16 @@ export function WorldCupShell({ variant, children, className }: Props) {
       {variant !== "default" ? (
         <>
           <div
-            className={cn(
-              "pointer-events-none fixed inset-0 z-0",
-              accentGlow[variant],
-            )}
+            className={cn("pointer-events-none fixed inset-0 z-0", accentGlow[variant])}
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none fixed inset-0 z-0 bg-cover bg-no-repeat sm:hidden"
+            style={{
+              backgroundImage: `url(${pageBackgrounds[variant].assetPath})`,
+              backgroundPosition: pageBackgrounds[variant].mobileObjectPosition,
+              opacity: pageBackgrounds[variant].imageOpacity,
+            }}
             aria-hidden
           />
           <div

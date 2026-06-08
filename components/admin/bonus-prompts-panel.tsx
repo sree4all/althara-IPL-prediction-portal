@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
 
 type MatchRow = {
   id: string;
@@ -28,7 +29,8 @@ type Prompt = {
 
 function matchLabel(m: MatchRow) {
   const k = m.external_key?.trim();
-  return k ? `${k} — ${m.home_team} vs ${m.away_team}` : `${m.home_team} vs ${m.away_team}`;
+  const base = k ? `${k} — ${m.home_team} vs ${m.away_team}` : `${m.home_team} vs ${m.away_team}`;
+  return `${base} · ${formatIstDateTimeFriendly(m.match_time_utc)}`;
 }
 
 function optionsToText(opts: PromptOption[] | undefined) {

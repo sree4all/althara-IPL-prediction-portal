@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { compareMatchOrder } from "@/lib/matches/match-order";
+import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
 
 const SEASON_YEAR = 2026;
 
@@ -31,9 +32,10 @@ export async function GET() {
 
   const list = sorted.map((m) => {
     const ext = (m.external_key as string | null)?.trim();
-    const label = ext
+    const teams = ext
       ? `${ext} — ${m.home_team} vs ${m.away_team}`
       : `${m.home_team} vs ${m.away_team}`;
+    const label = `${teams} · ${formatIstDateTimeFriendly(m.match_time_utc as string)}`;
     return {
       id: m.id as string,
       label,

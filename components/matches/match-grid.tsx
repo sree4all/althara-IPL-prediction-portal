@@ -42,8 +42,8 @@ export function MatchGrid() {
   if (matches.length === 0) {
     return (
       <p className="text-center text-sm text-muted-foreground">
-        No upcoming matches right now. Fixtures lock 30 minutes before start; completed
-        or locked games are not shown here.
+        No upcoming matches right now. Fixtures lock at kickoff; completed or locked games
+        are not shown here.
       </p>
     );
   }

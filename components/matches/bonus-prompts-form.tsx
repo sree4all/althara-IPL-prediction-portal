@@ -48,7 +48,13 @@ export function BonusPromptsForm({ matchId, answers, onAnswerChange, onAnswersLo
     };
   }, [matchId]);
 
-  if (!prompts.length) return null;
+  if (!prompts.length) {
+    return (
+      <p className="text-xs text-muted-foreground">
+        Watch for bonus prompts—organizers may post questions on this match before kickoff.
+      </p>
+    );
+  }
   return (
     <div className="space-y-3">
       {prompts.map((p) => {
@@ -74,10 +80,8 @@ export function BonusPromptsForm({ matchId, answers, onAnswerChange, onAnswersLo
               <>
                 {needsOptions ? (
                   <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
-                    No choices loaded for this match prompt. In Admin → Bonus prompts, open the row for{" "}
-                    <strong>this fixture</strong> (match-scoped), set Single choice, add lines under
-                    &quot;Choices for players&quot;, and Save options — not only the season-wide prompts on
-                    the Mega Bonus tab.
+                    Choices for this bonus prompt are not loaded yet. Check back soon—organizers may
+                    post bonus questions before kickoff.
                   </p>
                 ) : null}
                 <input

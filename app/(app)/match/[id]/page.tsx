@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { CommunityPicksList } from "@/components/matches/community-picks-list";
 import { PageHeader } from "@/components/layout/page-header";
-import { formatEasternDateTime } from "@/lib/utils/eastern-time";
+import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
 
 export default async function MatchDetailPage({
   params,
@@ -20,7 +20,7 @@ export default async function MatchDetailPage({
     <div className="space-y-4">
       <PageHeader
         title={`${match?.home_team ?? "—"} vs ${match?.away_team ?? "—"}`}
-        description={`Start: ${match?.match_time_utc ? formatEasternDateTime(match.match_time_utc) : "—"}`}
+        description={`Start: ${match?.match_time_utc ? formatIstDateTimeFriendly(match.match_time_utc) : "—"}`}
       />
       <CommunityPicksList matchId={id} />
     </div>

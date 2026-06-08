@@ -2,14 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-
-function isoToDatetimeLocalValue(iso: string | null | undefined): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
+import {
+  istDatetimeLocalToUtcIso,
+  utcIsoToIstDatetimeLocalValue,
+} from "@/lib/utils/time-format";
 
 export function TournamentConfigPanel({
   lock,
@@ -35,8 +31,8 @@ export function TournamentConfigPanel({
     mega_bonus_all_answers_visible: boolean;
   }) => Promise<void>;
 }) {
-  const [lockVal, setLockVal] = useState(lock ?? "");
-  const [tabAfter, setTabAfter] = useState(isoToDatetimeLocalValue(seasonBonusesVisibleAfterUtc));
+  const [lockVal, setLockVal] = useState(utcIsoToIstDatetimeLocalValue(lock));
+  const [tabAfter, setTabAfter] = useState(utcIsoToIstDatetimeLocalValue(seasonBonusesVisibleAfterUtc));
   const [tabRevealed, setTabRevealed] = useState(seasonBonusesRevealedByAdmin);
   const [isMaintenanceOn, setIsMaintenanceOn] = useState(maintenanceMode);
   const [maintenanceText, setMaintenanceText] = useState(
@@ -56,10 +52,10 @@ export function TournamentConfigPanel({
           After this time, players cannot edit season-long bonus answers.
         </p>
         <input
+          type="datetime-local"
           className="mt-2 w-full rounded-md border border-input px-2 py-1 text-sm"
           value={lockVal}
           onChange={(e) => setLockVal(e.target.value)}
-          placeholder="ISO timestamp or empty"
         />
       </div>
 
@@ -130,10 +126,8 @@ export function TournamentConfigPanel({
         size="sm"
         onClick={() =>
           onSave({
-            answer_lock_utc: lockVal.trim() || null,
-            season_bonuses_visible_after_utc: tabAfter
-              ? new Date(tabAfter).toISOString()
-              : null,
+            answer_lock_utc: istDatetimeLocalToUtcIso(lockVal),
+            season_bonuses_visible_after_utc: istDatetimeLocalToUtcIso(tabAfter),
             season_bonuses_revealed_by_admin: tabRevealed,
             maintenance_mode: isMaintenanceOn,
             maintenance_banner_text: maintenanceText.trim() || "അടിമ പണിയിലാണ്",

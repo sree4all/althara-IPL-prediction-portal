@@ -6,7 +6,7 @@ import { normAnswer } from "@/lib/scoring/normalize";
 import { isMatchLocked } from "@/lib/utils/match-lock";
 
 const LOCK_MSG =
-  "Sorry! The deadline for this match was 30 minutes before start time (US Eastern). This match is now locked.";
+  "Sorry! Predictions for this match locked at kickoff (IST). This match is now locked.";
 
 export async function POST(request: Request) {
   const supabase = await createClient();

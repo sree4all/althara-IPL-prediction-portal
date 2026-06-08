@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatEasternDateTime } from "@/lib/utils/eastern-time";
+import { formatIstDateTime } from "@/lib/utils/time-format";
 
 export function UtcNowClock() {
   const [now, setNow] = useState<Date | null>(null);
@@ -15,7 +15,7 @@ export function UtcNowClock() {
   if (now === null) {
     return (
       <p className="mb-4 text-sm font-bold tabular-nums text-wc-yellow" aria-hidden>
-        Current time (Eastern): …
+        Current time (IST): …
       </p>
     );
   }
@@ -26,8 +26,8 @@ export function UtcNowClock() {
       aria-live="polite"
       aria-atomic="true"
     >
-      <span className="text-white/70">Current time (Eastern):</span>
-      {formatEasternDateTime(now)}
+      <span className="text-white/70">Current time (IST):</span>
+      {formatIstDateTime(now)}
     </p>
   );
 }

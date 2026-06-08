@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DRAW_PICK } from "@/lib/fifa/stages";
+import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
 
 export type AdminMatchRow = {
   id: string;
@@ -27,7 +28,8 @@ type MatchBonusPrompt = {
 
 function label(m: AdminMatchRow) {
   const k = m.external_key?.trim();
-  return k ? `${k} — ${m.home_team} vs ${m.away_team}` : `${m.home_team} vs ${m.away_team}`;
+  const base = k ? `${k} — ${m.home_team} vs ${m.away_team}` : `${m.home_team} vs ${m.away_team}`;
+  return `${base} · ${formatIstDateTimeFriendly(m.match_time_utc)}`;
 }
 
 export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {

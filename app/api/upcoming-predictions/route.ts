@@ -106,7 +106,7 @@ export async function GET() {
       ? `${ext} — ${m.home_team} vs ${m.away_team}`
       : `${m.home_team} vs ${m.away_team}`;
     const mt = new Date(m.match_time_utc as string);
-    const lock = new Date(mt.getTime() - 30 * 60 * 1000);
+    const lock = mt;
     const structured = (bonusByMatch.get(id) ?? []).map((row) => ({
       prompt_text: row.prompt_text,
       answer_text: row.answer_text,

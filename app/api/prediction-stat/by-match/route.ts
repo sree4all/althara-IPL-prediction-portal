@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
 
 const SEASON_YEAR = 2026;
 
@@ -22,9 +23,10 @@ export async function GET(request: Request) {
   if (mErr || !match) return NextResponse.json({ error: "MATCH_NOT_FOUND" }, { status: 404 });
 
   const ext = (match.external_key as string | null)?.trim();
-  const label = ext
+  const teams = ext
     ? `${ext} — ${match.home_team} vs ${match.away_team}`
     : `${match.home_team} vs ${match.away_team}`;
+  const label = `${teams} · ${formatIstDateTimeFriendly(match.match_time_utc as string)}`;
 
   const { data: preds, error: pErr } = await supabase
     .from("predictions")
