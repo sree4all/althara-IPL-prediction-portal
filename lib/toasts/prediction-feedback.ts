@@ -4,7 +4,7 @@ const FIRST_SAVE = "Prediction recorded for [Match]!";
 const UPDATED =
   "We've updated your existing prediction with your new choice. Good luck!";
 const LOCKED =
-  "Sorry! The deadline for this match was 30 minutes before start time (GMT). This match is now locked.";
+  "Sorry! The deadline for this match was 30 minutes before start time (US Eastern). This match is now locked.";
 const TOURNAMENT_LOCKED = "Tournament answers are now locked.";
 
 export function toastPredictionRecorded(

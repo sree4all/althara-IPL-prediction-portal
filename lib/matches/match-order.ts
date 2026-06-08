@@ -2,7 +2,7 @@
  * Natural ordering for fixture keys like M1, M2, … M10 (not lexicographic).
  */
 
-/** Extract numeric part from external_key (e.g. "M12", "m 3 "). Returns null if none. */
+/** Extract numeric part from external_key (e.g. "M12", "WC26-M12", "m 3 "). Returns null if none. */
 export function parseMatchNumberFromExternalKey(externalKey: string | null | undefined): number | null {
   if (externalKey == null) return null;
   const t = String(externalKey).trim();

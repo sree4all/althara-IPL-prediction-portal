@@ -5,9 +5,7 @@ export const MVP2_ROUTES = {
   ADMIN_CONFIG: "/api/admin/config",
   HISTORY: "/api/history",
   COMMUNITY_PICKS: "/api/community-picks",
-  MIGRATION_IMPORT: "/api/migration/import-legacy",
-  MIGRATION_ALIASES: "/api/migration/aliases",
-  MIGRATION_ALIAS_CLAIM: "/api/migration/aliases/claim",
+  ADMIN_SCORING_STAGES: "/api/admin/scoring/stages",
 } as const;
 
 export type Mvp2RouteKey = keyof typeof MVP2_ROUTES;

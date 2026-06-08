@@ -45,10 +45,10 @@ export function LoginForm() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col gap-6">
+    <div className="flex w-full flex-col gap-5">
       <Button
         type="button"
-        className="w-full"
+        className="wc-cta-button"
         disabled={loading}
         onClick={signInWithGoogle}
       >
@@ -56,14 +56,14 @@ export function LoginForm() {
       </Button>
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border" />
+          <span className="w-full border-t border-white/15" />
         </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">Or</span>
+        <div className="relative flex justify-center text-xs uppercase tracking-wider">
+          <span className="bg-transparent px-2 text-white/40">Or</span>
         </div>
       </div>
       <form onSubmit={signInWithEmail} className="flex flex-col gap-3">
-        <label className="text-sm font-medium text-foreground" htmlFor="email">
+        <label className="text-sm font-medium text-white/80" htmlFor="email">
           Email
         </label>
         <input
@@ -74,7 +74,7 @@ export function LoginForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+          className="h-11 rounded-xl border border-white/15 bg-white/5 px-3 text-sm text-white placeholder:text-white/35 focus:border-wc-cta focus:outline-none focus:ring-2 focus:ring-wc-cta/30"
           placeholder="you@example.com"
         />
         <Button type="submit" variant="secondary" disabled={loading}>
@@ -82,7 +82,7 @@ export function LoginForm() {
         </Button>
       </form>
       {message ? (
-        <p className="text-center text-sm text-muted-foreground">{message}</p>
+        <p className="text-center text-sm text-white/70">{message}</p>
       ) : null}
     </div>
   );

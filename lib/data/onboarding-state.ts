@@ -1,5 +1,5 @@
 export const defaultOnboardingItems = [
-  "Match picks lock 30 minutes before match start (IST).",
+  "Match picks lock 30 minutes before match start (US Eastern).",
   "Tournament answers lock at configured IST time.",
   "Bonus prompts may be match-specific or tournament-wide.",
 ];

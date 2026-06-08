@@ -33,6 +33,8 @@ type AdminConfig = {
     options?: { label: string; value: string; sort_order: number }[];
   }[];
   matches: AdminMatch[];
+  tournamentOnly?: boolean;
+  bonusOnly?: boolean;
 };
 
 export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
@@ -72,18 +74,25 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
     }
   }
 
+  const showTournament = !initial.bonusOnly;
+  const showBonus = !initial.tournamentOnly;
+
   return (
     <div className="space-y-4">
-      <TournamentConfigPanel
-        lock={cfg.answer_lock_utc}
-        seasonBonusesVisibleAfterUtc={cfg.season_bonuses_visible_after_utc}
-        seasonBonusesRevealedByAdmin={cfg.season_bonuses_revealed_by_admin}
-        maintenanceMode={cfg.maintenance_mode}
-        maintenanceBannerText={cfg.maintenance_banner_text}
-        megaBonusAllAnswersVisible={cfg.mega_bonus_all_answers_visible}
-        onSave={saveTournamentSettings}
-      />
-      <BonusPromptsPanel initialPrompts={cfg.bonus_prompts} matches={cfg.matches} />
+      {showTournament ? (
+        <TournamentConfigPanel
+          lock={cfg.answer_lock_utc}
+          seasonBonusesVisibleAfterUtc={cfg.season_bonuses_visible_after_utc}
+          seasonBonusesRevealedByAdmin={cfg.season_bonuses_revealed_by_admin}
+          maintenanceMode={cfg.maintenance_mode}
+          maintenanceBannerText={cfg.maintenance_banner_text}
+          megaBonusAllAnswersVisible={cfg.mega_bonus_all_answers_visible}
+          onSave={saveTournamentSettings}
+        />
+      ) : null}
+      {showBonus ? (
+        <BonusPromptsPanel initialPrompts={cfg.bonus_prompts} matches={cfg.matches} />
+      ) : null}
     </div>
   );
 }

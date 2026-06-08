@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { DRAW_PICK } from "@/lib/fifa/stages";
+import { isMatchReadyForPredictions } from "@/lib/fifa/match-ready";
 import { normAnswer } from "@/lib/scoring/normalize";
-import { isKnockoutMatchReadyForPredictions } from "@/lib/knockout/placeholders";
 import { isMatchLocked } from "@/lib/utils/match-lock";
 
 const LOCK_MSG =
-  "Sorry! The deadline for this match was 30 minutes before start time (GMT). This match is now locked.";
+  "Sorry! The deadline for this match was 30 minutes before start time (US Eastern). This match is now locked.";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -28,7 +29,6 @@ export async function POST(request: Request) {
   }
 
   const { match_id, predicted_winner, bonus_answers } = body;
-  // Match-level extras use `bonus_prompts` + `bonus_answers` only (not legacy `bonus_pick`).
   const bonus_pick = null;
   if (!match_id || !predicted_winner) {
     return NextResponse.json({ error: "VALIDATION" }, { status: 400 });
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
   const { data: match, error: mErr } = await supabase
     .from("matches")
-    .select("id, match_time_utc, home_team, away_team, status, knockout_stage")
+    .select("id, match_time_utc, home_team, away_team, status, tournament_stage")
     .eq("id", match_id)
     .maybeSingle();
 
@@ -60,23 +60,20 @@ export async function POST(request: Request) {
     );
   }
 
-  if (match.knockout_stage) {
-    const home = match.home_team as string;
-    const away = match.away_team as string;
-    if (!isKnockoutMatchReadyForPredictions(home, away)) {
-      return NextResponse.json(
-        {
-          error: "KNOCKOUT_TEAMS_PENDING",
-          message:
-            "Teams for this knockout match are not set yet. Check back after the previous knockout results.",
-        },
-        { status: 403 },
-      );
-    }
+  const home = match.home_team as string;
+  const away = match.away_team as string;
+  if (!isMatchReadyForPredictions(home, away)) {
+    return NextResponse.json(
+      {
+        error: "TEAMS_PENDING",
+        message: "Teams for this match are not set yet. Check back later.",
+      },
+      { status: 403 },
+    );
   }
 
-  const winners = [match.home_team, match.away_team];
-  if (!winners.includes(predicted_winner)) {
+  const allowed = [home, away, DRAW_PICK];
+  if (!allowed.includes(predicted_winner)) {
     return NextResponse.json({ error: "VALIDATION" }, { status: 400 });
   }
 
@@ -116,7 +113,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: pErr.message }, { status: 500 });
   }
 
-  if (!match.knockout_stage && bonus_answers?.length) {
+  if (bonus_answers?.length) {
     const promptIds = [...new Set(bonus_answers.map((b) => b.prompt_id))];
     const { data: prompts, error: prErr } = await supabase
       .from("bonus_prompts")
@@ -149,11 +146,11 @@ export async function POST(request: Request) {
       }
       const it = (pr as { input_type?: string }).input_type;
       if (it === "single_choice") {
-        const allowed = optionValuesByPrompt.get(b.prompt_id);
-        if (!allowed || allowed.size === 0) {
+        const allowedOpts = optionValuesByPrompt.get(b.prompt_id);
+        if (!allowedOpts || allowedOpts.size === 0) {
           return NextResponse.json({ error: "BONUS_OPTIONS_NOT_CONFIGURED" }, { status: 400 });
         }
-        if (!allowed.has(normAnswer(text))) {
+        if (!allowedOpts.has(normAnswer(text))) {
           return NextResponse.json({ error: "INVALID_BONUS_OPTION" }, { status: 400 });
         }
       }
@@ -172,15 +169,15 @@ export async function POST(request: Request) {
         .eq("prompt_id", b.prompt_id);
       sel =
         resolvedMatchId === null ? sel.is("match_id", null) : sel.eq("match_id", resolvedMatchId);
-      const { data: existing, error: sErr } = await sel.maybeSingle();
+      const { data: existingBa, error: sErr } = await sel.maybeSingle();
       if (sErr) {
         return NextResponse.json({ error: sErr.message }, { status: 500 });
       }
-      if (existing?.id) {
+      if (existingBa?.id) {
         const { error: uErr } = await supabase
           .from("prediction_bonus_answers")
           .update({ answer_text: text, updated_at: nowIso })
-          .eq("id", existing.id);
+          .eq("id", existingBa.id);
         if (uErr) {
           return NextResponse.json({ error: uErr.message }, { status: 500 });
         }

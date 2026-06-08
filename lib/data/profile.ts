@@ -4,12 +4,9 @@ export type ProfileRow = {
   id: string;
   email: string | null;
   display_name: string;
-  legacy_points: number | null;
   current_points: number;
   rank: number | null;
   role?: string;
-  /** false = must finish /login/legacy-alias (claim or skip) before using the app */
-  legacy_alias_onboarding_completed?: boolean;
 };
 
 export async function getProfileForUser(
@@ -18,9 +15,7 @@ export async function getProfileForUser(
 ): Promise<ProfileRow | null> {
   const { data, error } = await supabase
     .from("profiles")
-    .select(
-      "id, email, display_name, legacy_points, current_points, rank, role, legacy_alias_onboarding_completed",
-    )
+    .select("id, email, display_name, current_points, rank, role")
     .eq("id", userId)
     .maybeSingle();
 

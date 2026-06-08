@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getLeaderboard } from "@/lib/data/leaderboard";
 import { LeaderboardTable } from "@/components/leaderboard/leaderboard-table";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function LeaderboardPage() {
   const supabase = await createClient();
@@ -8,10 +9,10 @@ export default async function LeaderboardPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold tracking-tight">Leaderboard</h1>
-      <p className="mb-6 text-sm text-muted-foreground">
-        Sorted by current season points, then player name.
-      </p>
+      <PageHeader
+        title="Leaderboard"
+        description="Sorted by current season points, then player name."
+      />
       <LeaderboardTable rows={rows} />
     </div>
   );

@@ -1,11 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { knockoutWinnerPoints, parseKnockoutStage } from "@/lib/knockout/scoring";
+import { parseTournamentStage } from "@/lib/fifa/stages";
 import { normAnswer } from "@/lib/scoring/normalize";
-import { isLegacyLateExcluded } from "@/lib/scoring/legacy-late-exclusions";
+import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
 
 export type ScoringConfigRow = {
   season_year: number;
-  match_winner_points: number;
   match_bonus_points: number;
 };
 
@@ -23,9 +22,7 @@ type LedgerInsert = {
 };
 
 const LEDGER_BATCH = 500;
-/** Profile `.in()` chunk size (PostgREST URL limits). */
 const PROFILE_ID_CHUNK = 150;
-/** Parallel profile point updates per batch (reduces latency vs strict sequential). */
 const PROFILE_UPDATE_CONCURRENCY = 40;
 
 function sumByUser(rows: { user_id: string; points_delta: number }[]): Map<string, number> {
@@ -43,11 +40,15 @@ export async function applyMatchScoring(
   matchId: string,
   seasonYear = 2026,
 ): Promise<MatchScoreOutcome> {
-  const { data: cfg, error: cErr } = await supabase
-    .from("scoring_config")
-    .select("season_year, match_winner_points, match_bonus_points")
-    .eq("season_year", seasonYear)
-    .maybeSingle();
+  const [{ data: cfg, error: cErr }, stageMap] = await Promise.all([
+    supabase
+      .from("scoring_config")
+      .select("season_year, match_bonus_points")
+      .eq("season_year", seasonYear)
+      .maybeSingle(),
+    loadStageScoringMap(supabase, seasonYear),
+  ]);
+
   if (cErr || !cfg) {
     return { ok: false, error: cErr?.message ?? "missing scoring_config" };
   }
@@ -55,7 +56,7 @@ export async function applyMatchScoring(
   const { data: match, error: mErr } = await supabase
     .from("matches")
     .select(
-      "id, external_key, status, winner, bonus_result, home_team, away_team, knockout_stage",
+      "id, external_key, status, winner, bonus_result, home_team, away_team, tournament_stage",
     )
     .eq("id", matchId)
     .maybeSingle();
@@ -67,12 +68,18 @@ export async function applyMatchScoring(
     return { ok: false, error: "Match status must be completed before scoring." };
   }
 
-  const winnerPts = Number(cfg.match_winner_points ?? 0);
   const bonusPts = Number(cfg.match_bonus_points ?? 0);
-  const knockoutStage = parseKnockoutStage(match.knockout_stage as string | null);
-  const knockoutPts = knockoutStage ? knockoutWinnerPoints(knockoutStage) : null;
+  const stageSlug = parseTournamentStage(match.tournament_stage as string | null) ?? "group";
+  const stageRow = stageMap.get(stageSlug);
+  if (!stageRow) {
+    return { ok: false, error: `missing stage_scoring_config for ${stageSlug}` };
+  }
 
   const actualWinner = match.winner as string | null;
+  if (!actualWinner?.trim()) {
+    return { ok: false, error: "Match winner (or Draw) must be set before scoring." };
+  }
+
   const legacyBonusResult = match.bonus_result as string | null;
 
   const { data: predictions, error: pErr } = await supabase
@@ -81,18 +88,6 @@ export async function applyMatchScoring(
     .eq("match_id", matchId);
   if (pErr) {
     return { ok: false, error: pErr.message };
-  }
-  const userIds = [...new Set((predictions ?? []).map((p) => p.user_id as string))];
-  let excludedUsers = new Set<string>();
-  try {
-    const { data: excludedRows } = await supabase
-      .from("legacy_prediction_exclusions")
-      .select("user_id")
-      .eq("match_id", matchId)
-      .in("user_id", userIds.length > 0 ? userIds : ["00000000-0000-0000-0000-000000000000"]);
-    excludedUsers = new Set((excludedRows ?? []).map((r) => r.user_id as string));
-  } catch {
-    excludedUsers = new Set<string>();
   }
 
   const { data: promptRows } = await supabase
@@ -137,23 +132,11 @@ export async function applyMatchScoring(
 
   for (const pred of predictions ?? []) {
     const userId = pred.user_id as string;
-    if (excludedUsers.has(userId)) continue;
-    if (isLegacyLateExcluded(userId, (match.external_key as string | null) ?? null)) continue;
     const predictedWinner = pred.predicted_winner as string;
 
-    let wDelta = 0;
-    if (actualWinner) {
-      if (knockoutPts) {
-        const correct =
-          normAnswer(predictedWinner) === normAnswer(actualWinner);
-        wDelta = correct ? knockoutPts.correct : knockoutPts.wrong;
-      } else {
-        wDelta =
-          normAnswer(predictedWinner) === normAnswer(actualWinner) ? winnerPts : 0;
-      }
-    }
+    const wDelta = winnerPointsDelta(predictedWinner, actualWinner, stageRow);
 
-    if (!knockoutStage && usePerPromptBonus) {
+    if (usePerPromptBonus) {
       for (const pr of promptsOrdered) {
         const pid = pr.id as string;
         const official = (pr.correct_answer as string | null)?.trim();
@@ -170,7 +153,7 @@ export async function applyMatchScoring(
           });
         }
       }
-    } else if (!knockoutStage && legacyBonusResult) {
+    } else if (legacyBonusResult) {
       const legacyPick = (pred.bonus_pick as string | null)?.trim();
       let fromPrompts = "";
       if (promptIds.length > 0) {
@@ -194,26 +177,18 @@ export async function applyMatchScoring(
       }
     }
 
-    const writeWinnerLedger =
-      knockoutStage !== null
-        ? actualWinner !== null && actualWinner !== undefined
-        : wDelta > 0;
-    if (writeWinnerLedger) {
-      toInsert.push({
-        user_id: userId,
-        source_type: "match",
-        source_id: matchId,
-        points_delta: wDelta,
-        reason: knockoutStage ? `knockout_winner:${knockoutStage}` : "match_winner",
-        awarded_at: now,
-      });
-    }
+    toInsert.push({
+      user_id: userId,
+      source_type: "match",
+      source_id: matchId,
+      points_delta: wDelta,
+      reason: `match_winner:${stageSlug}`,
+      awarded_at: now,
+    });
   }
 
   const awardByUser = sumByUser(toInsert);
 
-  // Replace ledger rows for this match in one shot (audit lines vary by bonus prompts).
-  // Profile points use net delta (award − refund), not full strip/re-add.
   if (oldLedger?.length) {
     const { error: delErr } = await supabase
       .from("points_ledger")

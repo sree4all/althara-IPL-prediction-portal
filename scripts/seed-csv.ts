@@ -28,6 +28,7 @@ import { parse } from "csv-parse/sync";
 import * as fs from "fs";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
+import { importFifaMatches } from "@/lib/fifa/import-matches";
 import { applyMatchScoring } from "@/lib/scoring/match-scoring";
 
 // tsx does not load .env.local (Next.js does); mirror Next precedence: .env then .env.local
@@ -917,9 +918,20 @@ async function main() {
     return;
   }
 
-  if (!mode || (!file && mode !== "demo" && mode !== "ipl2026")) {
+  if (mode === "fifa") {
+    const dir = file ?? "./docs/fifa";
+    const result = await importFifaMatches(makeServiceClient(), dir);
+    if (result.errors.length > 0) {
+      console.error("FIFA import errors:\n", result.errors.join("\n"));
+      process.exit(1);
+    }
+    console.log(`FIFA import complete: ${result.upserted} matches upserted from ${dir}`);
+    return;
+  }
+
+  if (!mode || (!file && mode !== "demo" && mode !== "ipl2026" && mode !== "fifa")) {
     console.error(
-      'Usage: npm run seed -- matches|profiles|aliases|legacy-predictions|legacy-predictions-staging <file> [season_label] [--display-name] | npm run seed:demo | npm run seed:ipl2026\nRequires NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      "Usage: npm run seed -- fifa [./docs/fifa] | matches <file> | profiles <file> | npm run seed:demo\nSee scripts/ops/README.md for reset + import runbook.",
     );
     process.exit(1);
   }
@@ -945,7 +957,7 @@ async function main() {
     await seedLegacyPredictionsStagingCli(file, seasonLabel);
   } else {
     console.error(
-      'First arg must be "matches", "profiles", "aliases", "legacy-predictions", "legacy-predictions-staging", "demo", or "ipl2026" (or npm run seed:ipl2026).',
+      'First arg must be "fifa", "matches", "profiles", "demo", or "ipl2026".',
     );
     process.exit(1);
   }

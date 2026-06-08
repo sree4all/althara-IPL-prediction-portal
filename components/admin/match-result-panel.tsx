@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { DRAW_PICK } from "@/lib/fifa/stages";
 
 export type AdminMatchRow = {
   id: string;
@@ -13,7 +14,7 @@ export type AdminMatchRow = {
   winner: string | null;
   bonus_result: string | null;
   scored_at: string | null;
-  knockout_stage?: string | null;
+  tournament_stage?: string | null;
 };
 
 type MatchBonusPrompt = {
@@ -29,7 +30,7 @@ function label(m: AdminMatchRow) {
 }
 
 export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
-  const unscoredMatches = matches.filter((m) => !m.scored_at && !m.knockout_stage);
+  const unscoredMatches = matches.filter((m) => !m.scored_at);
   const [matchId, setMatchId] = useState("");
   const [winner, setWinner] = useState("");
   const [legacyBonus, setLegacyBonus] = useState("");
@@ -78,8 +79,12 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
       setMsg("Select a match and winning team.");
       return;
     }
-    if (![selected.home_team, selected.away_team].includes(winner)) {
-      setMsg("Winner must be one of the two teams.");
+    const valid =
+      winner === DRAW_PICK ||
+      winner === selected.home_team ||
+      winner === selected.away_team;
+    if (!valid) {
+      setMsg("Result must be home team, away team, or Draw.");
       return;
     }
     setBusy(true);
@@ -147,7 +152,7 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
       </label>
       {selected ? (
         <div className="mt-3 space-y-3">
-          <p className="text-xs font-medium">Winning team</p>
+          <p className="text-xs font-medium">Match result</p>
           <div className="flex flex-wrap gap-3 text-sm">
             <label className="flex items-center gap-2">
               <input
@@ -166,6 +171,15 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
                 onChange={() => pickWinner(selected.away_team)}
               />
               {selected.away_team}
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="win"
+                checked={winner === DRAW_PICK}
+                onChange={() => pickWinner(DRAW_PICK)}
+              />
+              Draw
             </label>
           </div>
 

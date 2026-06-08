@@ -1,14 +1,14 @@
-/** Manual types mirroring `supabase/migrations/0001_schema.sql` — replace with generated types if using `supabase gen types`. */
+/** Manual types mirroring Supabase schema — replace with generated types if using `supabase gen types`. */
+
+import type { TournamentStageSlug } from "@/lib/fifa/stages";
 
 export type Profile = {
   id: string;
   email: string | null;
   display_name: string;
-  legacy_points: number | null;
   current_points: number;
   rank: number | null;
   role?: string;
-  legacy_alias_onboarding_completed?: boolean;
   scoring_bootstrapped_at?: string | null;
   created_at: string;
   updated_at: string;
@@ -23,8 +23,17 @@ export type Match = {
   winner: string | null;
   bonus_result: string | null;
   status: string;
+  tournament_stage: TournamentStageSlug;
   scored_at?: string | null;
   created_at: string;
+  updated_at: string;
+};
+
+export type StageScoringConfig = {
+  season_year: number;
+  stage_slug: TournamentStageSlug;
+  correct_points: number;
+  incorrect_points: number;
   updated_at: string;
 };
 
