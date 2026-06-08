@@ -85,7 +85,7 @@ export function TournamentQuestionsForm({ standalone = false }: Props) {
       <p className="mb-2 text-sm font-semibold">Mega Bonus</p>
       {hasTop4Duplicates ? (
         <p className="mb-2 text-xs text-amber-700 dark:text-amber-400">
-          Warning: Q1–Q4 should be 4 unique teams. Duplicate teams score only once.
+          Warning: Q1–Q4 should be 4 unique teams.
         </p>
       ) : null}
       {hasFinalistDuplicates ? (

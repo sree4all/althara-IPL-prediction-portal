@@ -5,9 +5,22 @@
 Seeding needs the **service role** (server only; never ship to browsers):
 
 - `NEXT_PUBLIC_SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` (publishable `sb_publishable_…` or legacy `anon` JWT)
+- `SUPABASE_SERVICE_ROLE_KEY` (secret `sb_secret_…` or legacy `service_role` JWT)
 
-Put them in `.env.local` (see `.env.local.example`), then run commands from the **repository root**. The seed script loads `.env` then `.env.local` automatically (same idea as Next.js).
+Put them in `.env.local` (see `env.local.example` at repo root), then run commands from the **repository root**. The seed script loads `.env` then `.env.local` automatically (same idea as Next.js).
+
+**Publishable key alone is not enough** for diagnose/fix scripts: Row Level Security hides all rows from the anonymous role. Use the **secret / service_role** key for operator scripts.
+
+### Mega Bonus / Top-4 scoring check
+
+```bash
+npm run diagnose:supabase
+npm run fix:mega-bonus-top4
+npm run fix:mega-bonus-top4 -- --sync-points
+```
+
+`diagnose:supabase` reports table counts, Top-4 `correct_answer` alignment, and a dry-run of tournament ledger rows. `audit:mega-bonus` compares each player’s expected Q1–4 / Q5–6 points vs the ledger and flags profile drift. `fix:mega-bonus-top4` sets Q1–Q4 and Q5–Q6 answer keys, then re-runs the same scoring logic as **Admin → Apply tournament scoring**.
 
 ---
 

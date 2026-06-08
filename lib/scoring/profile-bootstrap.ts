@@ -1,6 +1,7 @@
 import { parseTournamentStage } from "@/lib/fifa/stages";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
+import { isTop4ScoringAnswer } from "@/lib/scoring/tournament-scoring";
 import { createServiceClient } from "@/lib/supabase/service";
 
 const SEASON_YEAR = 2026;
@@ -251,12 +252,19 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
         if (!qid || ledgeredQuestionIds.has(qid)) continue;
         const q = questionMap.get(qid);
         if (!q) continue;
-        const official = (q.correct_answer ?? "").trim();
         const guess = ((a.answer_text as string | null) ?? "").trim();
-        if (!official || !guess) continue;
-        if (normAnswer(guess) !== normAnswer(official)) continue;
+        if (!guess) continue;
 
-        const pts = Number(tournamentSlotPts[q.slot_no - 1] ?? 2);
+        let pts = Number(tournamentSlotPts[q.slot_no - 1] ?? 2);
+        if (q.slot_no >= 1 && q.slot_no <= 4) {
+          if (!isTop4ScoringAnswer(guess)) continue;
+          pts = 2;
+        } else {
+          const official = (q.correct_answer ?? "").trim();
+          if (!official) continue;
+          if (normAnswer(guess) !== normAnswer(official)) continue;
+        }
+
         await supabase.from("points_ledger").insert({
           user_id: userId,
           source_type: "tournament_question",
