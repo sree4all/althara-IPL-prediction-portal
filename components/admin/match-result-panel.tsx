@@ -10,6 +10,7 @@ export type AdminMatchRow = {
   external_key: string | null;
   home_team: string;
   away_team: string;
+  match_time_utc: string;
   status: string;
   winner: string | null;
   bonus_result: string | null;

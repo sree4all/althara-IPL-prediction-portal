@@ -33,8 +33,8 @@ type Props = {
     id: string;
     slot_no: number;
     question_text: string;
-    correct_answer?: string | null;
-    scored_at?: string | null;
+    correct_answer: string | null;
+    scored_at: string | null;
     visible_after_utc?: string | null;
     revealed_by_admin?: boolean;
   }[];

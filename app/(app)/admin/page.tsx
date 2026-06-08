@@ -18,7 +18,7 @@ export default async function AdminPage() {
   }
   const { data: bonus } = await supabase
     .from("bonus_prompts")
-    .select("id, scope, match_id, prompt_key, prompt_text, is_active, display_order, input_type")
+    .select("id, season_year, scope, match_id, prompt_key, prompt_text, is_active, display_order, input_type")
     .eq("season_year", 2026)
     .order("display_order", { ascending: true });
   const { data: adminMatches } = await supabase

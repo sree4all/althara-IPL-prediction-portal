@@ -21,14 +21,11 @@ const accentGlow: Record<Exclude<PageBackgroundVariant, "default">, string> = {
 };
 
 export function WorldCupShell({ variant, children, className }: Props) {
-  const hero =
-    variant !== "default" ? pageBackgrounds[variant] : null;
-
   return (
     <div className={cn("relative min-h-screen wc-gradient-bg text-foreground", className)}>
       <div className="wc-pattern-overlay pointer-events-none fixed inset-0 z-0" aria-hidden />
       <div className="wc-vignette pointer-events-none fixed inset-0 z-0" aria-hidden />
-      {hero ? (
+      {variant !== "default" ? (
         <>
           <div
             className={cn(
@@ -40,9 +37,9 @@ export function WorldCupShell({ variant, children, className }: Props) {
           <div
             className="pointer-events-none fixed inset-0 z-0 hidden bg-contain bg-center bg-no-repeat sm:block"
             style={{
-              backgroundImage: `url(${hero.assetPath})`,
-              backgroundPosition: hero.objectPosition,
-              opacity: hero.imageOpacity,
+              backgroundImage: `url(${pageBackgrounds[variant].assetPath})`,
+              backgroundPosition: pageBackgrounds[variant].objectPosition,
+              opacity: pageBackgrounds[variant].imageOpacity,
             }}
             aria-hidden
           />
