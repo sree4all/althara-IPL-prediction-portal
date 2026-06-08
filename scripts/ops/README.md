@@ -35,6 +35,16 @@ See `scripts/seed-csv.ts` and `specs/004-fifa-tournament-reset/quickstart.md`.
 2. Re-create tournament bonus questions and match bonuses in Admin.
 3. Disable maintenance mode when ready.
 
+## Fix new user signup ("Database error saving new user")
+
+If magic link or Google signup fails after migration `0027`, run:
+
+```bash
+# SQL Editor: scripts/ops/fix-handle-new-user.sql
+```
+
+Cause: `handle_new_user` still referenced dropped column `legacy_alias_onboarding_completed`.
+
 ## Diagnose schema (run first if SQL errors)
 
 ```bash
