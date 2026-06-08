@@ -100,7 +100,7 @@ export function MatchCard({ match }: Props) {
 
               {match.has_prediction ? (
 
-                <span className="rounded-full bg-wc-scoreblue/20 px-2.5 py-0.5 text-xs font-semibold text-wc-scoreblue">
+                <span className="rounded-full bg-wc-green/20 px-2.5 py-0.5 text-xs font-semibold text-wc-green">
 
                   Already Predicted
 
