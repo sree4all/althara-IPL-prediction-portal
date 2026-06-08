@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { DRAW_PICK } from "@/lib/fifa/stages";
 import {
   toastPredictionError,
   toastPredictionLocked,
@@ -17,7 +18,6 @@ type Props = {
   matchLabel: string;
   initialWinner?: string | null;
   teamsPending?: boolean;
-  isKnockout?: boolean;
 };
 
 export function PredictionForm({
@@ -28,21 +28,24 @@ export function PredictionForm({
   matchLabel,
   initialWinner,
   teamsPending = false,
-  isKnockout = false,
 }: Props) {
-  const defaultWinner =
-    initialWinner === homeTeam || initialWinner === awayTeam ? initialWinner : homeTeam;
-  const [winner, setWinner] = useState(defaultWinner);
+  const validInitial =
+    initialWinner === homeTeam ||
+    initialWinner === awayTeam ||
+    initialWinner === DRAW_PICK
+      ? initialWinner
+      : homeTeam;
+  const [winner, setWinner] = useState(validInitial);
   const hasExistingPrediction =
-    initialWinner === homeTeam || initialWinner === awayTeam;
+    initialWinner === homeTeam ||
+    initialWinner === awayTeam ||
+    initialWinner === DRAW_PICK;
   const [hasSavedPrediction, setHasSavedPrediction] = useState(hasExistingPrediction);
   const [bonusByPrompt, setBonusByPrompt] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
   async function save() {
-    if (teamsPending) {
-      return;
-    }
+    if (teamsPending) return;
     if (locked) {
       toastPredictionLocked();
       return;
@@ -82,57 +85,74 @@ export function PredictionForm({
     }
   }
 
-  if (teamsPending) {
-    return null;
-  }
+  if (teamsPending) return null;
+
+  const pickClass = (selected: boolean) =>
+    selected
+      ? "border-wc-cta bg-wc-cta/20 text-white shadow-[0_0_12px_rgba(16,182,155,0.2)]"
+      : "border-white/15 bg-white/5 text-white/80 hover:border-white/30 hover:bg-white/10";
 
   return (
-    <div className="mt-3 space-y-3 border-t border-border pt-3">
+    <div className="mt-3 space-y-3 border-t border-white/10 pt-3">
       <fieldset disabled={locked} className="space-y-2">
-        <legend className="text-xs font-medium text-muted-foreground">
+        <legend className="text-xs font-semibold uppercase tracking-wide text-wc-yellow/90">
           Your pick
         </legend>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <label className="flex items-center gap-2 text-sm">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <label
+            className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-all ${pickClass(winner === homeTeam)}`}
+          >
             <input
               type="radio"
               name={`winner-${matchId}`}
+              className="accent-wc-cta"
               checked={winner === homeTeam}
               onChange={() => setWinner(homeTeam)}
             />
             {homeTeam}
           </label>
-          <label className="flex items-center gap-2 text-sm">
+          <label
+            className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-all ${pickClass(winner === awayTeam)}`}
+          >
             <input
               type="radio"
               name={`winner-${matchId}`}
+              className="accent-wc-cta"
               checked={winner === awayTeam}
               onChange={() => setWinner(awayTeam)}
             />
             {awayTeam}
           </label>
+          <label
+            className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-all ${pickClass(winner === DRAW_PICK)}`}
+          >
+            <input
+              type="radio"
+              name={`winner-${matchId}`}
+              className="accent-wc-cta"
+              checked={winner === DRAW_PICK}
+              onChange={() => setWinner(DRAW_PICK)}
+            />
+            Draw
+          </label>
         </div>
       </fieldset>
-      {!isKnockout ? (
-        <BonusPromptsForm
-          matchId={matchId}
-          answers={bonusByPrompt}
-          onAnswersLoaded={(loadedAnswers) =>
-            setBonusByPrompt((prev) => {
-              const next = { ...prev };
-              for (const [promptId, value] of Object.entries(loadedAnswers)) {
-                if (!next[promptId]?.trim()) {
-                  next[promptId] = value;
-                }
-              }
-              return next;
-            })
-          }
-          onAnswerChange={(promptId, value) =>
-            setBonusByPrompt((prev) => ({ ...prev, [promptId]: value }))
-          }
-        />
-      ) : null}
+      <BonusPromptsForm
+        matchId={matchId}
+        answers={bonusByPrompt}
+        onAnswersLoaded={(loadedAnswers) =>
+          setBonusByPrompt((prev) => {
+            const next = { ...prev };
+            for (const [promptId, value] of Object.entries(loadedAnswers)) {
+              if (!next[promptId]?.trim()) next[promptId] = value;
+            }
+            return next;
+          })
+        }
+        onAnswerChange={(promptId, value) =>
+          setBonusByPrompt((prev) => ({ ...prev, [promptId]: value }))
+        }
+      />
       <Button
         type="button"
         className="w-full sm:w-auto"

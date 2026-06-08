@@ -1,0 +1,58 @@
+# Operator scripts — World Cup 2026 reset & import
+
+**Production reset is operator-only.** There is no in-app control to wipe competition data.
+
+## Preconditions
+
+1. Take a database backup.
+2. Enable maintenance mode (`tournament_config.maintenance_mode = true`) and notify participants.
+3. Validate on **staging** first.
+
+## Reset competition data
+
+File: `reset-competition-data.sql`
+
+Preserves `profiles` (auth-linked accounts). Removes matches, predictions, ledger, bonuses, tournament Q&A, and zeros `current_points`.
+
+```bash
+# Example: psql against staging
+psql "$DATABASE_URL" -f scripts/ops/reset-competition-data.sql
+```
+
+## Import FIFA schedule
+
+After reset, load fixtures from CSV:
+
+```bash
+npm run seed -- fifa ./docs/fifa
+```
+
+See `scripts/seed-csv.ts` and `specs/004-fifa-tournament-reset/quickstart.md`.
+
+## Post-import
+
+1. Confirm `stage_scoring_config` has seven rows for season 2026.
+2. Re-create tournament bonus questions and match bonuses in Admin.
+3. Disable maintenance mode when ready.
+
+## Diagnose schema (run first if SQL errors)
+
+```bash
+# SQL Editor: scripts/ops/diagnose-matches-schema.sql
+```
+
+Paste the column list if `external_key`, `match_time_utc`, or `match_number` errors appear — the app expects migrations `0027` + `0028` applied.
+
+## Fix match metadata
+
+If knockout rows show `group_stage` for m97–m102, or IPL `2026-DEMO*` rows remain:
+
+```bash
+# SQL Editor: scripts/ops/fix-fifa-match-data.sql
+```
+
+Verify CSV expectations locally:
+
+```bash
+npx tsx scripts/verify-fifa-matches.ts
+```

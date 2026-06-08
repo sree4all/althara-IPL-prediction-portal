@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminOrResponse } from "@/lib/auth/require-admin";
-import { advanceKnockoutBracket } from "@/lib/knockout/bracket";
-import { parseKnockoutStage } from "@/lib/knockout/scoring";
+import { DRAW_PICK } from "@/lib/fifa/stages";
 import { applyMatchScoring } from "@/lib/scoring/match-scoring";
 
 export async function POST(
@@ -24,16 +23,17 @@ export async function POST(
 
   const { data: match, error: mErr } = await supabase
     .from("matches")
-    .select("id, home_team, away_team, status, knockout_stage")
+    .select("id, home_team, away_team, status, tournament_stage")
     .eq("id", matchId)
     .maybeSingle();
   if (mErr || !match) {
     return NextResponse.json({ error: "MATCH_NOT_FOUND" }, { status: 404 });
   }
 
+  const winner = body.winner.trim();
   const teams = [match.home_team as string, match.away_team as string];
-  if (!teams.includes(body.winner.trim())) {
-    return NextResponse.json({ error: "WINNER_NOT_IN_TEAMS" }, { status: 400 });
+  if (winner !== DRAW_PICK && !teams.includes(winner)) {
+    return NextResponse.json({ error: "WINNER_NOT_VALID" }, { status: 400 });
   }
 
   const { data: matchPrompts } = await supabase
@@ -43,8 +43,7 @@ export async function POST(
     .eq("scope", "match")
     .eq("match_id", matchId);
   const promptIdsForMatch = new Set((matchPrompts ?? []).map((p) => p.id as string));
-  const knockoutStage = parseKnockoutStage(match.knockout_stage as string | null);
-  const hasMatchPrompts = !knockoutStage && promptIdsForMatch.size > 0;
+  const hasMatchPrompts = promptIdsForMatch.size > 0;
 
   const now = new Date().toISOString();
 
@@ -77,7 +76,7 @@ export async function POST(
   const { error: uErr } = await supabase
     .from("matches")
     .update({
-      winner: body.winner.trim(),
+      winner,
       bonus_result,
       status: "completed",
       updated_at: now,
@@ -90,36 +89,10 @@ export async function POST(
     return NextResponse.json({ error: result.error, match_id: matchId }, { status: 500 });
   }
 
-  let bracket_updates: string[] = [];
-  if (knockoutStage) {
-    const winner = body.winner.trim();
-    const home = match.home_team as string;
-    const away = match.away_team as string;
-    const loser = winner === home ? away : home;
-    const adv = await advanceKnockoutBracket(supabase, knockoutStage, winner, loser);
-    if (!adv.ok) {
-      return NextResponse.json(
-        {
-          error: `Scored, but bracket update failed: ${adv.error}`,
-          match_id: matchId,
-          ledger_rows: result.ledgerRows,
-        },
-        { status: 500 },
-      );
-    }
-    bracket_updates = adv.updates;
-  }
-
-  const bracketNote =
-    bracket_updates.length > 0
-      ? ` Next fixtures updated: ${bracket_updates.join("; ")}.`
-      : "";
-
   return NextResponse.json({
     ok: true,
-    message: `Match scored. ${result.ledgerRows} ledger row(s) written.${bracketNote}`,
+    message: `Match scored. ${result.ledgerRows} ledger row(s) written.`,
     match_id: matchId,
     ledger_rows: result.ledgerRows,
-    bracket_updates,
   });
 }

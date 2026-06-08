@@ -1,7 +1,8 @@
+import { parseTournamentStage } from "@/lib/fifa/stages";
 import { normAnswer } from "@/lib/scoring/normalize";
-import { createServiceClient } from "@/lib/supabase/service";
-import { isLegacyLateExcluded } from "@/lib/scoring/legacy-late-exclusions";
+import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
 import { isTop4ScoringAnswer } from "@/lib/scoring/tournament-scoring";
+import { createServiceClient } from "@/lib/supabase/service";
 
 const SEASON_YEAR = 2026;
 
@@ -44,13 +45,15 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
   if (!claimedProfile) return;
 
   try {
-    const { data: cfg } = await supabase
-      .from("scoring_config")
-      .select("match_winner_points, match_bonus_points, tournament_slot_points")
-      .eq("season_year", SEASON_YEAR)
-      .maybeSingle();
+    const [{ data: cfg }, stageMap] = await Promise.all([
+      supabase
+        .from("scoring_config")
+        .select("match_bonus_points, tournament_slot_points")
+        .eq("season_year", SEASON_YEAR)
+        .maybeSingle(),
+      loadStageScoringMap(supabase, SEASON_YEAR),
+    ]);
 
-    const winnerPts = Number(cfg?.match_winner_points ?? 2);
     const bonusPts = Number(cfg?.match_bonus_points ?? 2);
     const tournamentSlotPts = slotPointsArray(cfg?.tournament_slot_points);
 
@@ -77,7 +80,7 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
     if (matchIds.length > 0) {
       const { data: matches } = await supabase
         .from("matches")
-        .select("id, external_key, status, winner, bonus_result")
+        .select("id, external_key, status, winner, bonus_result, tournament_stage")
         .in("id", matchIds)
         .eq("status", "completed");
 
@@ -94,23 +97,6 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
             : ["00000000-0000-0000-0000-000000000000"],
         );
       const ledgeredMatchIds = new Set((existingMatchLedger ?? []).map((r) => r.source_id as string));
-      let excludedMatchIds = new Set<string>();
-      try {
-        const { data: excludedRows } = await supabase
-          .from("legacy_prediction_exclusions")
-          .select("match_id")
-          .eq("user_id", userId)
-          .in(
-            "match_id",
-            completedMatchIds.length > 0
-              ? completedMatchIds
-              : ["00000000-0000-0000-0000-000000000000"],
-          );
-        excludedMatchIds = new Set((excludedRows ?? []).map((r) => r.match_id as string));
-      } catch {
-        excludedMatchIds = new Set<string>();
-      }
-
       const { data: prompts } = await supabase
         .from("bonus_prompts")
         .select("id, match_id, correct_answer, display_order")
@@ -164,26 +150,30 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
       for (const m of matches ?? []) {
         const mid = m.id as string;
         if (ledgeredMatchIds.has(mid)) continue;
-        if (excludedMatchIds.has(mid)) continue;
-        if (isLegacyLateExcluded(userId, (m.external_key as string | null) ?? null)) continue;
 
         const pred = predictedByMatch.get(mid);
         if (!pred) continue;
 
         let matchAdd = 0;
-        if (m.winner && normAnswer(pred.predicted_winner) === normAnswer(m.winner as string)) {
-          matchAdd += winnerPts;
-          await supabase.from("points_ledger").upsert(
-            {
-              user_id: userId,
-              source_type: "match",
-              source_id: mid,
-              points_delta: winnerPts,
-              reason: "match_winner",
-              awarded_at: now,
-            },
-            { onConflict: "user_id,source_type,source_id" },
-          );
+        const actualWinner = (m.winner as string | null)?.trim();
+        if (actualWinner) {
+          const stageSlug = parseTournamentStage(m.tournament_stage as string | null) ?? "group";
+          const stageRow = stageMap.get(stageSlug);
+          if (stageRow) {
+            const wDelta = winnerPointsDelta(pred.predicted_winner, actualWinner, stageRow);
+            matchAdd += wDelta;
+            await supabase.from("points_ledger").upsert(
+              {
+                user_id: userId,
+                source_type: "match",
+                source_id: mid,
+                points_delta: wDelta,
+                reason: `match_winner:${stageSlug}`,
+                awarded_at: now,
+              },
+              { onConflict: "user_id,source_type,source_id" },
+            );
+          }
         }
 
         const promptsForMatch = promptsByMatch.get(mid) ?? [];

@@ -9,6 +9,15 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: [
+          "var(--font-inter)",
+          "SF Pro Display",
+          "Helvetica Neue",
+          "Arial",
+          "sans-serif",
+        ],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -39,11 +48,29 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        wc: {
+          purple: "#18004F",
+          royal: "#2B0A88",
+          blue: "#11398C",
+          violet: "#5917FF",
+          cta: "#10B69B",
+          "cta-hover": "#13C5A7",
+          "cta-pressed": "#0D9D87",
+          orange: "#FF7044",
+          yellow: "#E4FF3B",
+          green: "#4FB84C",
+          scoreblue: "#394BFF",
+          red: "#FF254D",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        glow: "0 0 40px rgba(89, 23, 255, 0.25)",
+        cta: "0 8px 20px rgba(0, 0, 0, 0.18)",
       },
     },
   },

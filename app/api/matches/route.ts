@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { isKnockoutMatchReadyForPredictions } from "@/lib/knockout/placeholders";
-import { KNOCKOUT_SCORING_HINT } from "@/lib/knockout/constants";
-import { parseKnockoutStage } from "@/lib/knockout/scoring";
+import { isMatchReadyForPredictions } from "@/lib/fifa/match-ready";
+import { parseTournamentStage, stageScoringHint } from "@/lib/fifa/stages";
+import { loadStageScoringMap } from "@/lib/scoring/stage-scoring";
 import { isMatchLocked } from "@/lib/utils/match-lock";
 
 export async function GET() {
@@ -14,12 +14,15 @@ export async function GET() {
     return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
   }
 
-  const { data: matches, error } = await supabase
-    .from("matches")
-    .select(
-      "id, external_key, home_team, away_team, match_time_utc, status, winner, knockout_stage",
-    )
-    .order("match_time_utc", { ascending: true });
+  const [{ data: matches, error }, stageMap] = await Promise.all([
+    supabase
+      .from("matches")
+      .select(
+        "id, external_key, home_team, away_team, match_time_utc, status, winner, tournament_stage",
+      )
+      .order("match_time_utc", { ascending: true }),
+    loadStageScoringMap(supabase, 2026),
+  ]);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -28,7 +31,6 @@ export async function GET() {
   const serverTimeUtc = new Date().toISOString();
   const now = new Date();
 
-  // Matches list is prediction UX only: hide locked / past-deadline fixtures (see isMatchLocked).
   const openWindow = (matches ?? []).filter(
     (m) => !isMatchLocked(new Date(m.match_time_utc as string), now),
   );
@@ -51,10 +53,15 @@ export async function GET() {
   const payload = openWindow.map((m) => {
     const matchTimeUtc = new Date(m.match_time_utc as string);
     const locked = isMatchLocked(matchTimeUtc, now);
-    const koStage = parseKnockoutStage(m.knockout_stage as string | null);
-    const teamsPending =
-      !!koStage &&
-      !isKnockoutMatchReadyForPredictions(m.home_team as string, m.away_team as string);
+    const stageSlug = parseTournamentStage(m.tournament_stage as string | null);
+    const teamsPending = !isMatchReadyForPredictions(
+      m.home_team as string,
+      m.away_team as string,
+    );
+    const stageRow = stageSlug ? stageMap.get(stageSlug) : null;
+    const scoringHint = stageRow
+      ? stageScoringHint(stageSlug, stageRow.correct_points, stageRow.incorrect_points)
+      : null;
     const label = m.external_key
       ? `${m.external_key} — ${m.home_team} vs ${m.away_team}`
       : `${m.home_team} vs ${m.away_team}`;
@@ -69,9 +76,9 @@ export async function GET() {
       winner: m.winner,
       has_prediction: predictedByMatchId.has(m.id as string),
       predicted_winner: predictedByMatchId.get(m.id as string) ?? null,
-      knockout_stage: koStage,
-      knockout_teams_pending: teamsPending,
-      knockout_scoring_hint: koStage ? KNOCKOUT_SCORING_HINT[koStage] : null,
+      tournament_stage: stageSlug,
+      teams_pending: teamsPending,
+      stage_scoring_hint: scoringHint,
     };
   });
 

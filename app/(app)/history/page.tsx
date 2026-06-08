@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { PredictionHistoryTable } from "@/components/history/prediction-history-table";
+import { PageHeader } from "@/components/layout/page-header";
 import { getHistoryRows } from "@/lib/data/history";
 
 export default async function HistoryPage() {
@@ -13,7 +14,7 @@ export default async function HistoryPage() {
   const rows = await getHistoryRows(supabase, user.id);
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold tracking-tight">My History</h1>
+      <PageHeader title="My History" />
       <PredictionHistoryTable rows={rows} />
     </div>
   );

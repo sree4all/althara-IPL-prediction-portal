@@ -33,19 +33,6 @@ export async function GET(request: Request) {
     );
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        const { data: prof } = await supabase
-          .from("profiles")
-          .select("legacy_alias_onboarding_completed")
-          .eq("id", user.id)
-          .maybeSingle();
-        if (prof && prof.legacy_alias_onboarding_completed === false) {
-          return NextResponse.redirect(`${origin}/login/legacy-alias`);
-        }
-      }
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
