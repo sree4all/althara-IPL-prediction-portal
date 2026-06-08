@@ -3,6 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { isMatchReadyForPredictions } from "@/lib/fifa/match-ready";
 import { parseTournamentStage, stageScoringHint } from "@/lib/fifa/stages";
 import { loadStageScoringMap } from "@/lib/scoring/stage-scoring";
+import {
+  dedupeMatchesByFixtureNumber,
+  fixtureNumber,
+  idsByFixtureNumber,
+} from "@/lib/matches/dedupe-by-match-number";
 import { isMatchLocked } from "@/lib/utils/match-lock";
 
 export async function GET() {
@@ -28,13 +33,39 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  const allMatches = (matches ?? []) as {
+    id: string;
+    external_key: string | null;
+    home_team: string;
+    away_team: string;
+    match_time_utc: string;
+    status: string;
+    winner: string | null;
+    tournament_stage: string | null;
+    match_number?: number | null;
+  }[];
+  const uniqueMatches = dedupeMatchesByFixtureNumber(allMatches);
+  const aliasIdsByFixture = idsByFixtureNumber(allMatches);
+
   const serverTimeUtc = new Date().toISOString();
   const now = new Date();
 
-  const openWindow = (matches ?? []).filter(
+  const openWindow = uniqueMatches.filter(
     (m) => !isMatchLocked(new Date(m.match_time_utc as string), now),
   );
-  const openMatchIds = openWindow.map((m) => m.id as string);
+  const openFixtureNumbers = new Set(
+    openWindow.map((m) => fixtureNumber(m)).filter((n): n is number => n != null),
+  );
+  const openMatchIds = [
+    ...new Set(
+      allMatches
+        .filter((m) => {
+          const n = fixtureNumber(m);
+          return n != null && openFixtureNumbers.has(n);
+        })
+        .map((m) => m.id),
+    ),
+  ];
   const { data: predictionRows } =
     openMatchIds.length > 0
       ? await supabase
@@ -65,6 +96,12 @@ export async function GET() {
     const label = m.external_key
       ? `${m.external_key} — ${m.home_team} vs ${m.away_team}`
       : `${m.home_team} vs ${m.away_team}`;
+    const fixtureNo = fixtureNumber(m);
+    const aliasIds =
+      fixtureNo != null ? (aliasIdsByFixture.get(fixtureNo) ?? [m.id as string]) : [m.id as string];
+    const predictedWinner =
+      aliasIds.map((id) => predictedByMatchId.get(id)).find((v) => v != null && v !== "") ??
+      null;
     return {
       id: m.id,
       label,
@@ -74,8 +111,8 @@ export async function GET() {
       status: m.status,
       client_lock_hint: locked || teamsPending,
       winner: m.winner,
-      has_prediction: predictedByMatchId.has(m.id as string),
-      predicted_winner: predictedByMatchId.get(m.id as string) ?? null,
+      has_prediction: predictedWinner != null,
+      predicted_winner: predictedWinner,
       tournament_stage: stageSlug,
       teams_pending: teamsPending,
       stage_scoring_hint: scoringHint,

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { dedupeMatchesByFixtureNumber } from "@/lib/matches/dedupe-by-match-number";
 
 export async function GET() {
   const supabase = await createClient();
@@ -23,7 +24,7 @@ export async function GET() {
         "Watch for bonus prompts—they may appear on match pages when organizers post them.",
       ],
     },
-    matches: matches ?? [],
+    matches: dedupeMatchesByFixtureNumber(matches ?? []),
   });
 }
 

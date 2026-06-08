@@ -128,6 +128,26 @@ begin
     delete from public.matches
     where external_key like '2026-DEMO%'
        or external_key = any (demo_external_keys);
+
+    -- Re-point predictions from legacy wc2026:m{n} rows before deleting duplicates.
+    update public.predictions p
+    set match_id = canon.id,
+        updated_at = now()
+    from public.matches legacy
+    join public.matches canon
+      on canon.external_key = 'WC26-M' || substring(legacy.external_key from 'm([0-9]+)$')
+    where p.match_id = legacy.id
+      and legacy.external_key ~* '^wc2026:m[0-9]+$'
+      and canon.id <> legacy.id;
+
+    -- Legacy import key wc2026:m{n} when canonical WC26-M{n} already exists.
+    delete from public.matches legacy
+    where legacy.external_key ~* '^wc2026:m[0-9]+$'
+      and exists (
+        select 1
+        from public.matches canon
+        where canon.external_key = 'WC26-M' || substring(legacy.external_key from 'm([0-9]+)$')
+      );
   end if;
 
   select column_name

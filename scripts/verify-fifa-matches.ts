@@ -115,7 +115,7 @@ function main() {
 
   console.log("\nOther issues in your export:");
   console.log("  - 4 IPL demo rows (2026-DEMO1–4) should be deleted");
-  console.log("  - App import uses external_key WC26-M{n}; your DB uses wc2026:m{n}");
+  console.log("  - If both WC26-M{n} and wc2026:m{n} exist, run scripts/ops/fix-fifa-match-data.sql");
   console.log("  - App reads tournament_stage (group/r32/…); your export shows stage_key only");
 }
 

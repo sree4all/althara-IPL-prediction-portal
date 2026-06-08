@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { dedupeMatchesByFixtureNumber } from "@/lib/matches/dedupe-by-match-number";
 import { compareMatchOrder } from "@/lib/matches/match-order";
 import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
 
@@ -21,7 +22,7 @@ export async function GET() {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const sorted = [...(matches ?? [])].sort((a, b) =>
+  const sorted = dedupeMatchesByFixtureNumber([...(matches ?? [])]).sort((a, b) =>
     compareMatchOrder(
       a.external_key as string | null,
       a.match_time_utc as string,

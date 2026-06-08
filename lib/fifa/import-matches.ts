@@ -106,7 +106,7 @@ export async function importFifaMatches(
       const away = teamName(row.away_team_id, row.match_label, "away", teams);
       const cityId = Number(row.city_id);
       const venue = Number.isFinite(cityId) ? (venues.get(cityId) ?? "") : "";
-      const external_key = `wc2026:m${matchNumber}`;
+      const external_key = `WC26-M${matchNumber}`;
       const kickoffRaw = row.kickoff_at.trim();
       const kickoffTz = kickoffRaw.match(/([+-]\d{2}(?::\d{2})?|Z)\s*$/i)?.[1] ?? null;
 

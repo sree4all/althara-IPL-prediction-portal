@@ -4,6 +4,7 @@ import { getProfileForUser } from "@/lib/data/profile";
 import { AdminTabs } from "@/components/admin/admin-tabs";
 import { PageHeader } from "@/components/layout/page-header";
 import { DEFAULT_MAINTENANCE_BANNER_TEXT, fetchTournamentConfig2026 } from "@/lib/data/tournament-config";
+import { dedupeMatchesByFixtureNumber } from "@/lib/matches/dedupe-by-match-number";
 
 export default async function AdminPage() {
   const { supabase, user } = await requireUser();
@@ -68,7 +69,7 @@ export default async function AdminPage() {
           mega_bonus_all_answers_visible: Boolean(cfg?.mega_bonus_all_answers_visible),
         }}
         bonusPrompts={bonus ?? []}
-        matches={adminMatches ?? []}
+        matches={dedupeMatchesByFixtureNumber(adminMatches ?? [])}
         tournamentQuestions={tournamentQuestions ?? []}
         optionsByQuestion={optionsByQuestion}
       />
