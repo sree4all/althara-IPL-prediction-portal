@@ -51,4 +51,4 @@ export default async function LoginPage({
     </WorldCupShell>
   );
 }
-
+

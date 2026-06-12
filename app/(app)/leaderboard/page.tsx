@@ -12,6 +12,8 @@ export default async function LeaderboardPage() {
       <PageHeader
         title="Leaderboard"
         description="Sorted by current season points, then player name."
+        className="mb-4"
+        descriptionClassName="text-white/90"
       />
       <LeaderboardTable rows={rows} />
     </div>

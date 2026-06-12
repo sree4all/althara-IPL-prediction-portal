@@ -1,0 +1,370 @@
+{
+    "$schema": "https://design-system.schema/v1",
+    "name": "Neon Sports Scoreboard Landing",
+    "description": "A high-contrast, mobile-first sports-tech landing page with a purple neon gradient, oversized typography, soft-glow UI, and centered conversion funnel.",
+    "designIntent": {
+    "styleKeywords": [
+    "sports-tech",
+    "broadcast graphics",
+    "neon",
+    "mobile landing page",
+    "high contrast",
+    "clean but energetic",
+    "gaming-inspired",
+    "streaming overlay aesthetic"
+    ],
+    "replicationGoal": "Match the exact visual hierarchy, spacing rhythm, typography scale, and color atmosphere of the reference image."
+    },
+    
+    "layout": {
+    "canvas": {
+    "type": "mobile-portrait",
+    "width": 390,
+    "height": 844,
+    "safePadding": {
+    "top": 32,
+    "left": 28,
+    "right": 28,
+    "bottom": 40
+    },
+    "background": {
+    "type": "layered-gradient",
+    "baseColor": "#12003B",
+    "gradient": {
+    "angle": 145,
+    "stops": [
+    {
+    "color": "#18004F",
+    "position": 0
+    },
+    {
+    "color": "#2D0D8D",
+    "position": 0.45
+    },
+    {
+    "color": "#102F86",
+    "position": 1
+    }
+    ]
+    },
+    "overlayPattern": {
+    "type": "diagonal-grid",
+    "lineColor": "rgba(255,255,255,0.04)",
+    "lineWidth": 1,
+    "spacing": 26,
+    "angle": -45
+    },
+    "dotPattern": {
+    "enabled": true,
+    "dotColor": "rgba(255,255,255,0.08)",
+    "size": 3,
+    "spacing": 40
+    },
+    "vignette": {
+    "enabled": true,
+    "strength": 0.18
+    }
+    }
+    },
+    
+    "structure": {
+    "direction": "vertical",
+    "alignment": "center",
+    "maxWidth": 340,
+    "sections": [
+    {
+    "id": "hero-title",
+    "spacingTop": 52,
+    "spacingBottom": 40
+    },
+    {
+    "id": "hero-copy",
+    "spacingBottom": 44
+    },
+    {
+    "id": "cta-button",
+    "spacingBottom": 38
+    },
+    {
+    "id": "social-proof",
+    "spacingBottom": 42
+    },
+    {
+    "id": "scoreboard-preview",
+    "spacingBottom": 48
+    },
+    {
+    "id": "secondary-preview"
+    }
+    ]
+    }
+    },
+    
+    "typography": {
+    "fontStack": {
+    "primary": [
+    "Inter",
+    "SF Pro Display",
+    "Helvetica Neue",
+    "Arial",
+    "sans-serif"
+    ]
+    },
+    
+    "styles": {
+    "heroHeadline": {
+    "fontFamily": "primary",
+    "fontWeight": 800,
+    "fontSize": 54,
+    "lineHeight": 0.98,
+    "letterSpacing": -1.6,
+    "textAlign": "center",
+    "color": "#FFFFFF",
+    "maxWidth": 320
+    },
+    
+    "bodyLarge": {
+    "fontFamily": "primary",
+    "fontWeight": 400,
+    "fontSize": 27,
+    "lineHeight": 1.5,
+    "letterSpacing": -0.2,
+    "textAlign": "center",
+    "color": "rgba(255,255,255,0.92)",
+    "maxWidth": 330
+    },
+    
+    "buttonLabel": {
+    "fontFamily": "primary",
+    "fontWeight": 500,
+    "fontSize": 31,
+    "lineHeight": 1,
+    "letterSpacing": -0.6,
+    "color": "#FFFFFF"
+    },
+    
+    "ratingText": {
+    "fontFamily": "primary",
+    "fontWeight": 700,
+    "fontSize": 28,
+    "color": "#FFFFFF"
+    },
+    
+    "caption": {
+    "fontFamily": "primary",
+    "fontWeight": 400,
+    "fontSize": 18,
+    "lineHeight": 1.4,
+    "letterSpacing": -0.2,
+    "color": "rgba(255,255,255,0.35)"
+    }
+    }
+    },
+    
+    "spacingSystem": {
+    "baseUnit": 4,
+    "scale": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32,
+    "2xl": 40,
+    "3xl": 48,
+    "4xl": 56
+    },
+    "verticalRhythm": 40,
+    "contentWidth": 340
+    },
+    
+    "colors": {
+    "background": {
+    "deepPurple": "#18004F",
+    "royalPurple": "#2B0A88",
+    "electricBlue": "#11398C",
+    "violetGlow": "#5917FF"
+    },
+    
+    "text": {
+    "primary": "#FFFFFF",
+    "secondary": "rgba(255,255,255,0.92)",
+    "muted": "rgba(255,255,255,0.35)"
+    },
+    
+    "cta": {
+    "primary": "#10B69B",
+    "hover": "#13C5A7",
+    "pressed": "#0D9D87",
+    "text": "#FFFFFF"
+    },
+    
+    "accent": {
+    "orangeStar": "#FF7044",
+    "yellowHighlight": "#E4FF3B",
+    "scoreGreen": "#4FB84C",
+    "scoreBlue": "#394BFF",
+    "scoreRed": "#FF254D"
+    },
+    
+    "border": {
+    "subtle": "rgba(255,255,255,0.08)"
+    }
+    },
+    
+    "components": {
+    "heroTitle": {
+    "type": "text",
+    "style": "heroHeadline",
+    "alignment": "center",
+    "maxWidth": 320
+    },
+    
+    "heroParagraph": {
+    "type": "text",
+    "style": "bodyLarge",
+    "alignment": "center",
+    "maxWidth": 330
+    },
+    
+    "primaryButton": {
+    "type": "button",
+    "height": 92,
+    "width": "100%",
+    "borderRadius": 20,
+    "backgroundColor": "#10B69B",
+    "shadow": {
+    "x": 0,
+    "y": 8,
+    "blur": 20,
+    "color": "rgba(0,0,0,0.18)"
+    },
+    "padding": {
+    "x": 28,
+    "y": 24
+    },
+    "contentAlignment": "center",
+    "icon": {
+    "position": "right",
+    "size": 24,
+    "spacing": 12,
+    "stroke": 2
+    }
+    },
+    
+    "avatarCluster": {
+    "type": "stacked-avatars",
+    "avatarSize": 54,
+    "overlap": 18,
+    "border": {
+    "width": 4,
+    "color": "#FFFFFF"
+    }
+    },
+    
+    "ratingStars": {
+    "type": "star-rating",
+    "iconSize": 24,
+    "filledColor": "#FF7044",
+    "emptyColor": "rgba(255,255,255,0.35)",
+    "spacing": 6
+    },
+    
+    "scoreboardCard": {
+    "type": "embedded-preview",
+    "width": 310,
+    "height": 70,
+    "borderRadius": 2,
+    "shadow": {
+    "x": 0,
+    "y": 10,
+    "blur": 20,
+    "color": "rgba(0,0,0,0.35)"
+    }
+    }
+    },
+    
+    "effects": {
+    "glow": {
+    "enabled": true,
+    "softPurple": {
+    "blur": 80,
+    "opacity": 0.12
+    }
+    },
+    
+    "textRendering": {
+    "smoothing": "antialiased",
+    "headlineContrast": "strong"
+    }
+    },
+    
+    "compositionRules": {
+    "alignment": "strictly centered",
+    "heroPriority": "headline dominates first viewport",
+    "buttonImportance": "largest visual element after headline",
+    "negativeSpace": "generous vertical spacing between sections",
+    "contentDensity": "minimal",
+    "visualFlow": [
+    "headline",
+    "description",
+    "cta",
+    "social-proof",
+    "product-preview"
+    ]
+    },
+    
+    "aiReplicationHints": {
+    "mustHaveCharacteristics": [
+    "large oversized white headline",
+    "purple to blue neon gradient background",
+    "subtle diagonal grid texture",
+    "large mint-green CTA button",
+    "sports broadcast scoreboard previews",
+    "center aligned layout",
+    "soft glows and high contrast"
+    ],
+    
+    "avoid": [
+    "sharp enterprise UI",
+    "flat minimalism",
+    "tiny typography",
+    "heavy borders",
+    "dark gray text",
+    "complex card layouts"
+    ],
+    
+    "promptFragment": "Mobile sports-tech landing page, deep purple neon gradient background with subtle diagonal pattern, oversized white bold headline, large centered mint CTA button, sports scoreboard previews, soft glows, premium streaming overlay aesthetic."
+    },
+
+    "themes": {
+    "worldCup2026": {
+    "name": "World Cup 2026",
+    "description": "FIFA World Cup prediction experience — gradient-dominant shells with per-page hero textures at low opacity.",
+    "activation": "worldCupPredictionContest",
+    "pageBackgrounds": {
+    "welcome": {
+    "assetPath": "/design/world-cup-2026/welcome.png",
+    "imageOpacity": 0.32,
+    "objectPosition": "center center",
+    "backgroundSizeMobile": "contain",
+    "backgroundSizeDesktop": "88% auto",
+    "focalHint": "dual portrait; mobile uses contain so full artwork is visible",
+    "accentPalette": ["#FF7044", "#11398C", "#E4FF3B"]
+    },
+    "prediction": {
+    "assetPath": "/design/world-cup-2026/prediction.png",
+    "imageOpacity": 0.22,
+    "objectPosition": "center 55%",
+    "focalHint": "stadium walk; subjects lower third",
+    "accentPalette": ["#C8102E", "#6CACE4", "#2D5016"]
+    },
+    "standings": {
+    "assetPath": "/design/world-cup-2026/standings.png",
+    "imageOpacity": 0.25,
+    "objectPosition": "center center",
+    "focalHint": "pop-art portraits; navy already in asset",
+    "accentPalette": ["#0A1628", "#00B4D8", "#E6399B"]
+    }
+    }
+    }
+    }
