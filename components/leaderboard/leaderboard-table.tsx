@@ -27,52 +27,41 @@ export function LeaderboardTable({ rows }: Props) {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-white/25 bg-white/15 shadow-lg shadow-violet-900/20 backdrop-blur-md">
+    <div className="mx-auto w-full max-w-xs overflow-hidden rounded-xl border border-white/25 bg-white/15 shadow-lg shadow-violet-900/20 backdrop-blur-md sm:max-w-sm">
       <div className="wc-scoreboard-strip" aria-hidden />
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[280px] text-left text-sm font-bold text-white">
-          <thead className="bg-white/15">
-            <tr>
-              <th className="w-11 px-3 py-2 text-xs uppercase tracking-wide text-white">
-                #
-              </th>
-              <th className="px-3 py-2 text-xs uppercase tracking-wide text-white">
-                Name
-              </th>
-              <th className="px-3 py-2 text-right text-xs uppercase tracking-wide text-white">
-                Pts
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => {
-              const rank = rankLabel(r.rank ?? 0);
-              return (
-                <tr
-                  key={r.id}
-                  className="border-t border-white/15 transition-colors hover:bg-white/10"
-                >
-                  <td className="px-3 py-2 text-center">
-                    <span
-                      className={cn(
-                        "text-white",
-                        rank.isMedal ? "text-base leading-none" : "tabular-nums",
-                      )}
-                      aria-label={`Rank ${r.rank}`}
-                    >
-                      {rank.text}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2 text-white">{r.display_name}</td>
-                  <td className="px-3 py-2 text-right tabular-nums text-white">
-                    {r.current_points}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div
+        className="grid grid-cols-[2rem_1fr_auto] items-center gap-x-2 border-b border-white/15 bg-white/15 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white"
+        aria-hidden
+      >
+        <span className="text-center">#</span>
+        <span>Name</span>
+        <span className="text-right">Pts</span>
       </div>
+      <ul>
+        {rows.map((r) => {
+          const rank = rankLabel(r.rank ?? 0);
+          return (
+            <li
+              key={r.id}
+              className="grid grid-cols-[2rem_1fr_auto] items-center gap-x-2 border-t border-white/15 px-3 py-1.5 text-sm font-bold text-white transition-colors hover:bg-white/10"
+            >
+              <span
+                className={cn(
+                  "text-center text-white",
+                  rank.isMedal ? "text-base leading-none" : "tabular-nums text-xs",
+                )}
+                aria-label={`Rank ${r.rank}`}
+              >
+                {rank.text}
+              </span>
+              <span className="min-w-0 truncate" title={r.display_name}>
+                {r.display_name}
+              </span>
+              <span className="shrink-0 tabular-nums">{r.current_points}</span>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
