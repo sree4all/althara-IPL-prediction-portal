@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { parseTournamentStage } from "@/lib/fifa/stages";
+import { resolveMatchAliasIds } from "@/lib/matches/resolve-alias-ids";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
 
@@ -81,21 +82,41 @@ export async function applyMatchScoring(
   }
 
   const legacyBonusResult = match.bonus_result as string | null;
+  const aliasMatchIds = await resolveMatchAliasIds(supabase, matchId);
 
-  const { data: predictions, error: pErr } = await supabase
+  const { data: rawPredictions, error: pErr } = await supabase
     .from("predictions")
     .select("id, user_id, match_id, predicted_winner, bonus_pick")
-    .eq("match_id", matchId);
+    .in("match_id", aliasMatchIds);
   if (pErr) {
     return { ok: false, error: pErr.message };
   }
+
+  const predictionsByUser = new Map<
+    string,
+    { id: string; user_id: string; match_id: string; predicted_winner: string; bonus_pick: string | null }
+  >();
+  for (const pred of rawPredictions ?? []) {
+    const uid = pred.user_id as string;
+    const existing = predictionsByUser.get(uid);
+    if (!existing || pred.match_id === matchId) {
+      predictionsByUser.set(uid, {
+        id: pred.id as string,
+        user_id: uid,
+        match_id: pred.match_id as string,
+        predicted_winner: pred.predicted_winner as string,
+        bonus_pick: (pred.bonus_pick as string | null) ?? null,
+      });
+    }
+  }
+  const predictions = [...predictionsByUser.values()];
 
   const { data: promptRows } = await supabase
     .from("bonus_prompts")
     .select("id, correct_answer, display_order")
     .eq("season_year", seasonYear)
     .eq("scope", "match")
-    .eq("match_id", matchId)
+    .in("match_id", aliasMatchIds)
     .order("display_order", { ascending: true });
 
   const promptsOrdered = promptRows ?? [];
@@ -106,7 +127,7 @@ export async function applyMatchScoring(
     const { data: ba } = await supabase
       .from("prediction_bonus_answers")
       .select("user_id, prompt_id, answer_text")
-      .eq("match_id", matchId)
+      .in("match_id", aliasMatchIds)
       .in("prompt_id", promptIds);
     bonusAnswers = ba ?? [];
   }
