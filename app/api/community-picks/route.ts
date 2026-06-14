@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { resolveMatchAliasIds } from "@/lib/matches/resolve-alias-ids";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -12,11 +13,26 @@ export async function GET(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
 
-  const { data: picks } = await supabase
+  const aliasMatchIds = await resolveMatchAliasIds(supabase, matchId);
+
+  const { data: rawPicks } = await supabase
     .from("predictions")
-    .select("predicted_winner, user_id")
-    .eq("match_id", matchId);
-  const userIds = (picks ?? []).map((p) => p.user_id);
+    .select("predicted_winner, user_id, match_id")
+    .in("match_id", aliasMatchIds);
+
+  const picksByUser = new Map<string, { predicted_winner: string; user_id: string }>();
+  for (const p of rawPicks ?? []) {
+    const uid = p.user_id as string;
+    const existing = picksByUser.get(uid);
+    if (!existing || p.match_id === matchId) {
+      picksByUser.set(uid, {
+        user_id: uid,
+        predicted_winner: p.predicted_winner as string,
+      });
+    }
+  }
+  const picks = [...picksByUser.values()];
+  const userIds = picks.map((p) => p.user_id);
   if (userIds.length === 0) {
     return NextResponse.json({ match_id: matchId, rows: [] });
   }
