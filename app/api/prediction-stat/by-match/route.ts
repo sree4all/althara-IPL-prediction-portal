@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { resolveMatchAliasIds } from "@/lib/matches/resolve-alias-ids";
 import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
 
 const SEASON_YEAR = 2026;
@@ -28,11 +29,30 @@ export async function GET(request: Request) {
     : `${match.home_team} vs ${match.away_team}`;
   const label = `${teams} · ${formatIstDateTimeFriendly(match.match_time_utc as string)}`;
 
-  const { data: preds, error: pErr } = await supabase
+  const aliasMatchIds = await resolveMatchAliasIds(supabase, matchId);
+
+  const { data: rawPreds, error: pErr } = await supabase
     .from("predictions")
-    .select("user_id, predicted_winner, bonus_pick")
-    .eq("match_id", matchId);
+    .select("user_id, predicted_winner, bonus_pick, match_id")
+    .in("match_id", aliasMatchIds);
   if (pErr) return NextResponse.json({ error: pErr.message }, { status: 500 });
+
+  const predsByUser = new Map<
+    string,
+    { user_id: string; predicted_winner: string; bonus_pick: string | null }
+  >();
+  for (const p of rawPreds ?? []) {
+    const uid = p.user_id as string;
+    const existing = predsByUser.get(uid);
+    if (!existing || p.match_id === matchId) {
+      predsByUser.set(uid, {
+        user_id: uid,
+        predicted_winner: p.predicted_winner as string,
+        bonus_pick: (p.bonus_pick as string | null) ?? null,
+      });
+    }
+  }
+  const preds = [...predsByUser.values()];
 
   const userIds = [...new Set((preds ?? []).map((p) => p.user_id as string))];
   let nameByUser = new Map<string, string>();
@@ -47,7 +67,7 @@ export async function GET(request: Request) {
   const { data: bonusRows } = await supabase
     .from("prediction_bonus_answers")
     .select("user_id, prompt_id, answer_text")
-    .eq("match_id", matchId);
+    .in("match_id", aliasMatchIds);
 
   const promptIds = [...new Set((bonusRows ?? []).map((b) => b.prompt_id as string))];
   let promptMeta = new Map<string, { prompt_text: string; display_order: number }>();

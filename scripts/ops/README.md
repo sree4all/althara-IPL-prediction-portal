@@ -61,6 +61,18 @@ If knockout rows show `group_stage` for m97–m102, or IPL `2026-DEMO*` rows rem
 # SQL Editor: scripts/ops/fix-fifa-match-data.sql
 ```
 
+## Update a user's prediction (operator)
+
+To correct or set a match-winner pick on behalf of a participant (bypasses DB lock):
+
+```bash
+# Preferred: npm script (requires .env.local with service role key)
+npm run ops:update-prediction -- --user "Sumesh Raj" --match 8 --winner Australia
+npm run ops:update-prediction -- --email sumesh1912@gmail.com --match 8 --winner Australia
+```
+
+Or paste `scripts/ops/update-prediction.sql` into the Supabase SQL editor and adjust the `params` CTE.
+
 Verify CSV expectations locally:
 
 ```bash
