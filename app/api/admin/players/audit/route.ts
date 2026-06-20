@@ -21,11 +21,16 @@ export async function GET(request: Request) {
   }
 
   if (userId) {
-    const audit = await getPlayerAudit(supabase, userId);
-    if (!audit) {
-      return NextResponse.json({ error: "Player not found" }, { status: 404 });
+    try {
+      const audit = await getPlayerAudit(supabase, userId);
+      if (!audit) {
+        return NextResponse.json({ error: "Player not found" }, { status: 404 });
+      }
+      return NextResponse.json({ audit });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Audit failed";
+      return NextResponse.json({ error: message }, { status: 500 });
     }
-    return NextResponse.json({ audit });
   }
 
   if (!query) {

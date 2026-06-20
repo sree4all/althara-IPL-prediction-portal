@@ -12,6 +12,14 @@ export type PlayerAuditLedgerRow = {
   label: string;
 };
 
+export type PlayerAuditMatchBreakdown = {
+  match_id: string;
+  label: string;
+  winner_points: number;
+  bonus_points: number;
+  total: number;
+};
+
 export type PlayerAuditSummary = {
   profile: {
     id: string;
@@ -20,9 +28,11 @@ export type PlayerAuditSummary = {
     current_points: number;
   };
   ledger_total: number;
+  ledger_row_count: number;
   drift: number;
   history_rows: Awaited<ReturnType<typeof getHistoryRows>>;
   ledger_rows: PlayerAuditLedgerRow[];
+  match_breakdown: PlayerAuditMatchBreakdown[];
 };
 
 async function resolveLedgerLabels(
@@ -94,7 +104,10 @@ export async function getPlayerAudit(
     .maybeSingle();
   if (error || !profile) return null;
 
-  const ledger = await getPointsLedgerForUser(supabase, userId);
+  const { rows: ledger, error: ledgerErr } = await getPointsLedgerForUser(supabase, userId);
+  if (ledgerErr) {
+    throw new Error(`points_ledger: ${ledgerErr}`);
+  }
   const ledgerTotal = ledger.reduce((s, r) => s + Number(r.points_delta ?? 0), 0);
   const currentPoints = Number(profile.current_points ?? 0);
 
@@ -102,6 +115,28 @@ export async function getPlayerAudit(
     getHistoryRows(supabase, userId),
     resolveLedgerLabels(supabase, ledger),
   ]);
+
+  const byMatch = new Map<string, { winner: number; bonus: number; label: string }>();
+  for (const row of ledger_rows) {
+    if (row.source_type !== "match" && row.source_type !== "bonus") continue;
+    const cur = byMatch.get(row.source_id) ?? {
+      winner: 0,
+      bonus: 0,
+      label: row.label.replace(/^(Winner|Bonus) · /, ""),
+    };
+    if (row.source_type === "match") cur.winner += row.points_delta;
+    else cur.bonus += row.points_delta;
+    byMatch.set(row.source_id, cur);
+  }
+  const match_breakdown = [...byMatch.entries()]
+    .map(([match_id, v]) => ({
+      match_id,
+      label: v.label,
+      winner_points: v.winner,
+      bonus_points: v.bonus,
+      total: v.winner + v.bonus,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   return {
     profile: {
@@ -111,9 +146,11 @@ export async function getPlayerAudit(
       current_points: currentPoints,
     },
     ledger_total: ledgerTotal,
+    ledger_row_count: ledger_rows.length,
     drift: currentPoints - ledgerTotal,
     history_rows,
     ledger_rows,
+    match_breakdown,
   };
 }
 

@@ -17,7 +17,10 @@ export async function getHistoryRows(supabase: SupabaseClient, userId: string) {
     .from("predictions")
     .select("id, match_id, predicted_winner, bonus_pick, updated_at")
     .eq("user_id", userId);
-  const ledger = await getPointsLedgerForUser(supabase, userId);
+  const { rows: ledger, error: ledgerErr } = await getPointsLedgerForUser(supabase, userId);
+  if (ledgerErr) {
+    console.error("getHistoryRows ledger:", ledgerErr);
+  }
 
   const matchIds = [...new Set((predictions ?? []).map((p) => p.match_id as string))];
 
