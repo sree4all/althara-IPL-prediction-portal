@@ -87,6 +87,12 @@ export function AdminTabs({ tournamentConfig, bonusPrompts, matches }: Props) {
         <div className="space-y-4">
           <StageScoringPanel />
           <PointsMaintenancePanel />
+          <p className="text-xs text-muted-foreground">
+            <a href="/admin/player-audit" className="underline underline-offset-2">
+              Player audit
+            </a>{" "}
+            — search any participant&apos;s predictions and ledger breakdown.
+          </p>
         </div>
       ) : null}
     </div>

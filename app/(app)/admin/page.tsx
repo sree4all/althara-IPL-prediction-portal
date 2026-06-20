@@ -33,6 +33,12 @@ export default async function AdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Admin" />
+      <p className="text-sm text-white/70">
+        <a href="/admin/player-audit" className="underline underline-offset-2">
+          Player audit
+        </a>{" "}
+        — look up any participant&apos;s predictions and points.
+      </p>
       <AdminTabs
         tournamentConfig={{
           answer_lock_utc: cfg?.answer_lock_utc ?? null,

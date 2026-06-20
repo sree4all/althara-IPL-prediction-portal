@@ -1,6 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
-  dedupeMatchesByFixtureNumber,
   fixtureNumber,
   idsByFixtureNumber,
 } from "@/lib/matches/dedupe-by-match-number";
