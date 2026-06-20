@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { applyMatchScoring } from "@/lib/scoring/match-scoring";
+import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
 
 export type RecomputeAllMatchResult =
   | {
@@ -32,13 +33,17 @@ export async function recomputeAllCompletedMatchScoring(
 
   for (const row of rows ?? []) {
     const matchId = row.id as string;
-    const result = await applyMatchScoring(supabase, matchId, seasonYear);
+    const result = await applyMatchScoring(supabase, matchId, seasonYear, {
+      syncProfiles: false,
+    });
     if (!result.ok) {
       failures.push({ matchId, error: result.error });
     } else {
       processed += 1;
     }
   }
+
+  await syncProfilePointsFromLedger(supabase);
 
   return { ok: true, processed, failures };
 }

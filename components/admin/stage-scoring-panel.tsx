@@ -13,7 +13,6 @@ type StageRow = {
 
 export function StageScoringPanel() {
   const [stages, setStages] = useState<StageRow[]>([]);
-  const [tournamentSlots, setTournamentSlots] = useState<number[]>([2, 2, 2, 2, 2]);
   const [matchBonus, setMatchBonus] = useState(2);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -27,7 +26,6 @@ export function StageScoringPanel() {
       }
       const data = await res.json();
       setStages(data.stages ?? []);
-      setTournamentSlots(data.tournament_slot_points ?? [2, 2, 2, 2, 2]);
       setMatchBonus(Number(data.match_bonus_points ?? 2));
       setLoading(false);
     })();
@@ -40,7 +38,6 @@ export function StageScoringPanel() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         stages,
-        tournament_slot_points: tournamentSlots,
         match_bonus_points: matchBonus,
       }),
     });
@@ -117,7 +114,7 @@ export function StageScoringPanel() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="text-xs">
-          Random match bonus (default correct points)
+          Match bonus (correct answer points, e.g. M31)
           <input
             type="number"
             className="mt-1 w-full rounded-md border border-input px-2 py-1 text-sm"
@@ -125,28 +122,6 @@ export function StageScoringPanel() {
             onChange={(e) => setMatchBonus(Number(e.target.value))}
           />
         </label>
-      </div>
-
-      <p className="text-xs font-medium">Season-long tournament bonus slots</p>
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-        {tournamentSlots.map((p, i) => (
-          <label key={i} className="text-xs">
-            Slot {i + 1}
-            <input
-              type="number"
-              className="mt-1 w-full rounded-md border border-input px-1 py-1 text-sm"
-              value={p}
-              onChange={(e) => {
-                const v = Number(e.target.value);
-                setTournamentSlots((prev) => {
-                  const next = [...prev];
-                  next[i] = v;
-                  return next;
-                });
-              }}
-            />
-          </label>
-        ))}
       </div>
 
       <Button type="button" size="sm" onClick={save} disabled={saving}>

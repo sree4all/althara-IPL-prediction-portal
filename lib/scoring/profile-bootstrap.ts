@@ -1,7 +1,6 @@
 import { parseTournamentStage } from "@/lib/fifa/stages";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
-import { isFinalistsScoringAnswer, isTop4ScoringAnswer } from "@/lib/scoring/tournament-scoring";
 import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
 import { createServiceClient } from "@/lib/supabase/service";
 
@@ -194,69 +193,6 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
           }
         }
 
-      }
-    }
-
-    const { data: answers } = await supabase
-      .from("tournament_answers")
-      .select("question_id, answer_text")
-      .eq("user_id", userId);
-
-    const questionIds = [...new Set((answers ?? []).map((a) => a.question_id as string))];
-    if (questionIds.length > 0) {
-      const { data: questions } = await supabase
-        .from("tournament_questions")
-        .select("id, slot_no, correct_answer")
-        .eq("season_year", SEASON_YEAR)
-        .in("id", questionIds);
-
-      const questionMap = new Map(
-        (questions ?? []).map((q) => [
-          q.id as string,
-          {
-            slot_no: Number(q.slot_no ?? 1),
-            correct_answer: (q.correct_answer as string | null) ?? null,
-          },
-        ]),
-      );
-
-      const { data: existingTournamentLedger } = await supabase
-        .from("points_ledger")
-        .select("source_id")
-        .eq("user_id", userId)
-        .eq("source_type", "tournament_question")
-        .in("source_id", questionIds);
-      const ledgeredQuestionIds = new Set(
-        (existingTournamentLedger ?? []).map((r) => r.source_id as string),
-      );
-
-      for (const a of answers ?? []) {
-        const qid = a.question_id as string;
-        if (!qid || ledgeredQuestionIds.has(qid)) continue;
-        const q = questionMap.get(qid);
-        if (!q) continue;
-        const guess = ((a.answer_text as string | null) ?? "").trim();
-        if (!guess) continue;
-
-        const pts = 2;
-        if (q.slot_no >= 1 && q.slot_no <= 4) {
-          if (!isTop4ScoringAnswer(guess)) continue;
-        } else if (q.slot_no >= 5 && q.slot_no <= 6) {
-          if (!isFinalistsScoringAnswer(guess)) continue;
-        } else {
-          const official = (q.correct_answer ?? "").trim();
-          if (!official) continue;
-          if (normAnswer(guess) !== normAnswer(official)) continue;
-        }
-
-        await supabase.from("points_ledger").insert({
-          user_id: userId,
-          source_type: "tournament_question",
-          source_id: qid,
-          points_delta: pts,
-          reason: `tournament_slot_${q.slot_no}`,
-          awarded_at: now,
-        });
       }
     }
 
