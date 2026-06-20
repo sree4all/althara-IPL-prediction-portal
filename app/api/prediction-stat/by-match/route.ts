@@ -1,9 +1,18 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { resolveMatchAliasIds } from "@/lib/matches/resolve-alias-ids";
+import { createServiceClient } from "@/lib/supabase/service";
 import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
 
 const SEASON_YEAR = 2026;
+
+function readClient() {
+  try {
+    return createServiceClient();
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(request: Request) {
   const supabase = await createClient();
@@ -11,6 +20,8 @@ export async function GET(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+
+  const dataClient = readClient() ?? supabase;
 
   const { searchParams } = new URL(request.url);
   const matchId = searchParams.get("match_id");
@@ -29,9 +40,9 @@ export async function GET(request: Request) {
     : `${match.home_team} vs ${match.away_team}`;
   const label = `${teams} · ${formatIstDateTimeFriendly(match.match_time_utc as string)}`;
 
-  const aliasMatchIds = await resolveMatchAliasIds(supabase, matchId);
+  const aliasMatchIds = await resolveMatchAliasIds(dataClient, matchId);
 
-  const { data: rawPreds, error: pErr } = await supabase
+  const { data: rawPreds, error: pErr } = await dataClient
     .from("predictions")
     .select("user_id, predicted_winner, bonus_pick, match_id")
     .in("match_id", aliasMatchIds);
@@ -64,7 +75,7 @@ export async function GET(request: Request) {
     nameByUser = new Map((profiles ?? []).map((r) => [r.id as string, r.display_name as string]));
   }
 
-  const { data: bonusRows } = await supabase
+  const { data: bonusRows } = await dataClient
     .from("prediction_bonus_answers")
     .select("user_id, prompt_id, answer_text")
     .in("match_id", aliasMatchIds);
