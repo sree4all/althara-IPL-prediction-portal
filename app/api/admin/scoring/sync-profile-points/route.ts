@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { requireAdminOrResponse } from "@/lib/auth/require-admin";
 import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
 
+export const maxDuration = 120;
+
 /** Rebuild every profile's current_points from points_ledger (no terminal needed). */
 export async function POST() {
   const { supabase, denied } = await requireAdminOrResponse();

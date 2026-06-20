@@ -24,7 +24,7 @@ export function PointsMaintenancePanel() {
     const failed = data.failures?.length ?? 0;
     toast.success(
       `Re-scored ${data.processed ?? 0} completed match(es).` +
-        (failed > 0 ? ` ${failed} match(es) had errors — check match results first.` : ""),
+        (failed > 0 ? ` ${failed} match(es) skipped (missing winner or stage config).` : ""),
     );
   }
 
@@ -49,19 +49,11 @@ export function PointsMaintenancePanel() {
       <div>
         <p className="text-sm font-semibold">Points maintenance</p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Use these after fixing scores or cleaning old bonus data. No terminal access needed.
+          Try <strong>Sync leaderboard</strong> first — it is fast. Use recompute only after
+          changing match results or bonus answers.
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button
-          type="button"
-          size="sm"
-          variant="secondary"
-          disabled={busy !== null}
-          onClick={() => void recomputeAll()}
-        >
-          {busy === "recompute" ? "Recomputing…" : "Recompute all completed matches"}
-        </Button>
         <Button
           type="button"
           size="sm"
@@ -71,15 +63,24 @@ export function PointsMaintenancePanel() {
         >
           {busy === "sync" ? "Syncing…" : "Sync leaderboard from ledger"}
         </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          disabled={busy !== null}
+          onClick={() => void recomputeAll()}
+        >
+          {busy === "recompute" ? "Recomputing…" : "Recompute all completed matches"}
+        </Button>
       </div>
       <ul className="list-disc space-y-1 pl-4 text-xs text-muted-foreground">
         <li>
-          <strong>Recompute</strong> — re-runs winner + match bonus scoring for every completed
-          match (including M31 bonus). Run after entering or correcting match results.
+          <strong>Sync leaderboard</strong> — rebuilds standings from the points ledger (usually a few
+          seconds). Use this when totals look wrong but match results are already correct.
         </li>
         <li>
-          <strong>Sync leaderboard</strong> — rebuilds stored totals from the points ledger if the
-          leaderboard looks wrong.
+          <strong>Recompute</strong> — re-runs winner + M31 bonus scoring for every completed match.
+          Slower; only needed after editing results or bonus answers.
         </li>
       </ul>
     </div>

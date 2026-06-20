@@ -1,19 +1,20 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { loadLedgerTotalsByUser } from "@/lib/scoring/ledger-totals";
 
+const PROFILE_UPDATE_CONCURRENCY = 40;
+
 /** Rebuild profiles.current_points = SUM(points_ledger). */
 export async function syncProfilePointsFromLedger(
   supabase: SupabaseClient,
 ): Promise<{ updated: number; unchanged: number }> {
-  const { data: profiles, error: pErr } = await supabase
-    .from("profiles")
-    .select("id, current_points");
+  const [{ data: profiles, error: pErr }, sumByUser] = await Promise.all([
+    supabase.from("profiles").select("id, current_points"),
+    loadLedgerTotalsByUser(supabase),
+  ]);
   if (pErr) throw new Error(pErr.message);
 
-  const sumByUser = await loadLedgerTotalsByUser(supabase);
-
   const now = new Date().toISOString();
-  let updated = 0;
+  const toUpdate: { id: string; expected: number }[] = [];
   let unchanged = 0;
 
   for (const p of profiles ?? []) {
@@ -22,15 +23,25 @@ export async function syncProfilePointsFromLedger(
     const current = Number(p.current_points ?? 0);
     if (current === expected) {
       unchanged += 1;
-      continue;
+    } else {
+      toUpdate.push({ id: uid, expected });
     }
-    const { error } = await supabase
-      .from("profiles")
-      .update({ current_points: expected, updated_at: now })
-      .eq("id", uid);
-    if (error) throw new Error(error.message);
-    updated += 1;
   }
 
-  return { updated, unchanged };
+  for (let i = 0; i < toUpdate.length; i += PROFILE_UPDATE_CONCURRENCY) {
+    const slice = toUpdate.slice(i, i + PROFILE_UPDATE_CONCURRENCY);
+    const results = await Promise.all(
+      slice.map(({ id, expected }) =>
+        supabase
+          .from("profiles")
+          .update({ current_points: expected, updated_at: now })
+          .eq("id", id),
+      ),
+    );
+    for (const r of results) {
+      if (r.error) throw new Error(r.error.message);
+    }
+  }
+
+  return { updated: toUpdate.length, unchanged };
 }
