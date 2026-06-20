@@ -29,6 +29,7 @@ export async function applyMatchScoring(
   supabase: SupabaseClient,
   matchId: string,
   seasonYear = 2026,
+  options?: { syncProfiles?: boolean },
 ): Promise<MatchScoreOutcome> {
   const [{ data: cfg, error: cErr }, stageMap] = await Promise.all([
     supabase
@@ -214,7 +215,9 @@ export async function applyMatchScoring(
     }
   }
 
-  await syncProfilePointsFromLedger(supabase);
+  if (options?.syncProfiles !== false) {
+    await syncProfilePointsFromLedger(supabase);
+  }
 
   await supabase.from("matches").update({ scored_at: now, updated_at: now }).eq("id", matchId);
 
