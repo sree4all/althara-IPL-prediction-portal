@@ -1,21 +1,11 @@
 import { parseTournamentStage } from "@/lib/fifa/stages";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
-import { isTop4ScoringAnswer } from "@/lib/scoring/tournament-scoring";
+import { isFinalistsScoringAnswer, isTop4ScoringAnswer } from "@/lib/scoring/tournament-scoring";
+import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
 import { createServiceClient } from "@/lib/supabase/service";
 
 const SEASON_YEAR = 2026;
-
-function slotPointsArray(raw: unknown): number[] {
-  if (Array.isArray(raw)) return raw.map((n) => Number(n ?? 2));
-  try {
-    const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-    if (Array.isArray(parsed)) return parsed.map((n) => Number(n ?? 2));
-  } catch {
-    /* ignore */
-  }
-  return [2, 2, 2, 2, 3, 3, 5, 3, 3];
-}
 
 /**
  * Backfills points for a newly created profile only once.
@@ -48,14 +38,13 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
     const [{ data: cfg }, stageMap] = await Promise.all([
       supabase
         .from("scoring_config")
-        .select("match_bonus_points, tournament_slot_points")
+        .select("match_bonus_points")
         .eq("season_year", SEASON_YEAR)
         .maybeSingle(),
       loadStageScoringMap(supabase, SEASON_YEAR),
     ]);
 
     const bonusPts = Number(cfg?.match_bonus_points ?? 2);
-    const tournamentSlotPts = slotPointsArray(cfg?.tournament_slot_points);
 
     const { data: predictions } = await supabase
       .from("predictions")
@@ -75,7 +64,6 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
       });
     }
 
-    let pointsDelta = 0;
     const matchIds = [...predictedByMatch.keys()];
     if (matchIds.length > 0) {
       const { data: matches } = await supabase
@@ -154,14 +142,12 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
         const pred = predictedByMatch.get(mid);
         if (!pred) continue;
 
-        let matchAdd = 0;
         const actualWinner = (m.winner as string | null)?.trim();
         if (actualWinner) {
           const stageSlug = parseTournamentStage(m.tournament_stage as string | null) ?? "group";
           const stageRow = stageMap.get(stageSlug);
           if (stageRow) {
             const wDelta = winnerPointsDelta(pred.predicted_winner, actualWinner, stageRow);
-            matchAdd += wDelta;
             await supabase.from("points_ledger").upsert(
               {
                 user_id: userId,
@@ -184,7 +170,6 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
             const ans = (answerByMatchPrompt.get(`${mid}\t${p.id}`) ?? "").trim();
             if (!ans) continue;
             if (normAnswer(ans) !== normAnswer(official)) continue;
-            matchAdd += bonusPts;
             await supabase.from("points_ledger").insert({
               user_id: userId,
               source_type: "bonus",
@@ -198,7 +183,6 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
           const official = ((m.bonus_result as string | null) ?? "").trim();
           const guess = (pred.bonus_pick ?? "").trim();
           if (official && guess && normAnswer(guess) === normAnswer(official)) {
-            matchAdd += bonusPts;
             await supabase.from("points_ledger").insert({
               user_id: userId,
               source_type: "bonus",
@@ -210,7 +194,6 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
           }
         }
 
-        pointsDelta += matchAdd;
       }
     }
 
@@ -255,10 +238,11 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
         const guess = ((a.answer_text as string | null) ?? "").trim();
         if (!guess) continue;
 
-        let pts = Number(tournamentSlotPts[q.slot_no - 1] ?? 2);
+        const pts = 2;
         if (q.slot_no >= 1 && q.slot_no <= 4) {
           if (!isTop4ScoringAnswer(guess)) continue;
-          pts = 2;
+        } else if (q.slot_no >= 5 && q.slot_no <= 6) {
+          if (!isFinalistsScoringAnswer(guess)) continue;
         } else {
           const official = (q.correct_answer ?? "").trim();
           if (!official) continue;
@@ -273,15 +257,13 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
           reason: `tournament_slot_${q.slot_no}`,
           awarded_at: now,
         });
-        pointsDelta += pts;
       }
     }
 
-    const cur = Number(claimedProfile.current_points ?? 0);
+    await syncProfilePointsFromLedger(supabase);
     await supabase
       .from("profiles")
       .update({
-        current_points: cur + pointsDelta,
         scoring_bootstrapped_at: now,
         updated_at: now,
       })

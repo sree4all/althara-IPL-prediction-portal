@@ -9,7 +9,7 @@ import {
   type TournamentQuestionForScoring,
 } from "../../lib/scoring/tournament-scoring";
 
-const SLOT_POINTS = [2, 2, 2, 2, 3, 3, 5, 3, 3];
+const SLOT_POINTS = [2, 2, 2, 2, 2, 2, 2, 2, 2];
 const AWARDED_AT = "2026-05-25T00:00:00.000Z";
 
 test("Top 4 scoring treats Q1-Q4 as a shared set even when stored on one question", () => {
@@ -148,7 +148,7 @@ test("Top 4 scoring uses the fixed team list and two points per matching answer"
   );
 });
 
-test("Finalists Q5-Q6 use fixed RCB and GT list for 3 points per slot", () => {
+test("Finalists Q5-Q6 use fixed RCB and GT list for 2 points per slot", () => {
   const questions: TournamentQuestionForScoring[] = [
     { id: "q5", slot_no: 5, correct_answer: "RCB" },
     { id: "q6", slot_no: 6, correct_answer: null },
@@ -157,8 +157,8 @@ test("Finalists Q5-Q6 use fixed RCB and GT list for 3 points per slot", () => {
   assert.deepEqual(
     scoringQuestions.map((q) => ({ id: q.id, pts: q.pts })),
     [
-      { id: "q5", pts: 3 },
-      { id: "q6", pts: 3 },
+      { id: "q5", pts: 2 },
+      { id: "q6", pts: 2 },
     ],
   );
 
@@ -179,8 +179,8 @@ test("Finalists Q5-Q6 use fixed RCB and GT list for 3 points per slot", () => {
     pointsByUser.set(row.user_id, (pointsByUser.get(row.user_id) ?? 0) + row.points_delta);
   }
 
-  assert.equal(pointsByUser.get("user-a") ?? 0, 3);
-  assert.equal(pointsByUser.get("user-b") ?? 0, 3);
+  assert.equal(pointsByUser.get("user-a") ?? 0, 2);
+  assert.equal(pointsByUser.get("user-b") ?? 0, 2);
   assert.equal(pointsByUser.get("user-c") ?? 0, 0);
   assert.equal(pointsByUser.get("vis") ?? 0, 0);
   assert.equal(isFinalistsScoringAnswer("Gujarat Titans"), true);
@@ -232,7 +232,7 @@ test("RCB on Q1 and Q5 awards Top-4 and finalists points independently", () => {
   const ledgerRows = scoreTournamentAnswers(scoringQuestions, answers, AWARDED_AT);
   assert.equal(
     ledgerRows.reduce((s, r) => s + r.points_delta, 0),
-    5,
+    4,
   );
 });
 

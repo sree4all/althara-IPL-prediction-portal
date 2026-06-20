@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { loadLedgerTotalsByUser } from "@/lib/scoring/ledger-totals";
 
 export type LeaderboardRow = {
   id: string;
@@ -23,20 +24,25 @@ function compareLeaderboardRows(
 export async function getLeaderboard(
   supabase: SupabaseClient,
 ): Promise<LeaderboardRow[]> {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, display_name, current_points");
+  const [{ data, error }, ledgerTotals] = await Promise.all([
+    supabase.from("profiles").select("id, display_name"),
+    loadLedgerTotalsByUser(supabase),
+  ]);
 
   if (error || !data) {
     return [];
   }
 
-  const sorted = [...data].sort(compareLeaderboardRows);
-
-  return sorted.map((row, index) => ({
+  const withPoints = data.map((row) => ({
     id: row.id as string,
     display_name: (row.display_name as string) || "Player",
-    current_points: Number(row.current_points ?? 0),
+    current_points: ledgerTotals.get(row.id as string) ?? 0,
+  }));
+
+  const sorted = [...withPoints].sort(compareLeaderboardRows);
+
+  return sorted.map((row, index) => ({
+    ...row,
     rank: index + 1,
   }));
 }
