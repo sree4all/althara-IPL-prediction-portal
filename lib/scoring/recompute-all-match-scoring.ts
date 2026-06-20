@@ -5,6 +5,7 @@ import {
   fixtureNumber,
   idsByFixtureNumber,
 } from "@/lib/matches/dedupe-by-match-number";
+import { MATCH_BONUS_POINTS } from "@/lib/scoring/match-bonus-points";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
 import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
@@ -54,29 +55,20 @@ export async function recomputeAllCompletedMatchScoring(
   supabase: SupabaseClient,
   seasonYear = 2026,
 ): Promise<RecomputeAllMatchResult> {
-  const [{ data: cfg, error: cErr }, stageMap, { data: allMatches, error: mErr }] =
-    await Promise.all([
-      supabase
-        .from("scoring_config")
-        .select("match_bonus_points")
-        .eq("season_year", seasonYear)
-        .maybeSingle(),
-      loadStageScoringMap(supabase, seasonYear),
-      supabase
-        .from("matches")
-        .select(
-          "id, external_key, match_number, status, winner, bonus_result, tournament_stage",
-        ),
-    ]);
+  const [stageMap, { data: allMatches, error: mErr }] = await Promise.all([
+    loadStageScoringMap(supabase, seasonYear),
+    supabase
+      .from("matches")
+      .select(
+        "id, external_key, match_number, status, winner, bonus_result, tournament_stage",
+      ),
+  ]);
 
-  if (cErr || !cfg) {
-    return { ok: false, error: cErr?.message ?? "missing scoring_config" };
-  }
   if (mErr) {
     return { ok: false, error: mErr.message };
   }
 
-  const bonusPts = Number(cfg.match_bonus_points ?? 2);
+  const bonusPts = MATCH_BONUS_POINTS;
   const aliasByFixture = idsByFixtureNumber((allMatches ?? []) as ScorableMatch[]);
   const completedRaw = (allMatches ?? []).filter((m) => m.status === "completed");
   const canonicalMatches = dedupeMatchesByFixtureNumber(

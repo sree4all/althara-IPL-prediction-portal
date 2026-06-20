@@ -2,13 +2,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { parseTournamentStage } from "@/lib/fifa/stages";
 import { resolveMatchAliasIds } from "@/lib/matches/resolve-alias-ids";
 import { normAnswer } from "@/lib/scoring/normalize";
+import { MATCH_BONUS_POINTS } from "@/lib/scoring/match-bonus-points";
 import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
 import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
-
-export type ScoringConfigRow = {
-  season_year: number;
-  match_bonus_points: number;
-};
 
 export type MatchScoreOutcome =
   | { ok: true; ledgerRows: number }
@@ -31,18 +27,7 @@ export async function applyMatchScoring(
   seasonYear = 2026,
   options?: { syncProfiles?: boolean },
 ): Promise<MatchScoreOutcome> {
-  const [{ data: cfg, error: cErr }, stageMap] = await Promise.all([
-    supabase
-      .from("scoring_config")
-      .select("season_year, match_bonus_points")
-      .eq("season_year", seasonYear)
-      .maybeSingle(),
-    loadStageScoringMap(supabase, seasonYear),
-  ]);
-
-  if (cErr || !cfg) {
-    return { ok: false, error: cErr?.message ?? "missing scoring_config" };
-  }
+  const stageMap = await loadStageScoringMap(supabase, seasonYear);
 
   const { data: match, error: mErr } = await supabase
     .from("matches")
@@ -59,7 +44,7 @@ export async function applyMatchScoring(
     return { ok: false, error: "Match status must be completed before scoring." };
   }
 
-  const bonusPts = Number(cfg.match_bonus_points ?? 2);
+  const bonusPts = MATCH_BONUS_POINTS;
   const stageSlug = parseTournamentStage(match.tournament_stage as string | null) ?? "group";
   const stageRow = stageMap.get(stageSlug);
   if (!stageRow) {

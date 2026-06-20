@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { MATCH_BONUS_POINTS } from "@/lib/scoring/match-bonus-points";
 import { Button } from "@/components/ui/button";
 
 type StageRow = {
@@ -13,7 +14,6 @@ type StageRow = {
 
 export function StageScoringPanel() {
   const [stages, setStages] = useState<StageRow[]>([]);
-  const [matchBonus, setMatchBonus] = useState(2);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -26,7 +26,6 @@ export function StageScoringPanel() {
       }
       const data = await res.json();
       setStages(data.stages ?? []);
-      setMatchBonus(Number(data.match_bonus_points ?? 2));
       setLoading(false);
     })();
   }, []);
@@ -38,7 +37,7 @@ export function StageScoringPanel() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         stages,
-        match_bonus_points: matchBonus,
+        match_bonus_points: MATCH_BONUS_POINTS,
       }),
     });
     const data = await res.json().catch(() => ({}));
@@ -117,10 +116,11 @@ export function StageScoringPanel() {
           Match bonus (correct answer points, e.g. M31)
           <input
             type="number"
-            className="mt-1 w-full rounded-md border border-input px-2 py-1 text-sm"
-            value={matchBonus}
-            onChange={(e) => setMatchBonus(Number(e.target.value))}
+            readOnly
+            className="mt-1 w-full rounded-md border border-input bg-muted/40 px-2 py-1 text-sm"
+            value={MATCH_BONUS_POINTS}
           />
+          <span className="mt-1 block text-muted-foreground">Fixed at {MATCH_BONUS_POINTS} points.</span>
         </label>
       </div>
 
