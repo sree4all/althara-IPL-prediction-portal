@@ -1,4 +1,5 @@
 import { parseTournamentStage } from "@/lib/fifa/stages";
+import { MATCH_BONUS_POINTS } from "@/lib/scoring/match-bonus-points";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
 import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
@@ -34,16 +35,8 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
   if (!claimedProfile) return;
 
   try {
-    const [{ data: cfg }, stageMap] = await Promise.all([
-      supabase
-        .from("scoring_config")
-        .select("match_bonus_points")
-        .eq("season_year", SEASON_YEAR)
-        .maybeSingle(),
-      loadStageScoringMap(supabase, SEASON_YEAR),
-    ]);
-
-    const bonusPts = Number(cfg?.match_bonus_points ?? 2);
+    const stageMap = await loadStageScoringMap(supabase, SEASON_YEAR);
+    const bonusPts = MATCH_BONUS_POINTS;
 
     const { data: predictions } = await supabase
       .from("predictions")
