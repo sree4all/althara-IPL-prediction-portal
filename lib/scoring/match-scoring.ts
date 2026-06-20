@@ -3,6 +3,7 @@ import { parseTournamentStage } from "@/lib/fifa/stages";
 import { resolveMatchAliasIds } from "@/lib/matches/resolve-alias-ids";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
+import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
 
 export type ScoringConfigRow = {
   season_year: number;
@@ -23,18 +24,6 @@ type LedgerInsert = {
 };
 
 const LEDGER_BATCH = 500;
-const PROFILE_ID_CHUNK = 150;
-const PROFILE_UPDATE_CONCURRENCY = 40;
-
-function sumByUser(rows: { user_id: string; points_delta: number }[]): Map<string, number> {
-  const m = new Map<string, number>();
-  for (const row of rows) {
-    const uid = row.user_id;
-    const d = Number(row.points_delta ?? 0);
-    m.set(uid, (m.get(uid) ?? 0) + d);
-  }
-  return m;
-}
 
 export async function applyMatchScoring(
   supabase: SupabaseClient,
@@ -69,7 +58,7 @@ export async function applyMatchScoring(
     return { ok: false, error: "Match status must be completed before scoring." };
   }
 
-  const bonusPts = Number(cfg.match_bonus_points ?? 0);
+  const bonusPts = Number(cfg.match_bonus_points ?? 2);
   const stageSlug = parseTournamentStage(match.tournament_stage as string | null) ?? "group";
   const stageRow = stageMap.get(stageSlug);
   if (!stageRow) {
@@ -146,8 +135,6 @@ export async function applyMatchScoring(
     .eq("source_id", matchId)
     .in("source_type", ["match", "bonus"]);
 
-  const refundByUser = sumByUser(oldLedger ?? []);
-
   const now = new Date().toISOString();
   const toInsert: LedgerInsert[] = [];
 
@@ -208,8 +195,6 @@ export async function applyMatchScoring(
     });
   }
 
-  const awardByUser = sumByUser(toInsert);
-
   if (oldLedger?.length) {
     const { error: delErr } = await supabase
       .from("points_ledger")
@@ -229,51 +214,7 @@ export async function applyMatchScoring(
     }
   }
 
-  const userIdsForNet = new Set<string>([...refundByUser.keys(), ...awardByUser.keys()]);
-  const nets = new Map<string, number>();
-  for (const uid of userIdsForNet) {
-    const net = (awardByUser.get(uid) ?? 0) - (refundByUser.get(uid) ?? 0);
-    if (net !== 0) nets.set(uid, net);
-  }
-
-  if (nets.size > 0) {
-    const ids = [...nets.keys()];
-    const byId = new Map<string, number>();
-    for (let i = 0; i < ids.length; i += PROFILE_ID_CHUNK) {
-      const slice = ids.slice(i, i + PROFILE_ID_CHUNK);
-      const { data: profs, error: profErr } = await supabase
-        .from("profiles")
-        .select("id, current_points")
-        .in("id", slice);
-      if (profErr) {
-        return { ok: false, error: profErr.message };
-      }
-      for (const p of profs ?? []) {
-        byId.set(p.id as string, Number(p.current_points ?? 0));
-      }
-    }
-    for (let i = 0; i < ids.length; i += PROFILE_UPDATE_CONCURRENCY) {
-      const slice = ids.slice(i, i + PROFILE_UPDATE_CONCURRENCY);
-      const results = await Promise.all(
-        slice.map((uid) => {
-          const net = nets.get(uid)!;
-          const cur = byId.get(uid) ?? 0;
-          return supabase
-            .from("profiles")
-            .update({
-              current_points: cur + net,
-              updated_at: now,
-            })
-            .eq("id", uid);
-        }),
-      );
-      for (const r of results) {
-        if (r.error) {
-          return { ok: false, error: r.error.message };
-        }
-      }
-    }
-  }
+  await syncProfilePointsFromLedger(supabase);
 
   await supabase.from("matches").update({ scored_at: now, updated_at: now }).eq("id", matchId);
 

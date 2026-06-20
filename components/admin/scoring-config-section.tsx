@@ -28,7 +28,7 @@ export function ScoringConfigSection() {
         setLoading(false);
         return;
       }
-      let slots: number[] = [2, 2, 2, 2, 3, 3, 5, 3, 3];
+      let slots: number[] = [2, 2, 2, 2, 2, 2, 2, 2, 2];
       try {
         const raw = c.tournament_slot_points;
         if (Array.isArray(raw)) slots = raw.map((n: number) => Number(n));

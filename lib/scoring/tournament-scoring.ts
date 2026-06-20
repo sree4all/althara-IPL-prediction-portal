@@ -24,7 +24,7 @@ function slotPointsArray(raw: unknown): number[] {
   } catch {
     /* ignore */
   }
-  return [2, 2, 2, 2, 3, 3, 5, 3, 3];
+  return [2, 2, 2, 2, 2, 2, 2, 2, 2];
 }
 
 const TEAM_ANSWER_ALIASES = new Map<string, string>([
@@ -140,11 +140,7 @@ export function tournamentQuestionsToScore(
       return {
         id: q.id,
         slotNo,
-        pts: top4Slot
-          ? 2
-          : finalistsSlot
-            ? 3
-            : Number(slotPts[slotNo - 1] ?? 2),
+        pts: top4Slot || finalistsSlot ? 2 : Number(slotPts[slotNo - 1] ?? 2),
         correctRaw: top4Slot
           ? TOP4_SCORING_ANSWER_TEXT
           : finalistsSlot && finalistsActive
