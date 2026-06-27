@@ -8,6 +8,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { config as loadEnv } from "dotenv";
 import { resolve } from "path";
+import { loadLedgerTotalsByUser } from "@/lib/scoring/ledger-totals";
 import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
 
 for (const name of [".env", ".env.local"] as const) {
@@ -36,19 +37,7 @@ async function main() {
       process.exit(1);
     }
 
-    const { data: ledger, error: lErr } = await supabase
-      .from("points_ledger")
-      .select("user_id, points_delta");
-    if (lErr) {
-      console.error(lErr.message);
-      process.exit(1);
-    }
-
-    const sumByUser = new Map<string, number>();
-    for (const row of ledger ?? []) {
-      const uid = row.user_id as string;
-      sumByUser.set(uid, (sumByUser.get(uid) ?? 0) + Number(row.points_delta ?? 0));
-    }
+    const sumByUser = await loadLedgerTotalsByUser(supabase);
 
     let drift = 0;
     for (const p of profiles ?? []) {

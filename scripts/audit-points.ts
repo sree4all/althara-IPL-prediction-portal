@@ -6,6 +6,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { config as loadEnv } from "dotenv";
 import { resolve } from "path";
+import { loadLedgerTotalsByUser } from "@/lib/scoring/ledger-totals";
 
 for (const name of [".env", ".env.local"] as const) {
   loadEnv({ path: resolve(process.cwd(), name), override: name === ".env.local" });
@@ -31,19 +32,11 @@ async function main() {
     process.exit(1);
   }
 
-  const { data: ledger, error: lErr } = await supabase
+  const { count: ledgerRowCount } = await supabase
     .from("points_ledger")
-    .select("user_id, points_delta");
-  if (lErr) {
-    console.error(lErr.message);
-    process.exit(1);
-  }
+    .select("id", { count: "exact", head: true });
 
-  const sumByUser = new Map<string, number>();
-  for (const row of ledger ?? []) {
-    const uid = row.user_id as string;
-    sumByUser.set(uid, (sumByUser.get(uid) ?? 0) + Number(row.points_delta ?? 0));
-  }
+  const sumByUser = await loadLedgerTotalsByUser(supabase);
 
   let driftCount = 0;
   const drifts: { name: string; current: number; expected: number; diff: number }[] = [];
@@ -67,7 +60,7 @@ async function main() {
   drifts.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
 
   console.log(`Profiles: ${profiles?.length ?? 0}`);
-  console.log(`Ledger rows: ${ledger?.length ?? 0}`);
+  console.log(`Ledger rows: ${ledgerRowCount ?? 0}`);
   console.log(`Profiles with drift (current != ledger sum): ${driftCount}`);
   console.log("\nTop 15 drifts:");
   for (const d of drifts.slice(0, 15)) {
