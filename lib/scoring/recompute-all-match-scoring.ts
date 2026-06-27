@@ -255,10 +255,17 @@ export async function recomputeAllCompletedMatchScoring(
     }
   }
 
+  const ledgerSourceIds = new Set<string>();
+  for (const match of scorable) {
+    for (const id of aliasIdsForMatch(match, aliasByFixture)) {
+      ledgerSourceIds.add(id);
+    }
+  }
+
   const { error: delErr } = await supabase
     .from("points_ledger")
     .delete()
-    .in("source_id", canonicalIds)
+    .in("source_id", [...ledgerSourceIds])
     .in("source_type", ["match", "bonus"]);
   if (delErr) return { ok: false, error: delErr.message };
 

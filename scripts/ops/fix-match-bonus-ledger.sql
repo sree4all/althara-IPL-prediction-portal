@@ -17,5 +17,6 @@ where pl.source_type = 'bonus'
   and pl.points_delta <> 2
 order by p.display_name, pl.awarded_at;
 
--- After fixing config, use Admin → Scoring Configuration → Recompute all completed matches,
--- then Sync leaderboard from ledger.
+-- After deploying alias-ledger fixes, use Admin → Points maintenance:
+-- 1) Recompute all completed matches (cleans duplicate alias ledger rows)
+-- 2) Sync leaderboard from ledger
