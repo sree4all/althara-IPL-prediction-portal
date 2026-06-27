@@ -1,4 +1,9 @@
 import { parseTournamentStage } from "@/lib/fifa/stages";
+import {
+  aliasIdsFromRows,
+  canonicalMatchIdFromRows,
+  loadMatchAliasRows,
+} from "@/lib/matches/canonical-match-id";
 import { MATCH_BONUS_POINTS } from "@/lib/scoring/match-bonus-points";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
@@ -58,6 +63,8 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
 
     const matchIds = [...predictedByMatch.keys()];
     if (matchIds.length > 0) {
+      const allMatchRows = await loadMatchAliasRows(supabase);
+
       const { data: matches } = await supabase
         .from("matches")
         .select("id, external_key, status, winner, bonus_result, tournament_stage")
@@ -65,6 +72,13 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
         .eq("status", "completed");
 
       const completedMatchIds = (matches ?? []).map((m) => m.id as string);
+      const ledgerSourceIds = new Set<string>();
+      for (const mid of completedMatchIds) {
+        for (const id of aliasIdsFromRows(allMatchRows, mid)) {
+          ledgerSourceIds.add(id);
+        }
+      }
+
       const { data: existingMatchLedger } = await supabase
         .from("points_ledger")
         .select("source_id")
@@ -72,11 +86,19 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
         .in("source_type", ["match", "bonus"])
         .in(
           "source_id",
-          completedMatchIds.length > 0
-            ? completedMatchIds
+          ledgerSourceIds.size > 0
+            ? [...ledgerSourceIds]
             : ["00000000-0000-0000-0000-000000000000"],
         );
       const ledgeredMatchIds = new Set((existingMatchLedger ?? []).map((r) => r.source_id as string));
+
+      const promptMatchIds = new Set<string>();
+      for (const mid of completedMatchIds) {
+        for (const id of aliasIdsFromRows(allMatchRows, mid)) {
+          promptMatchIds.add(id);
+        }
+      }
+
       const { data: prompts } = await supabase
         .from("bonus_prompts")
         .select("id, match_id, correct_answer, display_order")
@@ -84,8 +106,8 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
         .eq("scope", "match")
         .in(
           "match_id",
-          completedMatchIds.length > 0
-            ? completedMatchIds
+          promptMatchIds.size > 0
+            ? [...promptMatchIds]
             : ["00000000-0000-0000-0000-000000000000"],
         )
         .order("display_order", { ascending: true });
@@ -104,6 +126,13 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
         });
       }
 
+      const bonusMatchIds = new Set<string>();
+      for (const mid of completedMatchIds) {
+        for (const id of aliasIdsFromRows(allMatchRows, mid)) {
+          bonusMatchIds.add(id);
+        }
+      }
+
       const promptIds = [...new Set((prompts ?? []).map((p) => p.id as string))];
       const { data: bonusAnswers } = await supabase
         .from("prediction_bonus_answers")
@@ -111,8 +140,8 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
         .eq("user_id", userId)
         .in(
           "match_id",
-          completedMatchIds.length > 0
-            ? completedMatchIds
+          bonusMatchIds.size > 0
+            ? [...bonusMatchIds]
             : ["00000000-0000-0000-0000-000000000000"],
         )
         .in(
@@ -129,7 +158,10 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
 
       for (const m of matches ?? []) {
         const mid = m.id as string;
-        if (ledgeredMatchIds.has(mid)) continue;
+        const canonicalId = canonicalMatchIdFromRows(allMatchRows, mid);
+        const aliasIds = aliasIdsFromRows(allMatchRows, mid);
+        const alreadyLedgered = aliasIds.some((id) => ledgeredMatchIds.has(id));
+        if (alreadyLedgered) continue;
 
         const pred = predictedByMatch.get(mid);
         if (!pred) continue;
@@ -144,7 +176,7 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
               {
                 user_id: userId,
                 source_type: "match",
-                source_id: mid,
+                source_id: canonicalId,
                 points_delta: wDelta,
                 reason: `match_winner:${stageSlug}`,
                 awarded_at: now,
@@ -154,18 +186,27 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
           }
         }
 
-        const promptsForMatch = promptsByMatch.get(mid) ?? [];
+        const promptsForMatch: { id: string; correct_answer: string | null; display_order: number }[] =
+          [];
+        for (const aliasId of aliasIds) {
+          const list = promptsByMatch.get(aliasId) ?? [];
+          promptsForMatch.push(...list);
+        }
+        promptsForMatch.sort((a, b) => a.display_order - b.display_order);
+
         if (promptsForMatch.length > 0) {
           for (const p of promptsForMatch) {
             const official = (p.correct_answer ?? "").trim();
             if (!official) continue;
-            const ans = (answerByMatchPrompt.get(`${mid}\t${p.id}`) ?? "").trim();
+            const ans = aliasIds
+              .map((aliasId) => (answerByMatchPrompt.get(`${aliasId}\t${p.id}`) ?? "").trim())
+              .find((value) => value.length > 0);
             if (!ans) continue;
             if (normAnswer(ans) !== normAnswer(official)) continue;
             await supabase.from("points_ledger").insert({
               user_id: userId,
               source_type: "bonus",
-              source_id: mid,
+              source_id: canonicalId,
               points_delta: bonusPts,
               reason: `match_bonus:${p.id}`,
               awarded_at: now,
@@ -178,7 +219,7 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
             await supabase.from("points_ledger").insert({
               user_id: userId,
               source_type: "bonus",
-              source_id: mid,
+              source_id: canonicalId,
               points_delta: bonusPts,
               reason: "match_bonus",
               awarded_at: now,

@@ -115,12 +115,6 @@ export async function applyMatchScoring(
 
   const usePerPromptBonus = promptsOrdered.length > 0;
 
-  const { data: oldLedger } = await supabase
-    .from("points_ledger")
-    .select("user_id, points_delta")
-    .eq("source_id", matchId)
-    .in("source_type", ["match", "bonus"]);
-
   const now = new Date().toISOString();
   const toInsert: LedgerInsert[] = [];
 
@@ -181,15 +175,13 @@ export async function applyMatchScoring(
     });
   }
 
-  if (oldLedger?.length) {
-    const { error: delErr } = await supabase
-      .from("points_ledger")
-      .delete()
-      .eq("source_id", matchId)
-      .in("source_type", ["match", "bonus"]);
-    if (delErr) {
-      return { ok: false, error: delErr.message };
-    }
+  const { error: delErr } = await supabase
+    .from("points_ledger")
+    .delete()
+    .in("source_id", aliasMatchIds)
+    .in("source_type", ["match", "bonus"]);
+  if (delErr) {
+    return { ok: false, error: delErr.message };
   }
 
   for (let i = 0; i < toInsert.length; i += LEDGER_BATCH) {

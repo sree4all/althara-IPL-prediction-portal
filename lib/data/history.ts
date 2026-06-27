@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getPointsLedgerForUser } from "@/lib/data/points-ledger";
+import { aliasIdsFromRows, loadMatchAliasRows } from "@/lib/matches/canonical-match-id";
 import { compareMatchOrder } from "@/lib/matches/match-order";
 import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
 
@@ -18,6 +19,7 @@ export async function getHistoryRows(supabase: SupabaseClient, userId: string) {
     .select("id, match_id, predicted_winner, bonus_pick, updated_at")
     .eq("user_id", userId);
   const ledger = await getPointsLedgerForUser(supabase, userId);
+  const allMatchRows = await loadMatchAliasRows(supabase);
 
   const matchIds = [...new Set((predictions ?? []).map((p) => p.match_id as string))];
 
@@ -116,10 +118,12 @@ export async function getHistoryRows(supabase: SupabaseClient, userId: string) {
   return predictionsOrdered.map((p) => {
     const mid = p.match_id as string;
     const m = matchById.get(mid);
+    const aliasIds = aliasIdsFromRows(allMatchRows, mid);
     const ledgerPts = sumLedger(
       ledger,
       (l) =>
-        (l.source_type === "match" || l.source_type === "bonus") && l.source_id === mid,
+        (l.source_type === "match" || l.source_type === "bonus") &&
+        aliasIds.includes(l.source_id),
     );
     const matchFinal =
       m != null &&
