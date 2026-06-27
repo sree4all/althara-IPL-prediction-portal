@@ -191,14 +191,11 @@ export function BonusPromptsPanel({
       <ul className="mb-4 space-y-3 text-sm">
         {prompts.map((p) => {
           const m = p.match_id ? matchById.get(p.match_id) : undefined;
-          const where =
-            p.scope === "tournament"
-              ? "Season-wide (Mega Bonus tab)"
-              : m
-                ? matchLabel(m)
-                : p.match_id
-                  ? `Match ${p.match_id}`
-                  : "—";
+          const where = m
+            ? matchLabel(m)
+            : p.match_id
+              ? `Match ${p.match_id}`
+              : "—";
           const it = p.input_type === "single_choice" ? "single_choice" : "text";
           return (
             <li

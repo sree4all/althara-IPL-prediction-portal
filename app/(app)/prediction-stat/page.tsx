@@ -90,7 +90,7 @@ export default function PredictionStatPage() {
       <h1 className="mb-2 text-2xl font-bold tracking-tight">Prediction Stat</h1>
       <p className="mb-6 text-sm text-muted-foreground">
         Pick a match to see every player&apos;s winner pick and bonus answers for that fixture
-        (transparent view). Defaults to the next fixture that is not completed.
+        (transparent view). Works for upcoming, locked, and completed matches.
       </p>
 
       {matches === null ? (

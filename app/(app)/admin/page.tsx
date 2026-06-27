@@ -21,6 +21,7 @@ export default async function AdminPage() {
     .from("bonus_prompts")
     .select("id, season_year, scope, match_id, prompt_key, prompt_text, is_active, display_order, input_type")
     .eq("season_year", 2026)
+    .eq("scope", "match")
     .order("display_order", { ascending: true });
   const { data: adminMatches } = await supabase
     .from("matches")
@@ -28,50 +29,24 @@ export default async function AdminPage() {
       "id, external_key, home_team, away_team, match_time_utc, status, winner, bonus_result, scored_at, tournament_stage",
     )
     .order("match_time_utc", { ascending: true });
-  const { data: tournamentQuestions } = await supabase
-    .from("tournament_questions")
-    .select("id, slot_no, question_text, correct_answer, scored_at, visible_after_utc, revealed_by_admin")
-    .eq("season_year", 2026)
-    .order("slot_no", { ascending: true });
-
-  const tqIds = (tournamentQuestions ?? []).map((q) => q.id as string);
-  const { data: tQuestionOpts } =
-    tqIds.length > 0
-      ? await supabase
-          .from("tournament_question_options")
-          .select("id, question_id, label, value, sort_order")
-          .in("question_id", tqIds)
-          .order("sort_order", { ascending: true })
-      : { data: [] };
-
-  const optionsByQuestion: Record<string, { label: string; value: string; sort_order: number }[]> =
-    {};
-  for (const o of tQuestionOpts ?? []) {
-    const qid = o.question_id as string;
-    if (!optionsByQuestion[qid]) optionsByQuestion[qid] = [];
-    optionsByQuestion[qid].push({
-      label: o.label as string,
-      value: o.value as string,
-      sort_order: Number(o.sort_order ?? 0),
-    });
-  }
 
   return (
     <div className="space-y-6">
       <PageHeader title="Admin" />
+      <p className="text-sm text-white/70">
+        <a href="/admin/player-audit" className="underline underline-offset-2">
+          Player audit
+        </a>{" "}
+        — look up any participant&apos;s predictions and points.
+      </p>
       <AdminTabs
         tournamentConfig={{
           answer_lock_utc: cfg?.answer_lock_utc ?? null,
-          season_bonuses_visible_after_utc: cfg?.season_bonuses_visible_after_utc ?? null,
-          season_bonuses_revealed_by_admin: Boolean(cfg?.season_bonuses_revealed_by_admin),
           maintenance_mode: Boolean(cfg?.maintenance_mode),
           maintenance_banner_text: cfg?.maintenance_banner_text ?? DEFAULT_MAINTENANCE_BANNER_TEXT,
-          mega_bonus_all_answers_visible: Boolean(cfg?.mega_bonus_all_answers_visible),
         }}
         bonusPrompts={bonus ?? []}
         matches={dedupeMatchesByFixtureNumber(adminMatches ?? [])}
-        tournamentQuestions={tournamentQuestions ?? []}
-        optionsByQuestion={optionsByQuestion}
       />
     </div>
   );

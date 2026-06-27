@@ -72,7 +72,7 @@ Same file explicitly:
 npm run seed -- matches ./docs/matches.csv
 ```
 
-For a minimal comma CSV without the GMT column, use **ISO 8601 UTC** only. Rows must be **strictly more than 30 minutes before start** to allow predictions on scheduled games.
+For a minimal comma CSV without the GMT column, use **ISO 8601 UTC** only. Predictions lock at kickoff; scheduled games accept picks until match start time.
 
 **Results & scoring:** `matches.winner` and `matches.bonus_result` are what the app compares to saved picks (see **History** / leaderboard reads). They are set by **fixture import** (`npm run seed -- matches …` from your sheet) or manual SQL/Table Editor in Supabase. There is **no** automatic job in this repo that inserts `points_ledger` rows when you update a winner; add ledger entries or recompute `profiles.current_points` yourself if you use the ledger for scoring.
 

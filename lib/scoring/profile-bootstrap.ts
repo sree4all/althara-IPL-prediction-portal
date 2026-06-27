@@ -1,186 +1,20 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { parseTournamentStage } from "@/lib/fifa/stages";
+import {
+  aliasIdsFromRows,
+  canonicalMatchIdFromRows,
+  loadMatchAliasRows,
+} from "@/lib/matches/canonical-match-id";
+import { MATCH_BONUS_POINTS } from "@/lib/scoring/match-bonus-points";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { loadStageScoringMap, winnerPointsDelta } from "@/lib/scoring/stage-scoring";
-import { isTop4ScoringAnswer } from "@/lib/scoring/tournament-scoring";
+import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
 import { createServiceClient } from "@/lib/supabase/service";
 
 const SEASON_YEAR = 2026;
 
-function slotPointsArray(raw: unknown): number[] {
-  if (Array.isArray(raw)) return raw.map((n) => Number(n ?? 2));
-  try {
-    const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-    if (Array.isArray(parsed)) return parsed.map((n) => Number(n ?? 2));
-  } catch {
-    /* ignore */
-  }
-  return [2, 2, 2, 2, 3, 3, 5, 3, 3];
-}
-
-/** Idempotent: award ledger rows for completed scored matches the user predicted but missed in bulk scoring. */
-async function backfillMissingUserMatchScoring(
-  supabase: SupabaseClient,
-  userId: string,
-  bonusPts: number,
-  stageMap: Awaited<ReturnType<typeof loadStageScoringMap>>,
-): Promise<number> {
-  const now = new Date().toISOString();
-
-  const { data: predictions } = await supabase
-    .from("predictions")
-    .select("match_id, predicted_winner, bonus_pick")
-    .eq("user_id", userId);
-
-  const predictedByMatch = new Map<
-    string,
-    { predicted_winner: string; bonus_pick: string | null }
-  >();
-  for (const row of predictions ?? []) {
-    const matchId = row.match_id as string;
-    if (!matchId) continue;
-    predictedByMatch.set(matchId, {
-      predicted_winner: (row.predicted_winner as string) ?? "",
-      bonus_pick: (row.bonus_pick as string | null) ?? null,
-    });
-  }
-
-  const matchIds = [...predictedByMatch.keys()];
-  if (matchIds.length === 0) return 0;
-
-  const { data: matches } = await supabase
-    .from("matches")
-    .select("id, external_key, status, winner, bonus_result, tournament_stage, scored_at")
-    .in("id", matchIds)
-    .eq("status", "completed")
-    .not("scored_at", "is", null);
-
-  const completedMatchIds = (matches ?? []).map((m) => m.id as string);
-  if (completedMatchIds.length === 0) return 0;
-
-  const { data: existingMatchLedger } = await supabase
-    .from("points_ledger")
-    .select("source_id")
-    .eq("user_id", userId)
-    .in("source_type", ["match", "bonus"])
-    .in("source_id", completedMatchIds);
-
-  const ledgeredMatchIds = new Set((existingMatchLedger ?? []).map((r) => r.source_id as string));
-
-  const { data: prompts } = await supabase
-    .from("bonus_prompts")
-    .select("id, match_id, correct_answer, display_order")
-    .eq("season_year", SEASON_YEAR)
-    .eq("scope", "match")
-    .in("match_id", completedMatchIds)
-    .order("display_order", { ascending: true });
-
-  const promptsByMatch = new Map<
-    string,
-    { id: string; correct_answer: string | null; display_order: number }[]
-  >();
-  for (const p of prompts ?? []) {
-    const mid = p.match_id as string;
-    if (!promptsByMatch.has(mid)) promptsByMatch.set(mid, []);
-    promptsByMatch.get(mid)!.push({
-      id: p.id as string,
-      correct_answer: (p.correct_answer as string | null) ?? null,
-      display_order: Number(p.display_order ?? 0),
-    });
-  }
-
-  const promptIds = [...new Set((prompts ?? []).map((p) => p.id as string))];
-  const { data: bonusAnswers } = await supabase
-    .from("prediction_bonus_answers")
-    .select("match_id, prompt_id, answer_text")
-    .eq("user_id", userId)
-    .in("match_id", completedMatchIds)
-    .in(
-      "prompt_id",
-      promptIds.length > 0 ? promptIds : ["00000000-0000-0000-0000-000000000000"],
-    );
-
-  const answerByMatchPrompt = new Map<string, string>();
-  for (const row of bonusAnswers ?? []) {
-    const mid = row.match_id as string;
-    const pid = row.prompt_id as string;
-    answerByMatchPrompt.set(`${mid}\t${pid}`, (row.answer_text as string) ?? "");
-  }
-
-  let pointsDelta = 0;
-
-  for (const m of matches ?? []) {
-    const mid = m.id as string;
-    if (ledgeredMatchIds.has(mid)) continue;
-
-    const pred = predictedByMatch.get(mid);
-    if (!pred) continue;
-
-    let matchAdd = 0;
-    const actualWinner = (m.winner as string | null)?.trim();
-    if (actualWinner) {
-      const stageSlug = parseTournamentStage(m.tournament_stage as string | null) ?? "group";
-      const stageRow = stageMap.get(stageSlug);
-      if (stageRow) {
-        const wDelta = winnerPointsDelta(pred.predicted_winner, actualWinner, stageRow);
-        matchAdd += wDelta;
-        await supabase.from("points_ledger").upsert(
-          {
-            user_id: userId,
-            source_type: "match",
-            source_id: mid,
-            points_delta: wDelta,
-            reason: `match_winner:${stageSlug}`,
-            awarded_at: now,
-          },
-          { onConflict: "user_id,source_type,source_id" },
-        );
-      }
-    }
-
-    const promptsForMatch = promptsByMatch.get(mid) ?? [];
-    if (promptsForMatch.length > 0) {
-      for (const p of promptsForMatch) {
-        const official = (p.correct_answer ?? "").trim();
-        if (!official) continue;
-        const ans = (answerByMatchPrompt.get(`${mid}\t${p.id}`) ?? "").trim();
-        if (!ans) continue;
-        if (normAnswer(ans) !== normAnswer(official)) continue;
-        matchAdd += bonusPts;
-        await supabase.from("points_ledger").insert({
-          user_id: userId,
-          source_type: "bonus",
-          source_id: mid,
-          points_delta: bonusPts,
-          reason: `match_bonus:${p.id}`,
-          awarded_at: now,
-        });
-      }
-    } else {
-      const official = ((m.bonus_result as string | null) ?? "").trim();
-      const guess = (pred.bonus_pick ?? "").trim();
-      if (official && guess && normAnswer(guess) === normAnswer(official)) {
-        matchAdd += bonusPts;
-        await supabase.from("points_ledger").insert({
-          user_id: userId,
-          source_type: "bonus",
-          source_id: mid,
-          points_delta: bonusPts,
-          reason: "match_bonus",
-          awarded_at: now,
-        });
-      }
-    }
-
-    pointsDelta += matchAdd;
-  }
-
-  return pointsDelta;
-}
-
 /**
- * Backfills missing match points on every login; runs one-time tournament bootstrap on first visit.
- * Safe to call repeatedly.
+ * Backfills points for a newly created profile only once.
+ * Safe to call repeatedly; it exits after `scoring_bootstrapped_at` is set.
  */
 export async function ensureProfileScoringBootstrap(userId: string): Promise<void> {
   let supabase: ReturnType<typeof createServiceClient>;
@@ -194,35 +28,7 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
 
   const now = new Date().toISOString();
 
-  const [{ data: cfg }, stageMap] = await Promise.all([
-    supabase
-      .from("scoring_config")
-      .select("match_bonus_points, tournament_slot_points")
-      .eq("season_year", SEASON_YEAR)
-      .maybeSingle(),
-    loadStageScoringMap(supabase, SEASON_YEAR),
-  ]);
-
-  const bonusPts = Number(cfg?.match_bonus_points ?? 2);
-  const tournamentSlotPts = slotPointsArray(cfg?.tournament_slot_points);
-
-  const matchDelta = await backfillMissingUserMatchScoring(supabase, userId, bonusPts, stageMap);
-  if (matchDelta !== 0) {
-    const { data: prof } = await supabase
-      .from("profiles")
-      .select("current_points")
-      .eq("id", userId)
-      .maybeSingle();
-    await supabase
-      .from("profiles")
-      .update({
-        current_points: Number(prof?.current_points ?? 0) + matchDelta,
-        updated_at: now,
-      })
-      .eq("id", userId);
-  }
-
-  // Atomic claim: only one concurrent request may bootstrap tournament scoring.
+  // Atomic claim: only one concurrent request may bootstrap this profile.
   const { data: claimedProfile } = await supabase
     .from("profiles")
     .update({ scoring_bootstrapped_at: now, updated_at: now })
@@ -234,82 +40,203 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
   if (!claimedProfile) return;
 
   try {
-    let pointsDelta = 0;
+    const stageMap = await loadStageScoringMap(supabase, SEASON_YEAR);
+    const bonusPts = MATCH_BONUS_POINTS;
 
-    const { data: answers } = await supabase
-      .from("tournament_answers")
-      .select("question_id, answer_text")
+    const { data: predictions } = await supabase
+      .from("predictions")
+      .select("match_id, predicted_winner, bonus_pick")
       .eq("user_id", userId);
 
-    const questionIds = [...new Set((answers ?? []).map((a) => a.question_id as string))];
-    if (questionIds.length > 0) {
-      const { data: questions } = await supabase
-        .from("tournament_questions")
-        .select("id, slot_no, correct_answer")
-        .eq("season_year", SEASON_YEAR)
-        .in("id", questionIds);
+    const predictedByMatch = new Map<
+      string,
+      { predicted_winner: string; bonus_pick: string | null }
+    >();
+    for (const row of predictions ?? []) {
+      const matchId = row.match_id as string;
+      if (!matchId) continue;
+      predictedByMatch.set(matchId, {
+        predicted_winner: (row.predicted_winner as string) ?? "",
+        bonus_pick: (row.bonus_pick as string | null) ?? null,
+      });
+    }
 
-      const questionMap = new Map(
-        (questions ?? []).map((q) => [
-          q.id as string,
-          {
-            slot_no: Number(q.slot_no ?? 1),
-            correct_answer: (q.correct_answer as string | null) ?? null,
-          },
-        ]),
-      );
+    const matchIds = [...predictedByMatch.keys()];
+    if (matchIds.length > 0) {
+      const allMatchRows = await loadMatchAliasRows(supabase);
 
-      const { data: existingTournamentLedger } = await supabase
+      const { data: matches } = await supabase
+        .from("matches")
+        .select("id, external_key, status, winner, bonus_result, tournament_stage")
+        .in("id", matchIds)
+        .eq("status", "completed");
+
+      const completedMatchIds = (matches ?? []).map((m) => m.id as string);
+      const ledgerSourceIds = new Set<string>();
+      for (const mid of completedMatchIds) {
+        for (const id of aliasIdsFromRows(allMatchRows, mid)) {
+          ledgerSourceIds.add(id);
+        }
+      }
+
+      const { data: existingMatchLedger } = await supabase
         .from("points_ledger")
         .select("source_id")
         .eq("user_id", userId)
-        .eq("source_type", "tournament_question")
-        .in("source_id", questionIds);
-      const ledgeredQuestionIds = new Set(
-        (existingTournamentLedger ?? []).map((r) => r.source_id as string),
-      );
+        .in("source_type", ["match", "bonus"])
+        .in(
+          "source_id",
+          ledgerSourceIds.size > 0
+            ? [...ledgerSourceIds]
+            : ["00000000-0000-0000-0000-000000000000"],
+        );
+      const ledgeredMatchIds = new Set((existingMatchLedger ?? []).map((r) => r.source_id as string));
 
-      for (const a of answers ?? []) {
-        const qid = a.question_id as string;
-        if (!qid || ledgeredQuestionIds.has(qid)) continue;
-        const q = questionMap.get(qid);
-        if (!q) continue;
-        const guess = ((a.answer_text as string | null) ?? "").trim();
-        if (!guess) continue;
+      const promptMatchIds = new Set<string>();
+      for (const mid of completedMatchIds) {
+        for (const id of aliasIdsFromRows(allMatchRows, mid)) {
+          promptMatchIds.add(id);
+        }
+      }
 
-        let pts = Number(tournamentSlotPts[q.slot_no - 1] ?? 2);
-        if (q.slot_no >= 1 && q.slot_no <= 4) {
-          if (!isTop4ScoringAnswer(guess)) continue;
-          pts = 2;
-        } else {
-          const official = (q.correct_answer ?? "").trim();
-          if (!official) continue;
-          if (normAnswer(guess) !== normAnswer(official)) continue;
+      const { data: prompts } = await supabase
+        .from("bonus_prompts")
+        .select("id, match_id, correct_answer, display_order")
+        .eq("season_year", SEASON_YEAR)
+        .eq("scope", "match")
+        .in(
+          "match_id",
+          promptMatchIds.size > 0
+            ? [...promptMatchIds]
+            : ["00000000-0000-0000-0000-000000000000"],
+        )
+        .order("display_order", { ascending: true });
+
+      const promptsByMatch = new Map<
+        string,
+        { id: string; correct_answer: string | null; display_order: number }[]
+      >();
+      for (const p of prompts ?? []) {
+        const mid = p.match_id as string;
+        if (!promptsByMatch.has(mid)) promptsByMatch.set(mid, []);
+        promptsByMatch.get(mid)!.push({
+          id: p.id as string,
+          correct_answer: (p.correct_answer as string | null) ?? null,
+          display_order: Number(p.display_order ?? 0),
+        });
+      }
+
+      const bonusMatchIds = new Set<string>();
+      for (const mid of completedMatchIds) {
+        for (const id of aliasIdsFromRows(allMatchRows, mid)) {
+          bonusMatchIds.add(id);
+        }
+      }
+
+      const promptIds = [...new Set((prompts ?? []).map((p) => p.id as string))];
+      const { data: bonusAnswers } = await supabase
+        .from("prediction_bonus_answers")
+        .select("match_id, prompt_id, answer_text")
+        .eq("user_id", userId)
+        .in(
+          "match_id",
+          bonusMatchIds.size > 0
+            ? [...bonusMatchIds]
+            : ["00000000-0000-0000-0000-000000000000"],
+        )
+        .in(
+          "prompt_id",
+          promptIds.length > 0 ? promptIds : ["00000000-0000-0000-0000-000000000000"],
+        );
+
+      const answerByMatchPrompt = new Map<string, string>();
+      for (const row of bonusAnswers ?? []) {
+        const mid = row.match_id as string;
+        const pid = row.prompt_id as string;
+        answerByMatchPrompt.set(`${mid}\t${pid}`, (row.answer_text as string) ?? "");
+      }
+
+      for (const m of matches ?? []) {
+        const mid = m.id as string;
+        const canonicalId = canonicalMatchIdFromRows(allMatchRows, mid);
+        const aliasIds = aliasIdsFromRows(allMatchRows, mid);
+        const alreadyLedgered = aliasIds.some((id) => ledgeredMatchIds.has(id));
+        if (alreadyLedgered) continue;
+
+        const pred = predictedByMatch.get(mid);
+        if (!pred) continue;
+
+        const actualWinner = (m.winner as string | null)?.trim();
+        if (actualWinner) {
+          const stageSlug = parseTournamentStage(m.tournament_stage as string | null) ?? "group";
+          const stageRow = stageMap.get(stageSlug);
+          if (stageRow) {
+            const wDelta = winnerPointsDelta(pred.predicted_winner, actualWinner, stageRow);
+            await supabase.from("points_ledger").upsert(
+              {
+                user_id: userId,
+                source_type: "match",
+                source_id: canonicalId,
+                points_delta: wDelta,
+                reason: `match_winner:${stageSlug}`,
+                awarded_at: now,
+              },
+              { onConflict: "user_id,source_type,source_id" },
+            );
+          }
         }
 
-        await supabase.from("points_ledger").insert({
-          user_id: userId,
-          source_type: "tournament_question",
-          source_id: qid,
-          points_delta: pts,
-          reason: `tournament_slot_${q.slot_no}`,
-          awarded_at: now,
-        });
-        pointsDelta += pts;
+        const promptsForMatch: { id: string; correct_answer: string | null; display_order: number }[] =
+          [];
+        for (const aliasId of aliasIds) {
+          const list = promptsByMatch.get(aliasId) ?? [];
+          promptsForMatch.push(...list);
+        }
+        promptsForMatch.sort((a, b) => a.display_order - b.display_order);
+
+        if (promptsForMatch.length > 0) {
+          for (const p of promptsForMatch) {
+            const official = (p.correct_answer ?? "").trim();
+            if (!official) continue;
+            const ans = aliasIds
+              .map((aliasId) => (answerByMatchPrompt.get(`${aliasId}\t${p.id}`) ?? "").trim())
+              .find((value) => value.length > 0);
+            if (!ans) continue;
+            if (normAnswer(ans) !== normAnswer(official)) continue;
+            await supabase.from("points_ledger").insert({
+              user_id: userId,
+              source_type: "bonus",
+              source_id: canonicalId,
+              points_delta: bonusPts,
+              reason: `match_bonus:${p.id}`,
+              awarded_at: now,
+            });
+          }
+        } else {
+          const official = ((m.bonus_result as string | null) ?? "").trim();
+          const guess = (pred.bonus_pick ?? "").trim();
+          if (official && guess && normAnswer(guess) === normAnswer(official)) {
+            await supabase.from("points_ledger").insert({
+              user_id: userId,
+              source_type: "bonus",
+              source_id: canonicalId,
+              points_delta: bonusPts,
+              reason: "match_bonus",
+              awarded_at: now,
+            });
+          }
+        }
       }
     }
 
-    if (pointsDelta !== 0) {
-      const cur = Number(claimedProfile.current_points ?? 0);
-      await supabase
-        .from("profiles")
-        .update({
-          current_points: cur + pointsDelta,
-          scoring_bootstrapped_at: now,
-          updated_at: now,
-        })
-        .eq("id", userId);
-    }
+    await syncProfilePointsFromLedger(supabase);
+    await supabase
+      .from("profiles")
+      .update({
+        scoring_bootstrapped_at: now,
+        updated_at: now,
+      })
+      .eq("id", userId);
   } catch (error) {
     // Release marker if bootstrap fails so user can retry on next login.
     await supabase

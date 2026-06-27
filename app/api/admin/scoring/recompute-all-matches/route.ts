@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { requireAdminOrResponse } from "@/lib/auth/require-admin";
 import { recomputeAllCompletedMatchScoring } from "@/lib/scoring/recompute-all-match-scoring";
 
+export const maxDuration = 300;
+
 /** Re-run ledger + profile updates for every completed match (repair / backfill). */
 export async function POST() {
   const { supabase, denied } = await requireAdminOrResponse();

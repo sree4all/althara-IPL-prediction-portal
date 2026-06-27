@@ -113,7 +113,7 @@ export async function GET() {
     }));
     const legacyPick = (pr?.bonus_pick as string | null)?.trim() || null;
     const summaryParts: string[] = structured.map((b) => `${b.prompt_text}: ${b.answer_text}`);
-    if (legacyPick) summaryParts.push(`Legacy bonus: ${legacyPick}`);
+    if (legacyPick) summaryParts.push(`Bonus: ${legacyPick}`);
     const bonus_summary = summaryParts.length ? summaryParts.join(" · ") : null;
     return {
       match_id: id,

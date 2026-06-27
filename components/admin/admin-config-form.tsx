@@ -16,11 +16,8 @@ type AdminMatch = {
 
 type AdminConfig = {
   answer_lock_utc: string | null;
-  season_bonuses_visible_after_utc: string | null;
-  season_bonuses_revealed_by_admin: boolean;
   maintenance_mode: boolean;
   maintenance_banner_text: string;
-  mega_bonus_all_answers_visible: boolean;
   bonus_prompts: {
     id: string;
     scope: string;
@@ -33,25 +30,27 @@ type AdminConfig = {
     options?: { label: string; value: string; sort_order: number }[];
   }[];
   matches: AdminMatch[];
-  tournamentOnly?: boolean;
+  settingsOnly?: boolean;
   bonusOnly?: boolean;
 };
 
 export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
   const [cfg, setCfg] = useState(initial);
 
-  async function saveTournamentSettings(patch: {
+  async function saveSettings(patch: {
     answer_lock_utc: string | null;
-    season_bonuses_visible_after_utc: string | null;
-    season_bonuses_revealed_by_admin: boolean;
     maintenance_mode: boolean;
     maintenance_banner_text: string;
-    mega_bonus_all_answers_visible: boolean;
   }) {
     const res = await fetch("/api/admin/config", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(patch),
+      body: JSON.stringify({
+        ...patch,
+        season_bonuses_revealed_by_admin: false,
+        season_bonuses_visible_after_utc: null,
+        mega_bonus_all_answers_visible: false,
+      }),
     });
     const data = (await res.json().catch(() => ({}))) as {
       ok?: boolean;
@@ -62,32 +61,26 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
       setCfg((prev) => ({
         ...prev,
         answer_lock_utc: patch.answer_lock_utc,
-        season_bonuses_visible_after_utc: patch.season_bonuses_visible_after_utc,
-        season_bonuses_revealed_by_admin: patch.season_bonuses_revealed_by_admin,
         maintenance_mode: patch.maintenance_mode,
         maintenance_banner_text: patch.maintenance_banner_text,
-        mega_bonus_all_answers_visible: patch.mega_bonus_all_answers_visible,
       }));
-      toast.success(data.message ?? "Tournament settings saved.");
+      toast.success(data.message ?? "Settings saved.");
     } else {
-      toast.error(data.error ?? "Could not save tournament settings.");
+      toast.error(data.error ?? "Could not save settings.");
     }
   }
 
-  const showTournament = !initial.bonusOnly;
-  const showBonus = !initial.tournamentOnly;
+  const showSettings = !initial.bonusOnly;
+  const showBonus = !initial.settingsOnly;
 
   return (
     <div className="space-y-4">
-      {showTournament ? (
+      {showSettings ? (
         <TournamentConfigPanel
           lock={cfg.answer_lock_utc}
-          seasonBonusesVisibleAfterUtc={cfg.season_bonuses_visible_after_utc}
-          seasonBonusesRevealedByAdmin={cfg.season_bonuses_revealed_by_admin}
           maintenanceMode={cfg.maintenance_mode}
           maintenanceBannerText={cfg.maintenance_banner_text}
-          megaBonusAllAnswersVisible={cfg.mega_bonus_all_answers_visible}
-          onSave={saveTournamentSettings}
+          onSave={saveSettings}
         />
       ) : null}
       {showBonus ? (
@@ -96,4 +89,3 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
     </div>
   );
 }
-

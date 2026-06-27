@@ -1,5 +1,5 @@
 /**
- * Compare profiles.current_points vs legacy_points + ledger sum.
+ * Compare profiles.current_points vs SUM(points_ledger).
  *
  *   npm run audit:points
  */
@@ -25,7 +25,7 @@ async function main() {
 
   const { data: profiles, error: pErr } = await supabase
     .from("profiles")
-    .select("id, display_name, legacy_points, current_points");
+    .select("id, display_name, current_points");
   if (pErr) {
     console.error(pErr.message);
     process.exit(1);
@@ -49,15 +49,14 @@ async function main() {
   const drifts: { name: string; current: number; expected: number; diff: number }[] = [];
 
   for (const p of profiles ?? []) {
-    const legacy = Number(p.legacy_points ?? 0);
     const ledgerSum = sumByUser.get(p.id as string) ?? 0;
-    const expected = legacy + ledgerSum;
+    const expected = ledgerSum;
     const current = Number(p.current_points ?? 0);
     const diff = current - expected;
     if (diff !== 0) {
       driftCount += 1;
       drifts.push({
-        name: (p.display_name as string) || p.id as string,
+        name: (p.display_name as string) || (p.id as string),
         current,
         expected,
         diff,
@@ -69,7 +68,7 @@ async function main() {
 
   console.log(`Profiles: ${profiles?.length ?? 0}`);
   console.log(`Ledger rows: ${ledger?.length ?? 0}`);
-  console.log(`Profiles with drift (current != legacy + ledger): ${driftCount}`);
+  console.log(`Profiles with drift (current != ledger sum): ${driftCount}`);
   console.log("\nTop 15 drifts:");
   for (const d of drifts.slice(0, 15)) {
     console.log(
