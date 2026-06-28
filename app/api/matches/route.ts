@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { isMatchReadyForPredictions } from "@/lib/fifa/match-ready";
+import { isMatchReadyForPredictions, isDrawAllowedForMatch } from "@/lib/fifa/match-ready";
 import { parseTournamentStage, stageScoringHint } from "@/lib/fifa/stages";
 import { loadStageScoringMap } from "@/lib/scoring/stage-scoring";
 import {
@@ -97,6 +97,7 @@ export async function GET() {
       ? `${m.external_key} — ${m.home_team} vs ${m.away_team}`
       : `${m.home_team} vs ${m.away_team}`;
     const fixtureNo = fixtureNumber(m);
+    const drawAllowed = isDrawAllowedForMatch(fixtureNo, stageSlug);
     const aliasIds =
       fixtureNo != null ? (aliasIdsByFixture.get(fixtureNo) ?? [m.id as string]) : [m.id as string];
     const predictedWinner =
@@ -115,6 +116,7 @@ export async function GET() {
       predicted_winner: predictedWinner,
       tournament_stage: stageSlug,
       teams_pending: teamsPending,
+      draw_allowed: drawAllowed,
       stage_scoring_hint: scoringHint,
     };
   });
