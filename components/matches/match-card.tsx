@@ -32,6 +32,8 @@ export type MatchApiRow = {
 
   teams_pending?: boolean;
 
+  draw_allowed?: boolean;
+
   stage_scoring_hint?: string | null;
 
 };
@@ -169,6 +171,8 @@ export function MatchCard({ match }: Props) {
           initialWinner={match.predicted_winner}
 
           teamsPending={teamsPending}
+
+          drawAllowed={match.draw_allowed !== false}
 
         />
 

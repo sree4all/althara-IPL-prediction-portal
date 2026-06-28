@@ -26,7 +26,7 @@ export default async function AdminPage() {
   const { data: adminMatches } = await supabase
     .from("matches")
     .select(
-      "id, external_key, home_team, away_team, match_time_utc, status, winner, bonus_result, scored_at, tournament_stage",
+      "id, external_key, match_number, home_team, away_team, match_time_utc, status, winner, bonus_result, scored_at, tournament_stage",
     )
     .order("match_time_utc", { ascending: true });
 
