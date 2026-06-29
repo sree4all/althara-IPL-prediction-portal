@@ -88,3 +88,19 @@ Verify CSV expectations locally:
 ```bash
 npx tsx scripts/verify-fifa-matches.ts
 ```
+
+## Fix Round of 32 fixtures (M73–M88)
+
+Official pairings and kickoffs are maintained in `docs/fifa/matches.csv` (sourced from [FIFA's published schedule](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/match-schedule-fixtures-results-teams-stadiums)). To push corrections to the live database **without touching matches that already have predictions**:
+
+```bash
+# Preview skipped fixtures
+npm run ops:fix-r32 -- --dry-run
+
+# Apply updates
+npm run ops:fix-r32
+```
+
+Matches with any existing prediction are left unchanged (operator rule A).
+
+**Kickoff times only (SQL):** paste `scripts/ops/fix-r32-kickoff-times.sql` into the Supabase SQL editor. Run the preview `SELECT` first, then the `begin` … `commit` block. Same prediction skip rule — only `match_time_utc` is updated.

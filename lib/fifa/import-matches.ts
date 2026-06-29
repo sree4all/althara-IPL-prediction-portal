@@ -75,10 +75,18 @@ export type FifaImportResult = {
   errors: string[];
 };
 
+export type FifaImportOptions = {
+  /** When set, only these fixture numbers are upserted. */
+  onlyMatchNumbers?: number[];
+  /** Fixture numbers to leave unchanged (e.g. matches with existing predictions). */
+  skipMatchNumbers?: number[];
+};
+
 export async function importFifaMatches(
   supabase: SupabaseClient,
   fifaDir: string,
   seasonYear = 2026,
+  options?: FifaImportOptions,
 ): Promise<FifaImportResult> {
   const teams = resolveTeams(fifaDir);
   const venues = resolveVenues(fifaDir);
@@ -91,6 +99,15 @@ export async function importFifaMatches(
     const matchNumber = Number(row.match_number);
     if (!Number.isFinite(matchNumber)) {
       errors.push(`Invalid match_number: ${row.match_number}`);
+      continue;
+    }
+    if (
+      options?.onlyMatchNumbers &&
+      !options.onlyMatchNumbers.includes(matchNumber)
+    ) {
+      continue;
+    }
+    if (options?.skipMatchNumbers?.includes(matchNumber)) {
       continue;
     }
     const stageId = Number(row.stage_id);
@@ -155,6 +172,10 @@ export async function importFifaMatches(
   }
 
   if (errors.length > 0) {
+    return { upserted, errors };
+  }
+
+  if (options?.onlyMatchNumbers) {
     return { upserted, errors };
   }
 
