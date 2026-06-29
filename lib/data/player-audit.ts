@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getHistoryRows } from "@/lib/data/history";
 import { getPointsLedgerForUser } from "@/lib/data/points-ledger";
+import { formatMatchTeamsLabel } from "@/lib/matches/match-display-label";
 
 export type PlayerAuditLedgerRow = {
   id: string;
@@ -50,10 +51,7 @@ async function resolveLedgerLabels(
       .select("id, external_key, home_team, away_team")
       .in("id", [...matchIds]);
     for (const m of matches ?? []) {
-      const key = (m.external_key as string | null)?.trim();
-      const label = key
-        ? `${key} — ${m.home_team} vs ${m.away_team}`
-        : `${m.home_team} vs ${m.away_team}`;
+      const label = formatMatchTeamsLabel(m.home_team as string, m.away_team as string);
       matchLabels.set(m.id as string, label);
     }
   }

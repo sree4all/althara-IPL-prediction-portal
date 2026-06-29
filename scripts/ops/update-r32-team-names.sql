@@ -28,8 +28,8 @@ from (
     (83, 'Portugal', 'Croatia'),
     (84, 'Spain', 'Austria'),
     (85, 'Switzerland', 'Algeria'),
-    (86, 'Colombia', 'Ghana'),
-    (87, 'Argentina', 'Cape Verde'),
+    (86, 'Argentina', 'Cabo Verde'),
+    (87, 'Colombia', 'Ghana'),
     (88, 'Australia', 'Egypt')
 ) as v (match_number, home_team, away_team)
 where m.match_number = v.match_number

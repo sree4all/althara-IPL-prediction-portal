@@ -3,6 +3,7 @@ import { test } from "node:test";
 import { parse } from "csv-parse/sync";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { R32_OFFICIAL_KICKOFFS } from "@/lib/fifa/r32-official-kickoffs";
 import { parseKickoffCsvAsUtcIso } from "@/lib/utils/eastern-time";
 
 const fifaDir = path.resolve(process.cwd(), "docs/fifa");
@@ -50,15 +51,29 @@ test("June 29 R32 opens with Brazil vs Japan (M76) at 1 PM Eastern", () => {
   assert.equal(june29[0].kickoff_at, "2026-06-29 13:00:00-05");
 });
 
+test("R32 CSV kickoffs match FIFA official UTC by team pairing", () => {
+  const byLabel = new Map(r32Rows().map((r) => [r.match_label, r]));
+  for (const official of R32_OFFICIAL_KICKOFFS) {
+    const label = `${official.home} vs ${official.away}`;
+    const csv = byLabel.get(label);
+    assert.ok(csv, `missing CSV row for ${label}`);
+    assert.equal(
+      parseKickoffCsvAsUtcIso(csv.kickoff_at),
+      official.match_time_utc,
+      label,
+    );
+  }
+});
+
 test("R32 SQL kickoff UTC values match CSV Eastern → UTC import logic", () => {
   const expectedSqlUtc: Record<number, string> = {
     73: "2026-06-28T19:00:00.000Z",
     74: "2026-06-29T20:30:00.000Z",
-    75: "2026-06-30T00:00:00.000Z",
+    75: "2026-06-30T01:00:00.000Z",
     76: "2026-06-29T17:00:00.000Z",
     77: "2026-06-30T21:00:00.000Z",
     78: "2026-06-30T17:00:00.000Z",
-    79: "2026-07-01T00:00:00.000Z",
+    79: "2026-07-01T01:00:00.000Z",
     80: "2026-07-01T16:00:00.000Z",
     81: "2026-07-02T00:00:00.000Z",
     82: "2026-07-01T20:00:00.000Z",

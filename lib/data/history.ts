@@ -1,8 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getPointsLedgerForUser } from "@/lib/data/points-ledger";
 import { aliasIdsFromRows, loadMatchAliasRows } from "@/lib/matches/canonical-match-id";
+import { formatMatchLabelWithIst } from "@/lib/matches/match-display-label";
 import { compareMatchOrder } from "@/lib/matches/match-order";
-import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
 
 const SEASON_YEAR = 2026;
 
@@ -96,12 +96,10 @@ export async function getHistoryRows(supabase: SupabaseClient, userId: string) {
 
   const matchById = new Map(matches.map((m) => [m.id, m]));
   const matchLabel = new Map(
-    matches.map((m) => {
-      const base = m.external_key
-        ? `${m.external_key} — ${m.home_team} vs ${m.away_team}`
-        : `${m.home_team} vs ${m.away_team}`;
-      return [m.id, `${base} · ${formatIstDateTimeFriendly(m.match_time_utc)}`];
-    }),
+    matches.map((m) => [
+      m.id,
+      formatMatchLabelWithIst(m.home_team, m.away_team, m.match_time_utc),
+    ]),
   );
 
   const predictionsOrdered = [...(predictions ?? [])].sort((pa, pb) => {

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DRAW_PICK } from "@/lib/fifa/stages";
 import { isDrawAllowedForMatch } from "@/lib/fifa/match-ready";
 import { fixtureNumber } from "@/lib/matches/dedupe-by-match-number";
-import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
+import { formatMatchLabelWithIst } from "@/lib/matches/match-display-label";
 
 export type AdminMatchRow = {
   id: string;
@@ -30,9 +30,7 @@ type MatchBonusPrompt = {
 };
 
 function label(m: AdminMatchRow) {
-  const k = m.external_key?.trim();
-  const base = k ? `${k} — ${m.home_team} vs ${m.away_team}` : `${m.home_team} vs ${m.away_team}`;
-  return `${base} · ${formatIstDateTimeFriendly(m.match_time_utc)}`;
+  return formatMatchLabelWithIst(m.home_team, m.away_team, m.match_time_utc);
 }
 
 export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {

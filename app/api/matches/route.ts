@@ -8,6 +8,7 @@ import {
   fixtureNumber,
   idsByFixtureNumber,
 } from "@/lib/matches/dedupe-by-match-number";
+import { formatMatchTeamsWithStage } from "@/lib/matches/match-display-label";
 import { isMatchLocked } from "@/lib/utils/match-lock";
 
 export async function GET() {
@@ -93,9 +94,11 @@ export async function GET() {
     const scoringHint = stageRow
       ? stageScoringHint(stageSlug, stageRow.correct_points, stageRow.incorrect_points)
       : null;
-    const label = m.external_key
-      ? `${m.external_key} — ${m.home_team} vs ${m.away_team}`
-      : `${m.home_team} vs ${m.away_team}`;
+    const label = formatMatchTeamsWithStage(
+      m.home_team as string,
+      m.away_team as string,
+      m.tournament_stage as string | null,
+    );
     const fixtureNo = fixtureNumber(m);
     const drawAllowed = isDrawAllowedForMatch(fixtureNo, stageSlug);
     const aliasIds =

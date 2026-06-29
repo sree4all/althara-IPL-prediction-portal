@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isMatchLocked } from "@/lib/utils/match-lock";
-import { compareMatchOrder } from "@/lib/matches/match-order";
+import { formatMatchTeamsLabel } from "@/lib/matches/match-display-label";
 
 const SEASON_YEAR = 2026;
 
@@ -101,10 +101,7 @@ export async function GET() {
   const out = sorted.map((m) => {
     const id = m.id as string;
     const pr = predByMatch.get(id);
-    const ext = (m.external_key as string | null)?.trim();
-    const label = ext
-      ? `${ext} — ${m.home_team} vs ${m.away_team}`
-      : `${m.home_team} vs ${m.away_team}`;
+    const label = formatMatchTeamsLabel(m.home_team as string, m.away_team as string);
     const mt = new Date(m.match_time_utc as string);
     const lock = mt;
     const structured = (bonusByMatch.get(id) ?? []).map((row) => ({

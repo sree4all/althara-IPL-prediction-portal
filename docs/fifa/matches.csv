@@ -73,11 +73,11 @@ id,match_number,home_team_id,away_team_id,city_id,stage_id,kickoff_at,match_labe
 72,72,40,37,3,1,2026-06-27 22:00:00-05,Group J
 73,73,2,5,6,2,2026-06-28 15:00:00-07,South Africa vs Canada
 74,74,17,14,2,2,2026-06-29 16:30:00-04,Germany vs Paraguay
-75,75,21,10,16,2,2026-06-29 20:00:00-06,Netherlands vs Morocco
+75,75,21,10,16,2,2026-06-29 21:00:00-06,Netherlands vs Morocco
 76,76,9,22,4,2,2026-06-29 13:00:00-05,Brazil vs Japan
 77,77,33,23,8,2,2026-06-30 17:00:00-04,France vs Sweden
 78,78,19,36,3,2,2026-06-30 13:00:00-05,Côte d'Ivoire vs Norway
-79,79,1,20,15,2,2026-06-30 20:00:00-06,Mexico vs Ecuador
+79,79,1,20,15,2,2026-06-30 21:00:00-06,Mexico vs Ecuador
 80,80,45,42,1,2,2026-07-01 12:00:00-04,England vs DR Congo
 81,81,13,6,10,2,2026-07-01 20:00:00-07,USA vs Bosnia and Herzegovina
 82,82,25,34,11,2,2026-07-01 16:00:00-07,Belgium vs Senegal

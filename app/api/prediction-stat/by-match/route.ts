@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { resolveMatchAliasIds } from "@/lib/matches/resolve-alias-ids";
 import { createServiceClient } from "@/lib/supabase/service";
-import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
+import { formatMatchLabelWithIst } from "@/lib/matches/match-display-label";
 
 const SEASON_YEAR = 2026;
 
@@ -34,11 +34,11 @@ export async function GET(request: Request) {
     .maybeSingle();
   if (mErr || !match) return NextResponse.json({ error: "MATCH_NOT_FOUND" }, { status: 404 });
 
-  const ext = (match.external_key as string | null)?.trim();
-  const teams = ext
-    ? `${ext} — ${match.home_team} vs ${match.away_team}`
-    : `${match.home_team} vs ${match.away_team}`;
-  const label = `${teams} · ${formatIstDateTimeFriendly(match.match_time_utc as string)}`;
+  const label = formatMatchLabelWithIst(
+    match.home_team as string,
+    match.away_team as string,
+    match.match_time_utc as string,
+  );
 
   const aliasMatchIds = await resolveMatchAliasIds(dataClient, matchId);
 
