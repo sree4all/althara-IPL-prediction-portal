@@ -18,6 +18,7 @@ type Props = {
   matchLabel: string;
   initialWinner?: string | null;
   teamsPending?: boolean;
+  drawAllowed?: boolean;
 };
 
 export function PredictionForm({
@@ -28,18 +29,19 @@ export function PredictionForm({
   matchLabel,
   initialWinner,
   teamsPending = false,
+  drawAllowed = true,
 }: Props) {
   const validInitial =
     initialWinner === homeTeam ||
     initialWinner === awayTeam ||
-    initialWinner === DRAW_PICK
+    (drawAllowed && initialWinner === DRAW_PICK)
       ? initialWinner
       : homeTeam;
   const [winner, setWinner] = useState(validInitial);
   const hasExistingPrediction =
     initialWinner === homeTeam ||
     initialWinner === awayTeam ||
-    initialWinner === DRAW_PICK;
+    (drawAllowed && initialWinner === DRAW_PICK);
   const [hasSavedPrediction, setHasSavedPrediction] = useState(hasExistingPrediction);
   const [bonusByPrompt, setBonusByPrompt] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -123,18 +125,20 @@ export function PredictionForm({
             />
             {awayTeam}
           </label>
-          <label
-            className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-all ${pickClass(winner === DRAW_PICK)}`}
-          >
-            <input
-              type="radio"
-              name={`winner-${matchId}`}
-              className="accent-wc-cta"
-              checked={winner === DRAW_PICK}
-              onChange={() => setWinner(DRAW_PICK)}
-            />
-            Draw
-          </label>
+          {drawAllowed ? (
+            <label
+              className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-all ${pickClass(winner === DRAW_PICK)}`}
+            >
+              <input
+                type="radio"
+                name={`winner-${matchId}`}
+                className="accent-wc-cta"
+                checked={winner === DRAW_PICK}
+                onChange={() => setWinner(DRAW_PICK)}
+              />
+              Draw
+            </label>
+          ) : null}
         </div>
       </fieldset>
       <BonusPromptsForm

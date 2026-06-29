@@ -9,6 +9,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { config as loadEnv } from "dotenv";
 import { resolve } from "path";
+import { allowedWinnerPicks } from "@/lib/fifa/match-ready";
 
 for (const name of [".env", ".env.local"] as const) {
   loadEnv({ path: resolve(process.cwd(), name), override: name === ".env.local" });
@@ -78,7 +79,7 @@ async function main() {
   const externalKeys = [`WC26-M${matchNumber}`, `wc2026:m${matchNumber}`, `M${matchNumber}`];
   const { data: matches, error: mErr } = await supabase
     .from("matches")
-    .select("id, external_key, match_number, home_team, away_team, match_time_utc")
+    .select("id, external_key, match_number, home_team, away_team, match_time_utc, tournament_stage")
     .or(
       `match_number.eq.${matchNumber},external_key.in.(${externalKeys.map((k) => `"${k}"`).join(",")})`,
     );
@@ -97,7 +98,12 @@ async function main() {
 
   const home = match.home_team as string;
   const away = match.away_team as string;
-  const allowed = [home, away, "Draw"];
+  const allowed = allowedWinnerPicks(
+    home,
+    away,
+    matchNumber,
+    match.tournament_stage as string | null,
+  );
   if (!allowed.includes(winner)) {
     console.error(`Winner must be one of: ${allowed.join(", ")}`);
     process.exit(1);

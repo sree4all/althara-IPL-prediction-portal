@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { loadLedgerTotalsByUser } from "@/lib/scoring/ledger-totals";
+import { createServiceClient } from "@/lib/supabase/service";
 
 export type LeaderboardRow = {
   id: string;
@@ -21,12 +22,24 @@ function compareLeaderboardRows(
   return nameA.localeCompare(nameB);
 }
 
+/** Ledger totals for all players (leaderboard is public to signed-in users). */
+async function loadLeaderboardTotals(
+  supabase: SupabaseClient,
+): Promise<Map<string, number>> {
+  try {
+    return await loadLedgerTotalsByUser(createServiceClient());
+  } catch {
+    // Fallback when service creds are unavailable (local dev without .env.local).
+    return loadLedgerTotalsByUser(supabase);
+  }
+}
+
 export async function getLeaderboard(
   supabase: SupabaseClient,
 ): Promise<LeaderboardRow[]> {
   const [{ data, error }, ledgerTotals] = await Promise.all([
     supabase.from("profiles").select("id, display_name"),
-    loadLedgerTotalsByUser(supabase),
+    loadLeaderboardTotals(supabase),
   ]);
 
   if (error || !data) {

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireAdminOrResponse } from "@/lib/auth/require-admin";
 import { DRAW_PICK } from "@/lib/fifa/stages";
+import { isDrawAllowedForMatch } from "@/lib/fifa/match-ready";
+import { fixtureNumber } from "@/lib/matches/dedupe-by-match-number";
 import { applyMatchScoring } from "@/lib/scoring/match-scoring";
 
 export async function POST(
@@ -23,7 +25,7 @@ export async function POST(
 
   const { data: match, error: mErr } = await supabase
     .from("matches")
-    .select("id, home_team, away_team, status, tournament_stage")
+    .select("id, external_key, match_number, home_team, away_team, status, tournament_stage")
     .eq("id", matchId)
     .maybeSingle();
   if (mErr || !match) {
@@ -32,6 +34,13 @@ export async function POST(
 
   const winner = body.winner.trim();
   const teams = [match.home_team as string, match.away_team as string];
+  const drawAllowed = isDrawAllowedForMatch(
+    fixtureNumber(match),
+    match.tournament_stage as string | null,
+  );
+  if (winner === DRAW_PICK && !drawAllowed) {
+    return NextResponse.json({ error: "DRAW_NOT_ALLOWED" }, { status: 400 });
+  }
   if (winner !== DRAW_PICK && !teams.includes(winner)) {
     return NextResponse.json({ error: "WINNER_NOT_VALID" }, { status: 400 });
   }

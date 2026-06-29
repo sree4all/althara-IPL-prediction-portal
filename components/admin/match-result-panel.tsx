@@ -4,11 +4,14 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DRAW_PICK } from "@/lib/fifa/stages";
+import { isDrawAllowedForMatch } from "@/lib/fifa/match-ready";
+import { fixtureNumber } from "@/lib/matches/dedupe-by-match-number";
 import { formatIstDateTimeFriendly } from "@/lib/utils/time-format";
 
 export type AdminMatchRow = {
   id: string;
   external_key: string | null;
+  match_number?: number | null;
   home_team: string;
   away_team: string;
   match_time_utc: string;
@@ -43,6 +46,15 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
   const [busy, setBusy] = useState(false);
 
   const selected = unscoredMatches.find((m) => m.id === matchId);
+  const drawAllowed = selected
+    ? isDrawAllowedForMatch(fixtureNumber(selected), selected.tournament_stage)
+    : true;
+
+  useEffect(() => {
+    if (!drawAllowed && winner === DRAW_PICK) {
+      setWinner("");
+    }
+  }, [drawAllowed, winner]);
 
   useEffect(() => {
     if (!matchId) {
@@ -83,11 +95,15 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
       return;
     }
     const valid =
-      winner === DRAW_PICK ||
+      (drawAllowed && winner === DRAW_PICK) ||
       winner === selected.home_team ||
       winner === selected.away_team;
     if (!valid) {
-      setMsg("Result must be home team, away team, or Draw.");
+      setMsg(
+        drawAllowed
+          ? "Result must be home team, away team, or Draw."
+          : "Result must be home team or away team.",
+      );
       return;
     }
     setBusy(true);
@@ -175,15 +191,17 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
               />
               {selected.away_team}
             </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="win"
-                checked={winner === DRAW_PICK}
-                onChange={() => pickWinner(DRAW_PICK)}
-              />
-              Draw
-            </label>
+            {drawAllowed ? (
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="win"
+                  checked={winner === DRAW_PICK}
+                  onChange={() => pickWinner(DRAW_PICK)}
+                />
+                Draw
+              </label>
+            ) : null}
           </div>
 
           {matchPrompts.length > 0 ? (

@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { DRAW_PICK } from "@/lib/fifa/stages";
-import { isMatchReadyForPredictions } from "@/lib/fifa/match-ready";
+import {
+  allowedWinnerPicks,
+  isMatchReadyForPredictions,
+} from "@/lib/fifa/match-ready";
+import { fixtureNumber } from "@/lib/matches/dedupe-by-match-number";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { isMatchLocked } from "@/lib/utils/match-lock";
 
@@ -36,7 +39,7 @@ export async function POST(request: Request) {
 
   const { data: match, error: mErr } = await supabase
     .from("matches")
-    .select("id, match_time_utc, home_team, away_team, status, tournament_stage")
+    .select("id, external_key, match_number, match_time_utc, home_team, away_team, status, tournament_stage")
     .eq("id", match_id)
     .maybeSingle();
 
@@ -72,7 +75,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const allowed = [home, away, DRAW_PICK];
+  const allowed = allowedWinnerPicks(
+    home,
+    away,
+    fixtureNumber(match),
+    match.tournament_stage as string | null,
+  );
   if (!allowed.includes(predicted_winner)) {
     return NextResponse.json({ error: "VALIDATION" }, { status: 400 });
   }
