@@ -50,6 +50,33 @@ test("June 29 R32 opens with Brazil vs Japan (M76) at 1 PM Eastern", () => {
   assert.equal(june29[0].kickoff_at, "2026-06-29 13:00:00-05");
 });
 
+test("R32 SQL kickoff UTC values match CSV Eastern → UTC import logic", () => {
+  const expectedSqlUtc: Record<number, string> = {
+    73: "2026-06-28T19:00:00.000Z",
+    74: "2026-06-29T20:30:00.000Z",
+    75: "2026-06-30T00:00:00.000Z",
+    76: "2026-06-29T17:00:00.000Z",
+    77: "2026-06-30T21:00:00.000Z",
+    78: "2026-06-30T17:00:00.000Z",
+    79: "2026-07-01T00:00:00.000Z",
+    80: "2026-07-01T16:00:00.000Z",
+    81: "2026-07-02T00:00:00.000Z",
+    82: "2026-07-01T20:00:00.000Z",
+    83: "2026-07-02T23:00:00.000Z",
+    84: "2026-07-02T19:00:00.000Z",
+    85: "2026-07-03T03:00:00.000Z",
+    86: "2026-07-03T22:00:00.000Z",
+    87: "2026-07-04T01:30:00.000Z",
+    88: "2026-07-03T18:00:00.000Z",
+  };
+
+  for (const row of r32Rows()) {
+    const fromCsv = parseKickoffCsvAsUtcIso(row.kickoff_at);
+    const fromSql = expectedSqlUtc[row.match_number];
+    assert.equal(fromCsv, fromSql, `M${row.match_number} CSV vs ops SQL UTC`);
+  }
+});
+
 test("R32 rows use confirmed team names, not bracket placeholders", () => {
   for (const row of r32Rows()) {
     assert.match(row.match_label, /^[A-Za-zÀ-ÿ' .-]+ vs [A-Za-zÀ-ÿ' .-]+$/);
