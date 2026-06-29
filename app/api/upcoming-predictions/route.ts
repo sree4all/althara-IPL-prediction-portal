@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isMatchLocked } from "@/lib/utils/match-lock";
 import { formatMatchTeamsLabel } from "@/lib/matches/match-display-label";
+import { compareMatchOrder } from "@/lib/matches/match-order";
 
 const SEASON_YEAR = 2026;
 
