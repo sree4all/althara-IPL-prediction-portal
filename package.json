@@ -21,6 +21,7 @@
     "fix:mega-bonus-top4": "tsx scripts/fix-mega-bonus-top4.ts",
     "reapply:match": "tsx scripts/reapply-match-scoring.ts",
     "ops:update-prediction": "tsx scripts/ops/update-prediction.ts",
+    "ops:remove-m73-2a": "tsx scripts/ops/remove-m73-2a-predictions.ts",
     "db:link": "npx supabase link",
     "db:push": "npx supabase db push",
     "db:migration-list": "npx supabase migration list"

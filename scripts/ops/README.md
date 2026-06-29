@@ -73,6 +73,16 @@ npm run ops:update-prediction -- --email sumesh1912@gmail.com --match 8 --winner
 
 Or paste `scripts/ops/update-prediction.sql` into the Supabase SQL editor and adjust the `params` CTE.
 
+## Remove Match 73 "2A" predictions (no negative points)
+
+If participants picked the placeholder **2A** before teams were confirmed on WC26-M73 (South Africa vs Canada), remove those predictions and ledger rows:
+
+```bash
+# SQL Editor: scripts/ops/remove-m73-2a-predictions.sql
+```
+
+Run the preview `SELECT` first, then the `begin` … `commit` block. Affected users' leaderboard totals are re-synced from the ledger.
+
 Verify CSV expectations locally:
 
 ```bash
