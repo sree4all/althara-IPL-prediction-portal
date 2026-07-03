@@ -23,6 +23,7 @@
     "ops:update-prediction": "tsx scripts/ops/update-prediction.ts",
     "ops:remove-m73-2a": "tsx scripts/ops/remove-m73-2a-predictions.ts",
     "ops:fix-r32": "tsx scripts/ops/fix-r32-fixtures.ts",
+    "ops:fix-r16": "tsx scripts/ops/fix-r16-fixtures.ts",
     "db:link": "npx supabase link",
     "db:push": "npx supabase db push",
     "db:migration-list": "npx supabase migration list"

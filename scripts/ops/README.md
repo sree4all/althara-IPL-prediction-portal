@@ -104,3 +104,27 @@ npm run ops:fix-r32
 Matches with any existing prediction are left unchanged (operator rule A).
 
 **Kickoff times only (SQL):** paste `scripts/ops/fix-r32-kickoff-times.sql` into the Supabase SQL editor. Run the preview `SELECT` first, then the `begin` … `commit` block. Same prediction skip rule — only `match_time_utc` is updated.
+
+## Fix Round of 16 fixtures (M89–M96)
+
+Official pairings and kickoffs are maintained in `docs/fifa/matches.csv` (sourced from [FIFA's published schedule](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/match-schedule-fixtures-results-teams-stadiums)). Confirmed team names are filled in as Round of 32 winners are decided; M95–M96 remain bracket placeholders until M86–M88 conclude.
+
+**Recommended — single SQL paste (teams + venues + kickoffs):**
+
+```bash
+# SQL Editor: scripts/ops/update-r16-fixtures.sql
+```
+
+Run the preview `SELECT` first, then the `begin` … `commit` block.
+
+**Alternative — CSV import (skips fixtures with predictions):**
+
+```bash
+npm run ops:fix-r16 -- --dry-run
+npm run ops:fix-r16
+```
+
+**Partial SQL patches:**
+
+- `scripts/ops/update-r16-team-names.sql` — team names only
+- `scripts/ops/fix-r16-kickoff-times.sql` — kickoff times only
