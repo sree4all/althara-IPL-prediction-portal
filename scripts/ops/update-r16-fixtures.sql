@@ -1,7 +1,7 @@
 -- Round of 16: apply confirmed fixtures M89–M96 (teams, venues, kickoffs).
 -- Paste into Supabase SQL editor. Run the preview SELECT first, then begin … commit.
 --
--- Confirmed as of 4 Jul 2026 (M95–M96 after M85–M88 concluded).
+-- Confirmed as of 4 Jul 2026. Kickoffs verified against FIFA/ESPN schedule (ET → UTC).
 -- Source: https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/match-schedule-fixtures-results-teams-stadiums
 
 -- Preview current state
@@ -50,7 +50,7 @@ from (
       5,
       10,
       ' — NRG Stadium',
-      '2026-07-04 22:00:00+00'::timestamptz
+      '2026-07-04 17:00:00+00'::timestamptz
     ),
     (
       91,
@@ -59,7 +59,7 @@ from (
       9,
       36,
       ' — MetLife Stadium',
-      '2026-07-06 00:00:00+00'::timestamptz
+      '2026-07-05 20:00:00+00'::timestamptz
     ),
     (
       92,
@@ -68,7 +68,7 @@ from (
       1,
       45,
       ' — Estadio Azteca',
-      '2026-07-06 06:00:00+00'::timestamptz
+      '2026-07-06 00:00:00+00'::timestamptz
     ),
     (
       93,
@@ -77,7 +77,7 @@ from (
       41,
       29,
       ' — AT&T Stadium',
-      '2026-07-07 00:00:00+00'::timestamptz
+      '2026-07-06 19:00:00+00'::timestamptz
     ),
     (
       94,
@@ -86,7 +86,7 @@ from (
       13,
       25,
       ' — Lumen Field',
-      '2026-07-07 00:00:00+00'::timestamptz
+      '2026-07-06 21:00:00+00'::timestamptz
     ),
     (
       95,

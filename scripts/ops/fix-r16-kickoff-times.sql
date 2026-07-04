@@ -13,12 +13,12 @@ set
 from (
   values
     ('Paraguay', 'France', '2026-07-04 21:00:00+00'::timestamptz),
-    ('Canada', 'Morocco', '2026-07-04 22:00:00+00'::timestamptz),
-    ('Brazil', 'Norway', '2026-07-06 00:00:00+00'::timestamptz),
-    ('Mexico', 'England', '2026-07-06 06:00:00+00'::timestamptz),
-    ('Portugal', 'Spain', '2026-07-07 00:00:00+00'::timestamptz),
-    ('USA', 'Belgium', '2026-07-07 00:00:00+00'::timestamptz),
-    ('United States', 'Belgium', '2026-07-07 00:00:00+00'::timestamptz),
+    ('Canada', 'Morocco', '2026-07-04 17:00:00+00'::timestamptz),
+    ('Brazil', 'Norway', '2026-07-05 20:00:00+00'::timestamptz),
+    ('Mexico', 'England', '2026-07-06 00:00:00+00'::timestamptz),
+    ('Portugal', 'Spain', '2026-07-06 19:00:00+00'::timestamptz),
+    ('USA', 'Belgium', '2026-07-06 21:00:00+00'::timestamptz),
+    ('United States', 'Belgium', '2026-07-06 21:00:00+00'::timestamptz),
     ('Argentina', 'Egypt', '2026-07-07 16:00:00+00'::timestamptz),
     ('Switzerland', 'Colombia', '2026-07-07 20:00:00+00'::timestamptz)
 ) as v (home_team, away_team, match_time_utc)

@@ -22,28 +22,28 @@ export const R16_OFFICIAL_KICKOFFS: R16Kickoff[] = [
   {
     home: "Canada",
     away: "Morocco",
-    match_time_utc: "2026-07-04T22:00:00.000Z",
+    match_time_utc: "2026-07-04T17:00:00.000Z",
   },
   {
     home: "Brazil",
     away: "Norway",
-    match_time_utc: "2026-07-06T00:00:00.000Z",
+    match_time_utc: "2026-07-05T20:00:00.000Z",
   },
   {
     home: "Mexico",
     away: "England",
-    match_time_utc: "2026-07-06T06:00:00.000Z",
+    match_time_utc: "2026-07-06T00:00:00.000Z",
   },
   {
     home: "Portugal",
     away: "Spain",
-    match_time_utc: "2026-07-07T00:00:00.000Z",
+    match_time_utc: "2026-07-06T19:00:00.000Z",
   },
   {
     home: "USA",
     away: "Belgium",
     homeAliases: ["United States"],
-    match_time_utc: "2026-07-07T00:00:00.000Z",
+    match_time_utc: "2026-07-06T21:00:00.000Z",
   },
   {
     home: "Argentina",
