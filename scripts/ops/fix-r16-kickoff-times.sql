@@ -18,7 +18,9 @@ from (
     ('Mexico', 'England', '2026-07-06 06:00:00+00'::timestamptz),
     ('Portugal', 'Spain', '2026-07-07 00:00:00+00'::timestamptz),
     ('USA', 'Belgium', '2026-07-07 00:00:00+00'::timestamptz),
-    ('United States', 'Belgium', '2026-07-07 00:00:00+00'::timestamptz)
+    ('United States', 'Belgium', '2026-07-07 00:00:00+00'::timestamptz),
+    ('Argentina', 'Egypt', '2026-07-07 16:00:00+00'::timestamptz),
+    ('Switzerland', 'Colombia', '2026-07-07 20:00:00+00'::timestamptz)
 ) as v (home_team, away_team, match_time_utc)
 where trim(m.home_team) = v.home_team
   and trim(m.away_team) = v.away_team
@@ -41,6 +43,8 @@ where (home_team, away_team) in (
   ('Mexico', 'England'),
   ('Portugal', 'Spain'),
   ('USA', 'Belgium'),
-  ('United States', 'Belgium')
+  ('United States', 'Belgium'),
+  ('Argentina', 'Egypt'),
+  ('Switzerland', 'Colombia')
 )
 order by match_time_utc, home_team;

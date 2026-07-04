@@ -107,7 +107,7 @@ Matches with any existing prediction are left unchanged (operator rule A).
 
 ## Fix Round of 16 fixtures (M89–M96)
 
-Official pairings and kickoffs are maintained in `docs/fifa/matches.csv` (sourced from [FIFA's published schedule](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/match-schedule-fixtures-results-teams-stadiums)). Confirmed team names are filled in as Round of 32 winners are decided; M95–M96 remain bracket placeholders until M86–M88 conclude.
+Official pairings and kickoffs are maintained in `docs/fifa/matches.csv` (sourced from [FIFA's published schedule](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/match-schedule-fixtures-results-teams-stadiums)). All R16 fixtures M89–M96 are confirmed as of 4 Jul 2026.
 
 **Recommended — single SQL paste (teams + venues + kickoffs):**
 

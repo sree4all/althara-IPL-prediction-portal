@@ -1,7 +1,7 @@
 -- Operator: replace Round of 16 bracket placeholders (matches 89–96) with confirmed teams.
 -- Paste into Supabase SQL editor after Round of 32 concludes and FIFA publishes fixtures.
 --
--- Confirmed as of 3 Jul 2026 (M95–M96 still depend on M86–M88 winners).
+-- Confirmed as of 4 Jul 2026 (M95–M96 after M85–M88 concluded).
 -- Source: https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/match-schedule-fixtures-results-teams-stadiums
 
 begin;
@@ -20,7 +20,9 @@ from (
     (91, 'Brazil', 'Norway'),
     (92, 'Mexico', 'England'),
     (93, 'Portugal', 'Spain'),
-    (94, 'USA', 'Belgium')
+    (94, 'USA', 'Belgium'),
+    (95, 'Argentina', 'Egypt'),
+    (96, 'Switzerland', 'Colombia')
 ) as v (match_number, home_team, away_team)
 where m.match_number = v.match_number
    or m.external_key = 'WC26-M' || v.match_number::text;
