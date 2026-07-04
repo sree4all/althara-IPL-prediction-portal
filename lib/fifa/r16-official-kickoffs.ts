@@ -45,6 +45,16 @@ export const R16_OFFICIAL_KICKOFFS: R16Kickoff[] = [
     homeAliases: ["United States"],
     match_time_utc: "2026-07-07T00:00:00.000Z",
   },
+  {
+    home: "Argentina",
+    away: "Egypt",
+    match_time_utc: "2026-07-07T16:00:00.000Z",
+  },
+  {
+    home: "Switzerland",
+    away: "Colombia",
+    match_time_utc: "2026-07-07T20:00:00.000Z",
+  },
 ];
 
 export function r16HomeNames(row: R16Kickoff): string[] {
