@@ -1,10 +1,11 @@
 /**
- * Generate bonus prompts for odd-numbered matches (service role).
+ * Generate bonus prompts for odd-numbered upcoming matches (service role).
  * Usage: npx tsx scripts/generate-odd-match-bonuses.ts [--dry-run] [--limit=5]
  */
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 import { generateMatchBonus } from "../lib/ai/generate-match-bonus";
+import { selectOddMatchBonusCandidates } from "../lib/fifa/odd-match-bonus-candidates";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -48,12 +49,11 @@ async function main() {
     .from("matches")
     .select("id, match_number, home_team, away_team, tournament_stage, match_time_utc, status")
     .eq("season_year", SEASON)
-    .eq("status", "scheduled")
     .order("match_number");
 
-  const candidates = (matches ?? []).filter((m) => {
-    const mn = m.match_number as number;
-    return mn % 2 === 1 && mn > cutoff && !hasBonus.has(m.id);
+  const candidates = selectOddMatchBonusCandidates(matches ?? [], {
+    cutoff,
+    hasBonusMatchIds: hasBonus,
   });
 
   console.log(`Cutoff match_number=${cutoff}, candidates=${candidates.length}, dry_run=${dryRun}`);
@@ -64,7 +64,7 @@ async function main() {
       home_team: m.home_team as string,
       away_team: m.away_team as string,
       tournament_stage: (m.tournament_stage as string) ?? "group",
-      match_time_utc: m.match_time_utc as string,
+      match_time_utc: m.match_time_utc,
     });
     console.log(`M${m.match_number}:`, draft.prompt_text, draft.options.map((o) => o.label).join(", "));
     if (dryRun) continue;

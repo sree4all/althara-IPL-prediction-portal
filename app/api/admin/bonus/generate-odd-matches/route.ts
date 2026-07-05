@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireAdminOrResponse } from "@/lib/auth/require-admin";
 import { generateMatchBonus } from "@/lib/ai/generate-match-bonus";
+import { selectOddMatchBonusCandidates } from "@/lib/fifa/odd-match-bonus-candidates";
 
 const SEASON_YEAR = 2026;
 
@@ -49,7 +50,6 @@ export async function POST(request: Request) {
     .from("matches")
     .select("id, match_number, home_team, away_team, tournament_stage, match_time_utc, status")
     .eq("season_year", seasonYear)
-    .eq("status", "scheduled")
     .order("match_number", { ascending: true });
 
   if (mErr) return NextResponse.json({ error: mErr.message }, { status: 500 });
@@ -63,11 +63,9 @@ export async function POST(request: Request) {
 
   const hasBonus = new Set((existingPrompts ?? []).map((p) => p.match_id as string));
 
-  const candidates = (matches ?? []).filter((m) => {
-    const mn = m.match_number as number | null;
-    if (mn == null || mn % 2 !== 1) return false;
-    if (mn <= cutoff) return false;
-    return !hasBonus.has(m.id as string);
+  const candidates = selectOddMatchBonusCandidates(matches ?? [], {
+    cutoff,
+    hasBonusMatchIds: hasBonus,
   });
 
   if (candidates.length === 0) {
@@ -81,7 +79,7 @@ export async function POST(request: Request) {
       home_team: m.home_team as string,
       away_team: m.away_team as string,
       tournament_stage: (m.tournament_stage as string) ?? "group",
-      match_time_utc: m.match_time_utc as string,
+      match_time_utc: m.match_time_utc,
     });
 
     if (dryRun) {
