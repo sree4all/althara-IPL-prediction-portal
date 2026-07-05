@@ -3,6 +3,7 @@ import { requireAdminOrResponse } from "@/lib/auth/require-admin";
 import { DRAW_PICK } from "@/lib/fifa/stages";
 import { isDrawAllowedForMatch } from "@/lib/fifa/match-ready";
 import { fixtureNumber } from "@/lib/matches/dedupe-by-match-number";
+import { propagateKnockoutWinner } from "@/lib/fifa/bracket-progression";
 import { applyMatchScoring } from "@/lib/scoring/match-scoring";
 
 export async function POST(
@@ -93,6 +94,12 @@ export async function POST(
     .eq("id", matchId);
   if (uErr) return NextResponse.json({ error: uErr.message }, { status: 500 });
 
+  const matchNum = fixtureNumber(match);
+  let propagation = { updated: [] as unknown[], conflicts: [] as unknown[] };
+  if (matchNum != null && winner !== DRAW_PICK) {
+    propagation = await propagateKnockoutWinner(supabase, matchNum, winner, 2026);
+  }
+
   const result = await applyMatchScoring(supabase, matchId, 2026);
   if (!result.ok) {
     return NextResponse.json({ error: result.error, match_id: matchId }, { status: 500 });
@@ -103,5 +110,6 @@ export async function POST(
     message: `Match scored. ${result.ledgerRows} ledger row(s) written.`,
     match_id: matchId,
     ledger_rows: result.ledgerRows,
+    propagation,
   });
 }

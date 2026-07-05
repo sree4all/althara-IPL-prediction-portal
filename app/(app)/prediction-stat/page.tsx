@@ -29,6 +29,7 @@ export default function PredictionStatPage() {
   const [matchId, setMatchId] = useState("");
   const [entries, setEntries] = useState<Entry[]>([]);
   const [matchLabel, setMatchLabel] = useState<string | null>(null);
+  const [picksRevealed, setPicksRevealed] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -77,6 +78,7 @@ export default function PredictionStatPage() {
       if (cancelled) return;
       setMatchLabel(data.match?.label ?? null);
       setEntries(data.entries ?? []);
+      setPicksRevealed(data.picks_revealed !== false);
       setError(null);
       setLoading(false);
     })();
@@ -123,6 +125,12 @@ export default function PredictionStatPage() {
       {matchId && !loading && matchLabel ? (
         <div className="space-y-3">
           <p className="text-sm font-medium">{matchLabel}</p>
+          {!picksRevealed ? (
+            <p className="text-xs text-muted-foreground">
+              Other players&apos; picks unlock at kickoff. You may only see your own submission until
+              then.
+            </p>
+          ) : null}
           {entries.length === 0 ? (
             <p className="text-sm text-muted-foreground">No predictions submitted for this match yet.</p>
           ) : (

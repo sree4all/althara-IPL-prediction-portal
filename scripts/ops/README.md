@@ -35,6 +35,19 @@ See `scripts/seed-csv.ts` and `specs/004-fifa-tournament-reset/quickstart.md`.
 2. Re-create tournament bonus questions and match bonuses in Admin.
 3. Disable maintenance mode when ready.
 
+## Migration 0036 — FIFA knockout enhancements
+
+Apply `supabase/migrations/0036_fifa_knockout_enhancements.sql` before deploying forecast tab, kickoff-gated picks, or AI odd-match bonuses:
+
+- `tournament_forecast_answers` table
+- `tournament_config.forecast_stats_visible` (default false)
+- `bonus_prompts.source`, `correct_points`, `incorrect_points`
+
+```bash
+npx supabase db push
+# or run the SQL file in Supabase SQL Editor on staging first
+```
+
 ## Fix new user signup ("Database error saving new user")
 
 If magic link or Google signup fails after migration `0027`, run:

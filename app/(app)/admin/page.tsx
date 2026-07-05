@@ -44,6 +44,7 @@ export default async function AdminPage() {
           answer_lock_utc: cfg?.answer_lock_utc ?? null,
           maintenance_mode: Boolean(cfg?.maintenance_mode),
           maintenance_banner_text: cfg?.maintenance_banner_text ?? DEFAULT_MAINTENANCE_BANNER_TEXT,
+          forecast_stats_visible: Boolean(cfg?.forecast_stats_visible),
         }}
         bonusPrompts={bonus ?? []}
         matches={dedupeMatchesByFixtureNumber(adminMatches ?? [])}

@@ -5,7 +5,7 @@ export const DEFAULT_MAINTENANCE_BANNER_TEXT = "അടിമ പണിയില�
 const SELECT_BASE =
   "id, season_year, answer_lock_utc, season_bonuses_visible_after_utc, season_bonuses_revealed_by_admin";
 const SELECT_WITH_MAINT = `${SELECT_BASE}, maintenance_mode, maintenance_banner_text`;
-const SELECT_FULL = `${SELECT_WITH_MAINT}, mega_bonus_all_answers_visible`;
+const SELECT_FULL = `${SELECT_WITH_MAINT}, mega_bonus_all_answers_visible, forecast_stats_visible`;
 
 /** Upsert/select failed because maintenance columns from migration 0022 are missing. */
 export function isMissingMaintenanceColumnsError(err: { message?: string; code?: string } | null): boolean {
@@ -28,6 +28,7 @@ export type TournamentConfigRow = {
   maintenance_mode: boolean;
   maintenance_banner_text: string;
   mega_bonus_all_answers_visible: boolean;
+  forecast_stats_visible: boolean;
 };
 
 export async function fetchTournamentConfig2026(
@@ -48,6 +49,9 @@ export async function fetchTournamentConfig2026(
         maintenance_banner_text: (d.maintenance_banner_text as string | null) ?? DEFAULT_MAINTENANCE_BANNER_TEXT,
         mega_bonus_all_answers_visible: Boolean(
           (d as { mega_bonus_all_answers_visible?: boolean }).mega_bonus_all_answers_visible,
+        ),
+        forecast_stats_visible: Boolean(
+          (d as { forecast_stats_visible?: boolean }).forecast_stats_visible,
         ),
       },
       error: null,
@@ -73,6 +77,7 @@ export async function fetchTournamentConfig2026(
             (d as { maintenance_banner_text?: string | null }).maintenance_banner_text ??
             DEFAULT_MAINTENANCE_BANNER_TEXT,
           mega_bonus_all_answers_visible: false,
+          forecast_stats_visible: false,
         },
         error: null,
       };
@@ -101,6 +106,7 @@ export async function fetchTournamentConfig2026(
       maintenance_mode: false,
       maintenance_banner_text: DEFAULT_MAINTENANCE_BANNER_TEXT,
       mega_bonus_all_answers_visible: false,
+      forecast_stats_visible: false,
     },
     error: null,
   };
