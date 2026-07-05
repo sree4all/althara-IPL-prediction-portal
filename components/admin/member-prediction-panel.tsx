@@ -27,6 +27,13 @@ type MatchDraft = {
   saving: boolean;
 };
 
+const EMPTY_DRAFT: MatchDraft = {
+  userId: "",
+  winner: "",
+  loadingPrediction: false,
+  saving: false,
+};
+
 function matchLabel(m: AdminMatchRow) {
   return formatMatchLabelWithIst(m.home_team, m.away_team, m.match_time_utc);
 }
@@ -76,10 +83,7 @@ export function MemberPredictionPanel({ matches }: { matches: AdminMatchRow[] })
     setDrafts((prev) => ({
       ...prev,
       [matchId]: {
-        userId: "",
-        winner: "",
-        loadingPrediction: false,
-        saving: false,
+        ...EMPTY_DRAFT,
         ...prev[matchId],
         ...patch,
       },
