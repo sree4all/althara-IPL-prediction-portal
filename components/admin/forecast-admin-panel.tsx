@@ -24,7 +24,7 @@ export function ForecastAdminPanel({
       return;
     }
     setStatsVisible(next);
-    toast.success(next ? "Forecast stats are public." : "Forecast stats are admin-only.");
+    toast.success(next ? "Member forecast picks are visible to all." : "Forecast picks are admin-only.");
   }
 
   async function syncSchedule() {
@@ -52,9 +52,12 @@ export function ForecastAdminPanel({
           checked={statsVisible}
           onChange={(e) => void saveVisibility(e.target.checked)}
         />
-        Forecast statistics visible to all signed-in members
+        Show member forecast picks to all members
       </label>
-      <p className="text-xs text-muted-foreground">Default is off (admin-only).</p>
+      <p className="text-xs text-muted-foreground">
+        Off by default — only admins see the picks list. When on, every signed-in member can view
+        all forecasts (like Prediction Stat).
+      </p>
 
       <Button type="button" size="sm" variant="outline" disabled={syncBusy} onClick={() => void syncSchedule()}>
         {syncBusy ? "Syncing…" : "Sync FIFA schedule (times & numbers)"}

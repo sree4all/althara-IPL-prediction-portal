@@ -3,29 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { FORECAST_SEASON_YEAR } from "@/lib/fifa/forecast-data";
 
-const MIN_FOR_PCT = 3;
-
-function aggregateCounts(arrays: string[][]) {
-  const counts = new Map<string, number>();
-  for (const arr of arrays) {
-    for (const t of arr) {
-      if (!t?.trim()) continue;
-      counts.set(t, (counts.get(t) ?? 0) + 1);
-    }
-  }
-  return counts;
-}
-
-function toStats(counts: Map<string, number>, total: number, showPct: boolean) {
-  return [...counts.entries()]
-    .map(([team, count]) => ({
-      team,
-      count,
-      pct: showPct ? Math.round((count / total) * 1000) / 10 : undefined,
-    }))
-    .sort((a, b) => b.count - a.count);
-}
-
 export async function GET() {
   const supabase = await createClient();
   const {
@@ -62,37 +39,37 @@ export async function GET() {
 
   const { data: rows, error } = await dataClient
     .from("tournament_forecast_answers")
-    .select("semi_finalist_teams, finalist_teams, winner_team")
+    .select("user_id, semi_finalist_teams, finalist_teams, winner_team, updated_at")
     .eq("season_year", FORECAST_SEASON_YEAR);
 
   if (error?.message?.includes("tournament_forecast_answers")) {
-    return NextResponse.json({
-      season_year: FORECAST_SEASON_YEAR,
-      total_forecasts: 0,
-      show_percentages: false,
-      semi_finalists: [],
-      finalists: [],
-      winners: [],
-    });
+    return NextResponse.json({ season_year: FORECAST_SEASON_YEAR, entries: [] });
   }
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const total = rows?.length ?? 0;
-  const showPct = total >= MIN_FOR_PCT;
+  const userIds = [...new Set((rows ?? []).map((r) => r.user_id as string))];
+  let nameByUser = new Map<string, string>();
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, display_name")
+      .in("id", userIds);
+    nameByUser = new Map((profiles ?? []).map((r) => [r.id as string, r.display_name as string]));
+  }
 
-  const semiRows = (rows ?? []).map((r) => (r.semi_finalist_teams as string[]) ?? []);
-  const finalRows = (rows ?? []).map((r) => (r.finalist_teams as string[]) ?? []);
-  const winnerRows = (rows ?? [])
-    .map((r) => (r.winner_team as string | null) ?? "")
-    .filter(Boolean)
-    .map((w) => [w]);
+  const entries = (rows ?? [])
+    .map((r) => ({
+      user_id: r.user_id as string,
+      display_name: nameByUser.get(r.user_id as string) ?? "Player",
+      semi_finalist_teams: (r.semi_finalist_teams as string[]) ?? [],
+      finalist_teams: (r.finalist_teams as string[]) ?? [],
+      winner_team: (r.winner_team as string | null) ?? null,
+      updated_at: (r.updated_at as string | null) ?? null,
+    }))
+    .sort((a, b) => a.display_name.localeCompare(b.display_name));
 
   return NextResponse.json({
     season_year: FORECAST_SEASON_YEAR,
-    total_forecasts: total,
-    show_percentages: showPct,
-    semi_finalists: toStats(aggregateCounts(semiRows), total, showPct),
-    finalists: toStats(aggregateCounts(finalRows), total, showPct),
-    winners: toStats(aggregateCounts(winnerRows), total, showPct),
+    entries,
   });
 }
