@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { resolveMatchAliasIds } from "@/lib/matches/resolve-alias-ids";
 import { createServiceClient } from "@/lib/supabase/service";
 import { formatMatchLabelWithIst } from "@/lib/matches/match-display-label";
+import { shouldRevealAllPicks } from "@/lib/matches/picks-reveal-gate";
 
 const SEASON_YEAR = 2026;
 
@@ -34,6 +35,15 @@ export async function GET(request: Request) {
     .maybeSingle();
   if (mErr || !match) return NextResponse.json({ error: "MATCH_NOT_FOUND" }, { status: 404 });
 
+  const { data: viewerProfile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  const isAdmin = viewerProfile?.role === "admin";
+  const kickoffUtc = match.match_time_utc as string;
+  const picksRevealed = shouldRevealAllPicks(kickoffUtc, isAdmin);
+
   const label = formatMatchLabelWithIst(
     match.home_team as string,
     match.away_team as string,
@@ -64,8 +74,11 @@ export async function GET(request: Request) {
     }
   }
   const preds = [...predsByUser.values()];
+  const visiblePreds = picksRevealed
+    ? preds
+    : preds.filter((p) => p.user_id === user.id);
 
-  const userIds = [...new Set((preds ?? []).map((p) => p.user_id as string))];
+  const userIds = [...new Set(visiblePreds.map((p) => p.user_id as string))];
   let nameByUser = new Map<string, string>();
   if (userIds.length > 0) {
     const { data: profiles } = await supabase
@@ -124,7 +137,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const entries = (preds ?? []).map((p) => {
+  const entries = visiblePreds.map((p) => {
     const uid = p.user_id as string;
     const rawBonus = bonusByUser.get(uid) ?? [];
     const bonus_answers = rawBonus.map((row) => ({
@@ -145,6 +158,8 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     season_year: SEASON_YEAR,
+    picks_revealed: picksRevealed,
+    kickoff_utc: kickoffUtc,
     match: {
       id: match.id,
       label,

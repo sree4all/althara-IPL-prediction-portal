@@ -4,6 +4,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { TournamentConfigPanel } from "@/components/admin/tournament-config-panel";
 import { BonusPromptsPanel } from "@/components/admin/bonus-prompts-panel";
+import {
+  ForecastAdminPanel,
+  OddMatchBonusAdminAction,
+} from "@/components/admin/forecast-admin-panel";
 
 type AdminMatch = {
   id: string;
@@ -18,6 +22,7 @@ type AdminConfig = {
   answer_lock_utc: string | null;
   maintenance_mode: boolean;
   maintenance_banner_text: string;
+  forecast_stats_visible?: boolean;
   bonus_prompts: {
     id: string;
     scope: string;
@@ -76,15 +81,23 @@ export function AdminConfigForm({ initial }: { initial: AdminConfig }) {
   return (
     <div className="space-y-4">
       {showSettings ? (
-        <TournamentConfigPanel
-          lock={cfg.answer_lock_utc}
-          maintenanceMode={cfg.maintenance_mode}
-          maintenanceBannerText={cfg.maintenance_banner_text}
-          onSave={saveSettings}
-        />
+        <>
+          <TournamentConfigPanel
+            lock={cfg.answer_lock_utc}
+            maintenanceMode={cfg.maintenance_mode}
+            maintenanceBannerText={cfg.maintenance_banner_text}
+            onSave={saveSettings}
+          />
+          <ForecastAdminPanel
+            initialForecastStatsVisible={Boolean(cfg.forecast_stats_visible)}
+          />
+        </>
       ) : null}
       {showBonus ? (
-        <BonusPromptsPanel initialPrompts={cfg.bonus_prompts} matches={cfg.matches} />
+        <>
+          <OddMatchBonusAdminAction />
+          <BonusPromptsPanel initialPrompts={cfg.bonus_prompts} matches={cfg.matches} />
+        </>
       ) : null}
     </div>
   );

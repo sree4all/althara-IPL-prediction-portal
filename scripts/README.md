@@ -39,6 +39,17 @@ Then:
 3. Open **History** / save a prediction to confirm API + RLS.
 4. **Admin** (`/admin`): set a real `answer_lock_utc` when you are done testing (demo uses year 2099 so tournament answers stay open).
 
+### AI odd-match bonuses (optional)
+
+Set `OPENAI_API_KEY` in `.env.local` for LLM-drafted bonus questions; without it, template questions are used.
+
+```bash
+npx tsx scripts/generate-odd-match-bonuses.ts --dry-run --limit=3
+npx tsx scripts/generate-odd-match-bonuses.ts --limit=5
+```
+
+Or use **Admin → Match Bonus → Generate missing odd-match bonuses**. AI prompts score **+3 / 0** via per-prompt `correct_points`.
+
 To refresh demo fixtures, run `npm run seed:demo` again (upserts are idempotent where unique keys exist).
 
 ---

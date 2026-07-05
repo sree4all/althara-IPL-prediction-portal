@@ -55,6 +55,18 @@ export type TournamentConfig = {
   maintenance_mode?: boolean | null;
   maintenance_banner_text?: string | null;
   mega_bonus_all_answers_visible?: boolean | null;
+  forecast_stats_visible?: boolean | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TournamentForecastAnswer = {
+  id: string;
+  user_id: string;
+  season_year: number;
+  semi_finalist_teams: string[];
+  finalist_teams: string[];
+  winner_team: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -92,6 +104,9 @@ export type BonusPrompt = {
   display_order: number;
   correct_answer?: string | null;
   input_type?: "text" | "single_choice";
+  source?: "manual" | "ai_generated";
+  correct_points?: number | null;
+  incorrect_points?: number | null;
 };
 
 export type BonusPromptOption = {

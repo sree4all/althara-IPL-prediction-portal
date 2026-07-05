@@ -5,12 +5,13 @@ alwaysApply: true
 ---
 # althara-IPL-prediction-portal Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-05-21
+Auto-generated from all feature plans. Last updated: 2026-07-05
 
 ## Active Technologies
 - Supabase PostgreSQL (extend existing `matches`, `profiles`, `predictions`) with new tables for bonus prompts, tournament questions/answers, points ledger, alias claims (002-ipl-prediction-mvp2)
 - Supabase PostgreSQL (extend `bonus_prompts`, `tournament_questions`; new option tables) (002-ipl-prediction-mvp2)
 - Supabase PostgreSQL — new `stage_scoring_config`; alter `matches`; drop legacy tables/columns (004-fifa-tournament-reset)
+- Supabase PostgreSQL — new `tournament_forecast_answers`; extend `tournament_config`, `bonus_prompts`; optional `bracket_slot_map` seed table or static TS map (005-fifa-knockout-enhancements)
 
 - TypeScript 5.x, Node.js 20 LTS + Next.js (App Router), React 19, Tailwind CSS, shadcn/ui, `@supabase/supabase-js`, `@supabase/ssr` (001-ipl-prediction-portal)
 
@@ -31,8 +32,8 @@ npm test; npm run lint
 TypeScript 5.x, Node.js 20 LTS: Follow standard conventions
 
 ## Recent Changes
+- 005-fifa-knockout-enhancements: Added TypeScript 5.x, Node.js 20 LTS + Next.js (App Router), React 19, Tailwind CSS, shadcn/ui, `@supabase/supabase-js`, `@supabase/ssr`
 - 004-fifa-tournament-reset: Added TypeScript 5.x, Node.js 20 LTS + Next.js (App Router), React 19, Tailwind CSS, shadcn/ui, `@supabase/supabase-js`, `@supabase/ssr`
-- 002-ipl-prediction-mvp2: Added TypeScript 5.x, Node.js 20 LTS + Next.js (App Router), React 19, Tailwind CSS, shadcn/ui, `@supabase/supabase-js`, `@supabase/ssr`
 - 002-ipl-prediction-mvp2: Added TypeScript 5.x, Node.js 20 LTS + Next.js (App Router), React 19, Tailwind CSS, shadcn/ui, `@supabase/supabase-js`, `@supabase/ssr`
 
 

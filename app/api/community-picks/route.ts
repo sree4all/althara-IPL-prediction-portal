@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { resolveMatchAliasIds } from "@/lib/matches/resolve-alias-ids";
+import { shouldRevealAllPicks } from "@/lib/matches/picks-reveal-gate";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -12,6 +13,23 @@ export async function GET(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  const isAdmin = profile?.role === "admin";
+
+  const { data: match } = await supabase
+    .from("matches")
+    .select("match_time_utc")
+    .eq("id", matchId)
+    .maybeSingle();
+  if (!match) return NextResponse.json({ error: "MATCH_NOT_FOUND" }, { status: 404 });
+
+  const kickoffUtc = match.match_time_utc as string;
+  const picksRevealed = shouldRevealAllPicks(kickoffUtc, isAdmin);
 
   const aliasMatchIds = await resolveMatchAliasIds(supabase, matchId);
 
@@ -31,10 +49,19 @@ export async function GET(request: Request) {
       });
     }
   }
-  const picks = [...picksByUser.values()];
+  let picks = [...picksByUser.values()];
+  if (!picksRevealed) {
+    picks = picks.filter((p) => p.user_id === user.id);
+  }
+
   const userIds = picks.map((p) => p.user_id);
   if (userIds.length === 0) {
-    return NextResponse.json({ match_id: matchId, rows: [] });
+    return NextResponse.json({
+      match_id: matchId,
+      kickoff_utc: kickoffUtc,
+      picks_revealed: picksRevealed,
+      rows: [],
+    });
   }
   const { data: profiles } = await supabase
     .from("profiles")
@@ -42,10 +69,14 @@ export async function GET(request: Request) {
     .in("id", userIds);
   const map = new Map((profiles ?? []).map((p) => [p.id, p.display_name]));
 
-  const rows = (picks ?? []).map((p) => ({
+  const rows = picks.map((p) => ({
     user_display_name: map.get(p.user_id) ?? "Player",
     predicted_winner: p.predicted_winner,
   }));
-  return NextResponse.json({ match_id: matchId, rows });
+  return NextResponse.json({
+    match_id: matchId,
+    kickoff_utc: kickoffUtc,
+    picks_revealed: picksRevealed,
+    rows,
+  });
 }
-

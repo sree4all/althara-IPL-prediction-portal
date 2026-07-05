@@ -22,6 +22,7 @@ type Props = {
     answer_lock_utc: string | null;
     maintenance_mode: boolean;
     maintenance_banner_text: string;
+    forecast_stats_visible?: boolean;
   };
   bonusPrompts: BonusPrompt[];
   matches: AdminMatchRow[];

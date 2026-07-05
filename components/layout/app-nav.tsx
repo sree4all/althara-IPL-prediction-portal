@@ -9,6 +9,7 @@ import { WORLD_CUP_DISPLAY_NAME } from "@/lib/brand";
 
 const links = [
   { href: "/matches", label: "Matches" },
+  { href: "/forecast", label: "Forecast" },
   { href: "/prediction-stat", label: "Prediction Stat" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/history", label: "History" },

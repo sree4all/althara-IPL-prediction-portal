@@ -80,6 +80,8 @@ export type FifaImportOptions = {
   onlyMatchNumbers?: number[];
   /** Fixture numbers to leave unchanged (e.g. matches with existing predictions). */
   skipMatchNumbers?: number[];
+  /** metadata: update kickoff/venue/number only; preserve teams and results. */
+  mode?: "full" | "metadata";
 };
 
 export async function importFifaMatches(
@@ -126,17 +128,40 @@ export async function importFifaMatches(
       const external_key = `WC26-M${matchNumber}`;
       const kickoffRaw = row.kickoff_at.trim();
       const kickoffTz = kickoffRaw.match(/([+-]\d{2}(?::\d{2})?|Z)\s*$/i)?.[1] ?? null;
+      const matchTimeUtc = parseKickoffCsvAsUtcIso(kickoffRaw);
+      const now = new Date().toISOString();
+
+      if (options?.mode === "metadata") {
+        const metadataPatch = {
+          match_number: matchNumber,
+          match_time_utc: matchTimeUtc,
+          kickoff_tz_offset: kickoffTz,
+          venue_label: venue ? ` — ${venue}` : null,
+          dataset_version: datasetVersion,
+          updated_at: now,
+        };
+        const { error: metaErr } = await supabase
+          .from("matches")
+          .update(metadataPatch)
+          .eq("external_key", external_key);
+        if (metaErr) {
+          errors.push(`Match ${matchNumber}: ${metaErr.message}`);
+        } else {
+          upserted++;
+        }
+        continue;
+      }
 
       const corePayload = {
         external_key,
         home_team: home,
         away_team: away,
-        match_time_utc: parseKickoffCsvAsUtcIso(kickoffRaw),
+        match_time_utc: matchTimeUtc,
         status: "scheduled",
         winner: null,
         bonus_result: null,
         tournament_stage: stageSlug,
-        updated_at: new Date().toISOString(),
+        updated_at: now,
       };
 
       const extendedPayload = {
@@ -175,7 +200,7 @@ export async function importFifaMatches(
     return { upserted, errors };
   }
 
-  if (options?.onlyMatchNumbers) {
+  if (options?.mode === "metadata" || options?.onlyMatchNumbers) {
     return { upserted, errors };
   }
 

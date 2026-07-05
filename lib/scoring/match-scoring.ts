@@ -88,7 +88,7 @@ export async function applyMatchScoring(
 
   const { data: promptRows } = await supabase
     .from("bonus_prompts")
-    .select("id, correct_answer, display_order")
+    .select("id, correct_answer, display_order, correct_points, incorrect_points")
     .eq("season_year", seasonYear)
     .eq("scope", "match")
     .in("match_id", aliasMatchIds)
@@ -131,11 +131,14 @@ export async function applyMatchScoring(
         if (!official) continue;
         const userAns = answersByUserPrompt.get(`${userId}\t${pid}`)?.trim() ?? "";
         if (userAns && normAnswer(userAns) === normAnswer(official)) {
+          const cp = (pr as { correct_points?: number | null }).correct_points;
+          const bonusDelta =
+            cp != null && Number.isFinite(Number(cp)) ? Number(cp) : bonusPts;
           toInsert.push({
             user_id: userId,
             source_type: "bonus",
             source_id: matchId,
-            points_delta: bonusPts,
+            points_delta: bonusDelta,
             reason: `match_bonus:${pid}`,
             awarded_at: now,
           });
