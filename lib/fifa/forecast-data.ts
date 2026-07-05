@@ -21,9 +21,9 @@ export async function loadKnockoutMatchRows(supabase: SupabaseClient): Promise<M
 export async function loadForecastLockContext(supabase: SupabaseClient) {
   const { data: qfRows } = await supabase
     .from("matches")
-    .select("match_time_utc, tournament_stage")
+    .select("match_time_utc, tournament_stage, match_number")
     .eq("season_year", SEASON_YEAR)
-    .eq("tournament_stage", "qf");
+    .or("tournament_stage.eq.qf,match_number.in.(97,98,99,100)");
 
   const lockAtUtc = earliestQuarterFinalKickoff(qfRows ?? []);
   return {

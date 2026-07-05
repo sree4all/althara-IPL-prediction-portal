@@ -131,7 +131,7 @@ export function ForecastForm() {
     <div className="space-y-6">
       {locked ? (
         <p className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
-          Forecast locked at quarter-final kickoff
+          Forecast locked at Round of 8 kickoff
           {eligibility.lock_at_utc ? ` (${new Date(eligibility.lock_at_utc).toLocaleString()})` : ""}.
         </p>
       ) : null}
