@@ -4,6 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { AdminConfigForm } from "@/components/admin/admin-config-form";
 import { MatchResultPanel, type AdminMatchRow } from "@/components/admin/match-result-panel";
+import { MemberPredictionPanel } from "@/components/admin/member-prediction-panel";
 import { PointsMaintenancePanel } from "@/components/admin/points-maintenance-panel";
 import { StageScoringPanel } from "@/components/admin/stage-scoring-panel";
 import type { BonusPrompt } from "@/lib/types/database";
@@ -53,7 +54,12 @@ export function AdminTabs({ tournamentConfig, bonusPrompts, matches }: Props) {
         ))}
       </nav>
 
-      {tab === "matches" ? <MatchResultPanel matches={matches} /> : null}
+      {tab === "matches" ? (
+        <div className="space-y-4">
+          <MemberPredictionPanel matches={matches} />
+          <MatchResultPanel matches={matches} />
+        </div>
+      ) : null}
 
       {tab === "settings" ? (
         <AdminConfigForm

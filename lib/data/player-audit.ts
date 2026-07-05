@@ -115,6 +115,31 @@ export async function getPlayerAudit(
   };
 }
 
+export type AdminProfileOption = {
+  id: string;
+  display_name: string;
+  email: string | null;
+  current_points: number;
+};
+
+export async function listAllProfiles(
+  supabase: SupabaseClient,
+): Promise<AdminProfileOption[]> {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, display_name, email, current_points")
+    .order("display_name", { ascending: true });
+
+  if (error || !data) return [];
+
+  return data.map((p) => ({
+    id: p.id as string,
+    display_name: (p.display_name as string) || "Player",
+    email: (p.email as string | null) ?? null,
+    current_points: Number(p.current_points ?? 0),
+  }));
+}
+
 export async function searchProfilesByName(
   supabase: SupabaseClient,
   query: string,
