@@ -9,7 +9,7 @@ export default function ForecastPage() {
           <h1 className="text-lg font-bold">Tournament Forecast</h1>
           <p className="text-sm text-muted-foreground">
             Predict the four semi-finalists, two finalists, and the winner. Edits lock at the first
-            quarter-final kickoff.
+            Round of 8 kickoff (Match 97).
           </p>
         </div>
         <Link href="/forecast/stats" className="shrink-0 text-sm text-primary underline">
