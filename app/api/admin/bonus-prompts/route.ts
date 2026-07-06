@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   let q = supabase
     .from("bonus_prompts")
     .select(
-      "id, scope, match_id, prompt_key, prompt_text, is_active, display_order, input_type, correct_answer",
+      "id, scope, match_id, prompt_key, prompt_text, is_active, display_order, input_type, correct_answer, source",
     )
     .eq("season_year", 2026)
     .order("display_order", { ascending: true });

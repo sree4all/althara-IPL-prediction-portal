@@ -137,8 +137,8 @@ export function OddMatchBonusAdminAction() {
     <div className="rounded-md border border-border p-3">
       <p className="text-sm font-semibold">AI odd-match bonuses</p>
       <p className="mt-1 text-xs text-muted-foreground">
-        Generates +3 / 0 point bonuses for odd-numbered fixtures without an active prompt. Requires{" "}
-        <code className="text-xs">OPENAI_API_KEY</code> for LLM drafts (falls back to templates).
+        Generates +3 / 0 point bonuses for odd-numbered fixtures without an active prompt. Uses
+        curated Yes/No templates (same style as manually seeded R32 bonuses) when LLM is unavailable.
       </p>
       <Button type="button" size="sm" className="mt-2" disabled={busy} onClick={() => void generate()}>
         {busy ? "Generating…" : "Generate missing odd-match bonuses"}

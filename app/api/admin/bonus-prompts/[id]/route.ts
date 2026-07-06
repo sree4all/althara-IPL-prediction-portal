@@ -1,6 +1,18 @@
 import { NextResponse } from "next/server";
 import { requireAdminOrResponse } from "@/lib/auth/require-admin";
 
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { supabase, denied } = await requireAdminOrResponse();
+  if (denied) return denied;
+  const { id } = await params;
+  const { error } = await supabase.from("bonus_prompts").delete().eq("id", id);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ ok: true });
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },

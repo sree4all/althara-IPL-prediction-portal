@@ -25,6 +25,7 @@ type Prompt = {
   is_active: boolean;
   display_order: number;
   input_type?: string;
+  source?: string;
   options?: PromptOption[];
 };
 
@@ -137,6 +138,26 @@ export function BonusPromptsPanel({
     await reloadPrompts();
   }
 
+  async function deletePrompt(id: string, promptKey: string) {
+    if (
+      !window.confirm(
+        `Delete bonus prompt "${promptKey}"? Participant answers for this prompt will also be removed.`,
+      )
+    ) {
+      return;
+    }
+    setBusy(id);
+    setError(null);
+    const res = await fetch(`/api/admin/bonus-prompts/${id}`, { method: "DELETE" });
+    setBusy(null);
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      setError(d.error ?? "Delete failed");
+      return;
+    }
+    setPrompts((prev) => prev.filter((p) => p.id !== id));
+  }
+
   async function addMatchPrompt(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -206,8 +227,9 @@ export function BonusPromptsPanel({
                   <span className="text-muted-foreground"> · </span>
                   <span>{p.prompt_text}</span>
                   <div className="text-xs text-muted-foreground">{p.scope} · {where}</div>
-                  <div className="text-xs">{p.is_active ? "Active" : "Inactive"} · Input: {it}</div>
+                  <div className="text-xs">{p.is_active ? "Active" : "Inactive"} · Input: {it}{p.source ? ` · ${p.source}` : ""}</div>
                 </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -217,6 +239,16 @@ export function BonusPromptsPanel({
                 >
                   {p.is_active ? "Disable" : "Enable"}
                 </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  disabled={busy === p.id}
+                  onClick={() => void deletePrompt(p.id, p.prompt_key)}
+                >
+                  Delete
+                </Button>
+                </div>
               </div>
               <label className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 Response type

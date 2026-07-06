@@ -1,28 +1,11 @@
-export type GeneratedBonus = {
-  prompt_text: string;
-  options: { label: string; value: string }[];
-};
+import {
+  isWinnerDuplicateBonus,
+  pickMatchBonusTemplate,
+  type GeneratedBonus,
+  type MatchBonusContext,
+} from "@/lib/ai/match-bonus-templates";
 
-export type MatchBonusContext = {
-  match_number: number;
-  home_team: string;
-  away_team: string;
-  tournament_stage: string;
-  match_time_utc: string;
-};
-
-function templateBonus(ctx: MatchBonusContext): GeneratedBonus {
-  const opts = [
-    { label: ctx.home_team, value: ctx.home_team },
-    { label: ctx.away_team, value: ctx.away_team },
-    { label: "Draw / Neither", value: "Neither" },
-  ].filter((o, i, arr) => arr.findIndex((x) => x.value === o.value) === i);
-
-  return {
-    prompt_text: `Who will win ${ctx.home_team} vs ${ctx.away_team} (M${ctx.match_number})?`,
-    options: opts.length >= 2 ? opts : [{ label: "Yes", value: "Yes" }, { label: "No", value: "No" }],
-  };
-}
+export type { GeneratedBonus, MatchBonusContext };
 
 function parseLlmJson(text: string): GeneratedBonus | null {
   try {
@@ -44,9 +27,9 @@ function parseLlmJson(text: string): GeneratedBonus | null {
 
 export async function generateMatchBonus(ctx: MatchBonusContext): Promise<GeneratedBonus> {
   const key = process.env.OPENAI_API_KEY?.trim();
-  if (!key) return templateBonus(ctx);
+  if (!key) return pickMatchBonusTemplate(ctx);
 
-  const system = `You create short football match bonus questions. Reply JSON only: {"prompt_text":"...","options":[{"label":"...","value":"..."}]}. Use 3-5 sensible options referencing the teams or match outcome. No offensive content.`;
+  const system = `You create short football match bonus questions. Reply JSON only: {"prompt_text":"...","options":[{"label":"...","value":"..."}]}. Use Yes/No or 3-5 sensible options about match events (first goal, cards, extra time, possession, etc.). Do NOT ask who will win the match — that is already the main prediction. No offensive content.`;
   const user = `Match M${ctx.match_number}, stage ${ctx.tournament_stage}, ${ctx.home_team} vs ${ctx.away_team}, kickoff ${ctx.match_time_utc}.`;
 
   try {
@@ -65,13 +48,15 @@ export async function generateMatchBonus(ctx: MatchBonusContext): Promise<Genera
         temperature: 0.4,
       }),
     });
-    if (!res.ok) return templateBonus(ctx);
+    if (!res.ok) return pickMatchBonusTemplate(ctx);
     const data = (await res.json()) as {
       choices?: { message?: { content?: string } }[];
     };
     const content = data.choices?.[0]?.message?.content ?? "";
-    return parseLlmJson(content) ?? templateBonus(ctx);
+    const parsed = parseLlmJson(content);
+    if (parsed && !isWinnerDuplicateBonus(parsed.prompt_text)) return parsed;
+    return pickMatchBonusTemplate(ctx);
   } catch {
-    return templateBonus(ctx);
+    return pickMatchBonusTemplate(ctx);
   }
 }
