@@ -51,9 +51,10 @@ export async function GET() {
   const serverTimeUtc = new Date().toISOString();
   const now = new Date();
 
-  const openWindow = uniqueMatches.filter(
-    (m) => !isMatchLocked(new Date(m.match_time_utc as string), now),
-  );
+  const openWindow = uniqueMatches.filter((m) => {
+    if (isMatchLocked(new Date(m.match_time_utc as string), now)) return false;
+    return isMatchReadyForPredictions(m.home_team as string, m.away_team as string);
+  });
   const openFixtureNumbers = new Set(
     openWindow.map((m) => fixtureNumber(m)).filter((n): n is number => n != null),
   );

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isMatchReadyForPredictions } from "@/lib/fifa/match-ready";
 import { isMatchLocked } from "@/lib/utils/match-lock";
 import { formatMatchTeamsLabel } from "@/lib/matches/match-display-label";
 import { compareMatchOrder } from "@/lib/matches/match-order";
@@ -25,7 +26,8 @@ export async function GET() {
     const st = String(m.status ?? "").toLowerCase();
     if (st === "completed" || st === "abandoned" || st === "cancelled") return false;
     const t = new Date(m.match_time_utc as string);
-    return !isMatchLocked(t);
+    if (isMatchLocked(t)) return false;
+    return isMatchReadyForPredictions(m.home_team as string, m.away_team as string);
   });
 
   const ids = open.map((m) => m.id as string);

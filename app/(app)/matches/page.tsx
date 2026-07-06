@@ -9,7 +9,7 @@ export default function MatchesPage() {
     <div>
       <PageHeader
         title="Matches"
-        description="Only matches you can still predict on are listed (next three first; use See more for the rest). Predictions lock at match start time (IST)."
+        description="Only open fixtures with both teams confirmed are listed (next three first; use See more for the rest). Predictions lock at match start time (IST)."
       />
       <ScheduleOnboardingPanel items={defaultOnboardingItems} />
       <UtcNowClock />

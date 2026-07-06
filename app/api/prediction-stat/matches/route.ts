@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isMatchReadyForPredictions } from "@/lib/fifa/match-ready";
 import { dedupeMatchesByFixtureNumber } from "@/lib/matches/dedupe-by-match-number";
 import { formatMatchLabelWithIst } from "@/lib/matches/match-display-label";
 import { compareMatchOrder } from "@/lib/matches/match-order";
@@ -22,7 +23,9 @@ export async function GET() {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const sorted = dedupeMatchesByFixtureNumber([...(matches ?? [])]).sort((a, b) =>
+  const sorted = dedupeMatchesByFixtureNumber([...(matches ?? [])])
+    .filter((m) => isMatchReadyForPredictions(m.home_team as string, m.away_team as string))
+    .sort((a, b) =>
     compareMatchOrder(
       a.external_key as string | null,
       a.match_time_utc as string,

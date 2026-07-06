@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isMatchReadyForPredictions } from "@/lib/fifa/match-ready";
 import { resolveMatchAliasIds } from "@/lib/matches/resolve-alias-ids";
 import { createServiceClient } from "@/lib/supabase/service";
 import { formatMatchLabelWithIst } from "@/lib/matches/match-display-label";
@@ -34,6 +35,9 @@ export async function GET(request: Request) {
     .eq("id", matchId)
     .maybeSingle();
   if (mErr || !match) return NextResponse.json({ error: "MATCH_NOT_FOUND" }, { status: 404 });
+  if (!isMatchReadyForPredictions(match.home_team as string, match.away_team as string)) {
+    return NextResponse.json({ error: "MATCH_NOT_FOUND" }, { status: 404 });
+  }
 
   const { data: viewerProfile } = await supabase
     .from("profiles")
