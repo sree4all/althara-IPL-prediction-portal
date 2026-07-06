@@ -134,8 +134,18 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
     const summary =
       (data as { message?: string }).message ??
       `Scored. Ledger rows written: ${data.ledger_rows ?? 0}.`;
-    setMsg(summary);
-    toast.success(summary);
+    const propagation = (data as { propagation?: { updated?: { match_number: number; slot: string; team: string }[]; conflicts?: unknown[] } }).propagation;
+    const propLines = (propagation?.updated ?? []).map(
+      (u) => `M${u.match_number} ${u.slot} ← ${u.team}`,
+    );
+    const fullSummary =
+      propLines.length > 0
+        ? `${summary} Bracket: ${propLines.join("; ")}.`
+        : propagation?.conflicts?.length
+          ? `${summary} Bracket conflicts — check admin logs.`
+          : summary;
+    setMsg(fullSummary);
+    toast.success(fullSummary);
   }
 
   return (
@@ -143,8 +153,9 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
       <p className="mb-2 text-sm font-semibold">Complete match &amp; score</p>
       <p className="mb-3 text-xs text-muted-foreground">
         Sets status to completed, stores the official winner and bonus answers (one per match bonus
-        question, loaded from your Bonus prompts), then writes points to the ledger. Re-running replaces
-        previous ledger rows for this match.
+        question, loaded from your Bonus prompts), then writes points to the ledger. The winner is
+        automatically placed into the next-round fixture (e.g. M92 winner → M99 away). Re-running
+        replaces previous ledger rows for this match.
       </p>
       {msg ? <p className="mb-2 text-xs text-muted-foreground">{msg}</p> : null}
       <label className="block text-xs text-muted-foreground">

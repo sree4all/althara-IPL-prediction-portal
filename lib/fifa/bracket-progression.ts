@@ -21,11 +21,52 @@ export type PropagationResult = {
 
 const PLACEHOLDER = /^(TBD|W\d+|RU\d+)$/i;
 
-function isPlaceholder(name: string): boolean {
+export function isBracketPlaceholder(name: string): boolean {
   const t = name.trim();
   if (!t) return true;
   if (PLACEHOLDER.test(t)) return true;
   return t.startsWith("Winner ") || t.startsWith("Loser ");
+}
+
+type TargetRow = {
+  id: string;
+  home_team: string;
+  away_team: string;
+  home_team_display?: string | null;
+  away_team_display?: string | null;
+};
+
+/** Canonical WC26-M{n} row; tolerates null season_year (legacy imports). */
+export async function resolveBracketTargetMatch(
+  supabase: SupabaseClient,
+  targetMatchNumber: number,
+  seasonYear = 2026,
+): Promise<TargetRow | null> {
+  const externalKey = `WC26-M${targetMatchNumber}`;
+
+  const { data: byKey, error: keyErr } = await supabase
+    .from("matches")
+    .select("id, home_team, away_team, home_team_display, away_team_display, external_key")
+    .eq("external_key", externalKey)
+    .or(`season_year.eq.${seasonYear},season_year.is.null`)
+    .limit(1)
+    .maybeSingle();
+
+  if (!keyErr && byKey) return byKey as TargetRow;
+
+  const { data: byNumber, error: numErr } = await supabase
+    .from("matches")
+    .select("id, home_team, away_team, home_team_display, away_team_display, external_key")
+    .eq("match_number", targetMatchNumber)
+    .or(`season_year.eq.${seasonYear},season_year.is.null`);
+
+  if (!numErr && byNumber?.length) {
+    const preferred =
+      byNumber.find((r) => /^WC26-M\d+$/i.test(String((r as { external_key?: string }).external_key))) ??
+      byNumber[0];
+    return preferred as TargetRow;
+  }
+  return null;
 }
 
 export async function propagateKnockoutWinner(
@@ -55,27 +96,29 @@ async function applyFeed(
   seasonYear: number,
   result: PropagationResult,
 ) {
-  const externalKey = `WC26-M${feed.targetMatchNumber}`;
-  const { data: target, error } = await supabase
-    .from("matches")
-    .select("id, home_team, away_team, home_team_display, away_team_display")
-    .eq("external_key", externalKey)
-    .eq("season_year", seasonYear)
-    .maybeSingle();
-
-  if (error || !target) return;
+  const target = await resolveBracketTargetMatch(supabase, feed.targetMatchNumber, seasonYear);
+  if (!target) return;
 
   const slotTeam =
     feed.targetSlot === "home"
       ? (target.home_team as string)
       : (target.away_team as string);
 
-  if (!isPlaceholder(slotTeam) && slotTeam.trim() !== winner) {
+  if (!isBracketPlaceholder(slotTeam) && slotTeam.trim() !== winner) {
     result.conflicts.push({
       match_number: feed.targetMatchNumber,
       slot: feed.targetSlot,
       existing_team: slotTeam,
       attempted_team: winner,
+    });
+    return;
+  }
+
+  if (!isBracketPlaceholder(slotTeam) && slotTeam.trim() === winner) {
+    result.updated.push({
+      match_number: feed.targetMatchNumber,
+      slot: feed.targetSlot,
+      team: winner,
     });
     return;
   }

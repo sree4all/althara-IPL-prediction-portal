@@ -3,7 +3,7 @@ import { requireAdminOrResponse } from "@/lib/auth/require-admin";
 import { DRAW_PICK } from "@/lib/fifa/stages";
 import { isDrawAllowedForMatch } from "@/lib/fifa/match-ready";
 import { fixtureNumber } from "@/lib/matches/dedupe-by-match-number";
-import { propagateKnockoutWinner } from "@/lib/fifa/bracket-progression";
+import { propagateKnockoutWinner, type PropagationResult } from "@/lib/fifa/bracket-progression";
 import { applyMatchScoring } from "@/lib/scoring/match-scoring";
 
 export async function POST(
@@ -83,19 +83,24 @@ export async function POST(
 
   const bonus_result = hasMatchPrompts ? null : legacyBonus;
 
+  const matchNum = fixtureNumber(match);
+  const matchPatch: Record<string, unknown> = {
+    winner,
+    bonus_result,
+    status: "completed",
+    updated_at: now,
+  };
+  if (matchNum != null && match.match_number == null) {
+    matchPatch.match_number = matchNum;
+  }
+
   const { error: uErr } = await supabase
     .from("matches")
-    .update({
-      winner,
-      bonus_result,
-      status: "completed",
-      updated_at: now,
-    })
+    .update(matchPatch)
     .eq("id", matchId);
   if (uErr) return NextResponse.json({ error: uErr.message }, { status: 500 });
 
-  const matchNum = fixtureNumber(match);
-  let propagation = { updated: [] as unknown[], conflicts: [] as unknown[] };
+  let propagation: PropagationResult = { updated: [], conflicts: [] };
   if (matchNum != null && winner !== DRAW_PICK) {
     propagation = await propagateKnockoutWinner(supabase, matchNum, winner, 2026);
   }
