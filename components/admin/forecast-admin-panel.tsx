@@ -11,6 +11,7 @@ export function ForecastAdminPanel({
 }) {
   const [statsVisible, setStatsVisible] = useState(initialForecastStatsVisible);
   const [syncBusy, setSyncBusy] = useState(false);
+  const [scoringBusy, setScoringBusy] = useState(false);
 
   async function saveVisibility(next: boolean) {
     const res = await fetch("/api/admin/forecast/visibility", {
@@ -42,6 +43,21 @@ export function ForecastAdminPanel({
     }
   }
 
+  async function applyForecastScoring() {
+    setScoringBusy(true);
+    try {
+      const res = await fetch("/api/admin/forecast/apply-scoring", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data.error ?? "Forecast scoring failed.");
+        return;
+      }
+      toast.success(data.message ?? "Forecast scoring applied.");
+    } finally {
+      setScoringBusy(false);
+    }
+  }
+
   return (
     <div className="space-y-4 rounded-md border border-border p-3">
       <p className="text-sm font-semibold">Tournament Forecast &amp; FIFA schedule</p>
@@ -64,6 +80,20 @@ export function ForecastAdminPanel({
       </Button>
       <p className="text-xs text-muted-foreground">
         Updates kickoff times and match numbers from docs/fifa without overwriting team names.
+      </p>
+
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        disabled={scoringBusy}
+        onClick={() => void applyForecastScoring()}
+      >
+        {scoringBusy ? "Scoring…" : "Apply forecast scoring"}
+      </Button>
+      <p className="text-xs text-muted-foreground">
+        Awards 10 / 15 / 20 pts for correct semi-finalists, finalists, and winner. Also runs
+        automatically when QF, SF, or Final results are recorded.
       </p>
     </div>
   );

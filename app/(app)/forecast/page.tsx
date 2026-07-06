@@ -25,7 +25,8 @@ export default async function ForecastPage() {
           <h1 className="text-lg font-bold">Tournament Forecast</h1>
           <p className="text-sm text-muted-foreground">
             Predict the four semi-finalists, two finalists, and the winner. Edits lock at the first
-            Round of 8 kickoff (Match 97).
+            Round of 8 kickoff (Match 97). Scoring: 10 pts per correct semi-finalist (max 40), 15
+            pts per correct finalist (max 30), 20 pts for the correct winner.
           </p>
         </div>
         {showPicksLink ? (

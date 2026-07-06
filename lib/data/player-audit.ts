@@ -67,6 +67,17 @@ async function resolveLedgerLabels(
       }
     } else if (row.source_type === "tournament_question") {
       label = `Removed season bonus · ${row.reason ?? row.source_id}`;
+    } else if (row.source_type === "forecast") {
+      const reason = row.reason ?? "";
+      if (reason.startsWith("forecast_semi:")) {
+        label = `Forecast · Semi-finalist · ${reason.slice("forecast_semi:".length)} (+10)`;
+      } else if (reason.startsWith("forecast_finalist:")) {
+        label = `Forecast · Finalist · ${reason.slice("forecast_finalist:".length)} (+15)`;
+      } else if (reason.startsWith("forecast_winner:")) {
+        label = `Forecast · Winner · ${reason.slice("forecast_winner:".length)} (+20)`;
+      } else {
+        label = `Forecast · ${reason || row.source_id}`;
+      }
     }
 
     return {

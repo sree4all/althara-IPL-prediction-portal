@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { finalHalfForGroup, sfGroupForTeam } from "@/lib/fifa/bracket-map";
+import { normAnswer } from "@/lib/scoring/normalize";
+import type { ForecastScoringBreakdown } from "@/lib/scoring/forecast-scoring";
 
 function finalHalfForTeam(team: string, aliveTeams: Set<string>): "left" | "right" | null {
   const groupId = sfGroupForTeam(team, aliveTeams);
@@ -37,6 +39,61 @@ type Answers = {
   winner_team: string | null;
 };
 
+function teamButtonClass(selected: boolean, isCorrect: boolean | null): string {
+  if (isCorrect === true) return "border-emerald-500/60 bg-emerald-500/15";
+  if (isCorrect === false && selected) return "border-muted-foreground/30 opacity-70";
+  return "";
+}
+
+function ForecastPointsSummary({ scoring }: { scoring: ForecastScoringBreakdown }) {
+  const { semi, finalist, winner, total_earned, total_max } = scoring.scoring;
+  const hasAnyScored = semi.scored || finalist.scored || winner.scored;
+
+  return (
+    <div className="rounded-md border border-border bg-muted/30 p-3 text-sm">
+      <p className="font-medium">Forecast scoring</p>
+      <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+        <li>
+          Semi-finalists: <strong className="text-foreground">10 pts</strong> per correct team (max 40)
+          {semi.scored ? (
+            <span className="text-foreground">
+              {" "}
+              — {semi.earned}/{semi.max} earned
+            </span>
+          ) : null}
+        </li>
+        <li>
+          Finalists: <strong className="text-foreground">15 pts</strong> per correct team (max 30)
+          {finalist.scored ? (
+            <span className="text-foreground">
+              {" "}
+              — {finalist.earned}/{finalist.max} earned
+            </span>
+          ) : null}
+        </li>
+        <li>
+          Winner: <strong className="text-foreground">20 pts</strong>
+          {winner.scored ? (
+            <span className="text-foreground">
+              {" "}
+              — {winner.earned}/{winner.max} earned
+            </span>
+          ) : null}
+        </li>
+      </ul>
+      {hasAnyScored ? (
+        <p className="mt-2 text-sm font-semibold">
+          Total: {total_earned} / {total_max} pts
+        </p>
+      ) : (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Points are awarded as knockout results are recorded (max {total_max} pts).
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function ForecastForm() {
   const [eligibility, setEligibility] = useState<Eligibility | null>(null);
   const [answers, setAnswers] = useState<Answers>({
@@ -44,6 +101,7 @@ export function ForecastForm() {
     finalist_teams: [],
     winner_team: null,
   });
+  const [scoring, setScoring] = useState<ForecastScoringBreakdown | null>(null);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -59,6 +117,7 @@ export function ForecastForm() {
         finalist_teams: data.finalist_teams ?? [],
         winner_team: data.winner_team ?? null,
       });
+      if (data.scoring) setScoring(data.scoring as ForecastScoringBreakdown);
     }
   }, []);
 
@@ -70,6 +129,43 @@ export function ForecastForm() {
     () => new Set(eligibility?.eligible_teams ?? []),
     [eligibility],
   );
+
+  const correctSemiSet = useMemo(
+    () => new Set((scoring?.scoring.semi.correct_teams ?? []).map(normAnswer)),
+    [scoring],
+  );
+  const correctFinalistSet = useMemo(
+    () => new Set((scoring?.scoring.finalist.correct_teams ?? []).map(normAnswer)),
+    [scoring],
+  );
+  const actualSemiSet = useMemo(
+    () => new Set((scoring?.actuals.semi_finalists ?? []).map(normAnswer)),
+    [scoring],
+  );
+  const actualFinalistSet = useMemo(
+    () => new Set((scoring?.actuals.finalists ?? []).map(normAnswer)),
+    [scoring],
+  );
+
+  function semiCorrectness(team: string): boolean | null {
+    if (!scoring?.scoring.semi.scored) return null;
+    const selected = answers.semi_finalist_teams.includes(team);
+    if (!selected) return null;
+    return correctSemiSet.has(normAnswer(team));
+  }
+
+  function finalistCorrectness(team: string): boolean | null {
+    if (!scoring?.scoring.finalist.scored) return null;
+    const selected = answers.finalist_teams.includes(team);
+    if (!selected) return null;
+    return correctFinalistSet.has(normAnswer(team));
+  }
+
+  function winnerCorrectness(team: string): boolean | null {
+    if (!scoring?.scoring.winner.scored) return null;
+    if (answers.winner_team !== team) return null;
+    return scoring.scoring.winner.correct;
+  }
 
   function toggleSemi(team: string) {
     if (eligibility?.locked) return;
@@ -123,6 +219,7 @@ export function ForecastForm() {
         toast.error(data.error ?? "Could not save forecast.");
         return;
       }
+      if (data.scoring) setScoring(data.scoring as ForecastScoringBreakdown);
       toast.success("Tournament Forecast saved.");
       await load();
     } finally {
@@ -145,6 +242,8 @@ export function ForecastForm() {
 
   return (
     <div className="space-y-6">
+      {scoring ? <ForecastPointsSummary scoring={scoring} /> : null}
+
       {locked ? (
         <p className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
           Forecast locked at Round of 8 kickoff
@@ -158,8 +257,22 @@ export function ForecastForm() {
         </p>
       ) : null}
 
+      {scoring?.scoring.semi.scored && scoring.actuals.semi_finalists.length > 0 ? (
+        <p className="text-xs text-muted-foreground">
+          Actual semi-finalists: {scoring.actuals.semi_finalists.join(", ")}
+        </p>
+      ) : null}
+      {scoring?.scoring.finalist.scored && scoring.actuals.finalists.length > 0 ? (
+        <p className="text-xs text-muted-foreground">
+          Actual finalists: {scoring.actuals.finalists.join(", ")}
+        </p>
+      ) : null}
+      {scoring?.scoring.winner.scored && scoring.actuals.winner ? (
+        <p className="text-xs text-muted-foreground">Actual winner: {scoring.actuals.winner}</p>
+      ) : null}
+
       <section>
-        <h2 className="text-sm font-semibold">Semi-finalists (pick 4)</h2>
+        <h2 className="text-sm font-semibold">Semi-finalists (pick 4) · 10 pts each</h2>
         <p className="text-xs text-muted-foreground">
           Bracket rules apply — only one team per Round of 16 path (e.g. Canada and Morocco cannot
           both be selected).
@@ -167,16 +280,21 @@ export function ForecastForm() {
         <div className="mt-2 flex flex-wrap gap-2">
           {semiOptions.map((team) => {
             const selected = answers.semi_finalist_teams.includes(team);
+            const correctness = semiCorrectness(team);
+            const actual = scoring?.scoring.semi.scored && actualSemiSet.has(normAnswer(team));
             return (
               <Button
                 key={team}
                 type="button"
                 size="sm"
                 variant={selected ? "default" : "outline"}
+                className={teamButtonClass(selected, correctness)}
                 disabled={locked}
                 onClick={() => toggleSemi(team)}
               >
                 {team}
+                {actual && !selected ? " (actual)" : ""}
+                {correctness === true ? " ✓" : correctness === false ? " ✗" : ""}
               </Button>
             );
           })}
@@ -184,7 +302,7 @@ export function ForecastForm() {
       </section>
 
       <section>
-        <h2 className="text-sm font-semibold">Finalists (pick 2 from your semi-finalists)</h2>
+        <h2 className="text-sm font-semibold">Finalists (pick 2) · 15 pts each</h2>
         <p className="text-xs text-muted-foreground">
           Finalists must come from opposite sides of the bracket — they must be able to meet in the
           final, not the same semi-final. For example, England and Argentina are both on the right
@@ -208,12 +326,16 @@ export function ForecastForm() {
               !selected &&
               !selectable &&
               answers.finalist_teams.length > 0;
+            const correctness = finalistCorrectness(team);
+            const actual =
+              scoring?.scoring.finalist.scored && actualFinalistSet.has(normAnswer(team));
             return (
               <Button
                 key={team}
                 type="button"
                 size="sm"
                 variant={selected ? "default" : "outline"}
+                className={teamButtonClass(selected, correctness)}
                 disabled={locked || answers.semi_finalist_teams.length < 4 || (!selected && !selectable)}
                 title={
                   blockedByHalf
@@ -225,6 +347,8 @@ export function ForecastForm() {
                 onClick={() => toggleFinalist(team)}
               >
                 {team}
+                {actual && !selected ? " (actual)" : ""}
+                {correctness === true ? " ✓" : correctness === false ? " ✗" : ""}
               </Button>
             );
           })}
@@ -232,20 +356,25 @@ export function ForecastForm() {
       </section>
 
       <section>
-        <h2 className="text-sm font-semibold">Winner</h2>
+        <h2 className="text-sm font-semibold">Winner · 20 pts</h2>
         <div className="mt-2 flex flex-wrap gap-2">
-          {answers.finalist_teams.map((team) => (
-            <Button
-              key={team}
-              type="button"
-              size="sm"
-              variant={answers.winner_team === team ? "default" : "outline"}
-              disabled={locked || answers.finalist_teams.length < 2}
-              onClick={() => setAnswers((p) => ({ ...p, winner_team: team }))}
-            >
-              {team}
-            </Button>
-          ))}
+          {answers.finalist_teams.map((team) => {
+            const correctness = winnerCorrectness(team);
+            return (
+              <Button
+                key={team}
+                type="button"
+                size="sm"
+                variant={answers.winner_team === team ? "default" : "outline"}
+                className={teamButtonClass(answers.winner_team === team, correctness)}
+                disabled={locked || answers.finalist_teams.length < 2}
+                onClick={() => setAnswers((p) => ({ ...p, winner_team: team }))}
+              >
+                {team}
+                {correctness === true ? " ✓" : correctness === false ? " ✗" : ""}
+              </Button>
+            );
+          })}
         </div>
       </section>
 

@@ -7,7 +7,17 @@ import {
   loadKnockoutMatchRows,
 } from "@/lib/fifa/forecast-data";
 import { computeBracketState } from "@/lib/fifa/bracket-eligibility";
+import {
+  computeForecastScoringBreakdown,
+  loadForecastActuals,
+} from "@/lib/scoring/forecast-scoring";
 import { parseForecastAnswersPayload } from "@/lib/types/forecast-contracts";
+
+const EMPTY_ANSWERS = {
+  semi_finalist_teams: [] as string[],
+  finalist_teams: [] as string[],
+  winner_team: null as string | null,
+};
 
 export async function GET() {
   const supabase = await createClient();
@@ -16,30 +26,39 @@ export async function GET() {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
 
-  const { data, error } = await supabase
-    .from("tournament_forecast_answers")
-    .select("semi_finalist_teams, finalist_teams, winner_team, updated_at")
-    .eq("user_id", user.id)
-    .eq("season_year", FORECAST_SEASON_YEAR)
-    .maybeSingle();
+  const [answersRes, actuals] = await Promise.all([
+    supabase
+      .from("tournament_forecast_answers")
+      .select("semi_finalist_teams, finalist_teams, winner_team, updated_at")
+      .eq("user_id", user.id)
+      .eq("season_year", FORECAST_SEASON_YEAR)
+      .maybeSingle(),
+    loadForecastActuals(supabase, FORECAST_SEASON_YEAR),
+  ]);
 
-  if (error?.message?.includes("tournament_forecast_answers")) {
+  if (answersRes.error?.message?.includes("tournament_forecast_answers")) {
+    const scoring = computeForecastScoringBreakdown(EMPTY_ANSWERS, actuals);
     return NextResponse.json({
       season_year: FORECAST_SEASON_YEAR,
-      semi_finalist_teams: [],
-      finalist_teams: [],
-      winner_team: null,
+      ...EMPTY_ANSWERS,
       updated_at: null,
+      scoring,
     });
   }
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (answersRes.error) return NextResponse.json({ error: answersRes.error.message }, { status: 500 });
+
+  const answers = {
+    semi_finalist_teams: (answersRes.data?.semi_finalist_teams as string[]) ?? [],
+    finalist_teams: (answersRes.data?.finalist_teams as string[]) ?? [],
+    winner_team: (answersRes.data?.winner_team as string | null) ?? null,
+  };
+  const scoring = computeForecastScoringBreakdown(answers, actuals);
 
   return NextResponse.json({
     season_year: FORECAST_SEASON_YEAR,
-    semi_finalist_teams: (data?.semi_finalist_teams as string[]) ?? [],
-    finalist_teams: (data?.finalist_teams as string[]) ?? [],
-    winner_team: (data?.winner_team as string | null) ?? null,
-    updated_at: data?.updated_at ?? null,
+    ...answers,
+    updated_at: answersRes.data?.updated_at ?? null,
+    scoring,
   });
 }
 
@@ -80,5 +99,8 @@ export async function PUT(request: Request) {
   });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  return NextResponse.json({ ok: true, ...row, updated_at: now });
+  const actuals = await loadForecastActuals(supabase, FORECAST_SEASON_YEAR);
+  const scoring = computeForecastScoringBreakdown(body, actuals);
+
+  return NextResponse.json({ ok: true, ...row, updated_at: now, scoring });
 }

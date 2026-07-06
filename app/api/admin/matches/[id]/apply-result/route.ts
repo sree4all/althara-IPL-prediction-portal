@@ -4,6 +4,10 @@ import { DRAW_PICK } from "@/lib/fifa/stages";
 import { isDrawAllowedForMatch } from "@/lib/fifa/match-ready";
 import { fixtureNumber } from "@/lib/matches/dedupe-by-match-number";
 import { propagateKnockoutWinner, type PropagationResult } from "@/lib/fifa/bracket-progression";
+import {
+  applyForecastScoring,
+  isForecastScoringMatch,
+} from "@/lib/scoring/forecast-scoring";
 import { applyMatchScoring } from "@/lib/scoring/match-scoring";
 
 export async function POST(
@@ -110,11 +114,24 @@ export async function POST(
     return NextResponse.json({ error: result.error, match_id: matchId }, { status: 500 });
   }
 
+  let forecastLedgerRows = 0;
+  if (isForecastScoringMatch(matchNum)) {
+    const forecastResult = await applyForecastScoring(supabase, 2026);
+    if (!forecastResult.ok) {
+      return NextResponse.json(
+        { error: forecastResult.error, match_id: matchId },
+        { status: 500 },
+      );
+    }
+    forecastLedgerRows = forecastResult.ledgerRows;
+  }
+
   return NextResponse.json({
     ok: true,
     message: `Match scored. ${result.ledgerRows} ledger row(s) written.`,
     match_id: matchId,
     ledger_rows: result.ledgerRows,
+    forecast_ledger_rows: forecastLedgerRows,
     propagation,
   });
 }

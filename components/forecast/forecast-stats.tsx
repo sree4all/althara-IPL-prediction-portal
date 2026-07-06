@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { normAnswer } from "@/lib/scoring/normalize";
 
 type Entry = {
   user_id: string;
@@ -8,14 +9,29 @@ type Entry = {
   semi_finalist_teams: string[];
   finalist_teams: string[];
   winner_team: string | null;
+  forecast_points: number;
 };
 
-function formatTeams(teams: string[]) {
-  return teams.length > 0 ? teams.join(", ") : "—";
+type Actuals = {
+  semi_finalists: string[];
+  finalists: string[];
+  winner: string | null;
+};
+
+function formatTeams(teams: string[], actualSet: Set<string>, scored: boolean) {
+  if (teams.length === 0) return "—";
+  return teams
+    .map((t) => {
+      if (!scored) return t;
+      const mark = actualSet.has(normAnswer(t)) ? " ✓" : " ✗";
+      return `${t}${mark}`;
+    })
+    .join(", ");
 }
 
 export function ForecastStatsView() {
   const [entries, setEntries] = useState<Entry[] | null>(null);
+  const [actuals, setActuals] = useState<Actuals | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -33,6 +49,7 @@ export function ForecastStatsView() {
       }
       const data = await res.json();
       setEntries(data.entries ?? []);
+      setActuals(data.actuals ?? null);
     })();
   }, []);
 
@@ -43,32 +60,71 @@ export function ForecastStatsView() {
     return <p className="text-sm text-muted-foreground">No tournament forecasts submitted yet.</p>;
   }
 
+  const semiScored = (actuals?.semi_finalists.length ?? 0) > 0;
+  const finalistScored = (actuals?.finalists.length ?? 0) > 0;
+  const winnerScored = Boolean(actuals?.winner);
+  const actualSemiSet = new Set((actuals?.semi_finalists ?? []).map(normAnswer));
+  const actualFinalistSet = new Set((actuals?.finalists ?? []).map(normAnswer));
+  const actualWinnerNorm = actuals?.winner ? normAnswer(actuals.winner) : null;
+
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
-      <table className="w-full min-w-[520px] text-left text-sm">
-        <thead className="bg-muted/50">
-          <tr>
-            <th className="px-3 py-2 font-medium">Player</th>
-            <th className="px-3 py-2 font-medium">Semi-finalists</th>
-            <th className="px-3 py-2 font-medium">Finalists</th>
-            <th className="px-3 py-2 font-medium">Winner</th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((e) => (
-            <tr key={e.user_id} className="border-t border-border">
-              <td className="px-3 py-2 align-top">{e.display_name}</td>
-              <td className="px-3 py-2 align-top text-muted-foreground">
-                {formatTeams(e.semi_finalist_teams)}
-              </td>
-              <td className="px-3 py-2 align-top text-muted-foreground">
-                {formatTeams(e.finalist_teams)}
-              </td>
-              <td className="px-3 py-2 align-top">{e.winner_team ?? "—"}</td>
+    <div className="space-y-3">
+      <p className="text-xs text-muted-foreground">
+        Scoring: 10 pts per correct semi-finalist (max 40), 15 pts per correct finalist (max 30), 20
+        pts for the correct winner.
+      </p>
+      {semiScored ? (
+        <p className="text-xs text-muted-foreground">
+          Actual semi-finalists: {actuals!.semi_finalists.join(", ")}
+        </p>
+      ) : null}
+      {finalistScored ? (
+        <p className="text-xs text-muted-foreground">
+          Actual finalists: {actuals!.finalists.join(", ")}
+        </p>
+      ) : null}
+      {winnerScored ? (
+        <p className="text-xs text-muted-foreground">Actual winner: {actuals!.winner}</p>
+      ) : null}
+
+      <div className="overflow-x-auto rounded-lg border border-border">
+        <table className="w-full min-w-[600px] text-left text-sm">
+          <thead className="bg-muted/50">
+            <tr>
+              <th className="px-3 py-2 font-medium">Player</th>
+              <th className="px-3 py-2 font-medium">Pts</th>
+              <th className="px-3 py-2 font-medium">Semi-finalists</th>
+              <th className="px-3 py-2 font-medium">Finalists</th>
+              <th className="px-3 py-2 font-medium">Winner</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {entries.map((e) => (
+              <tr key={e.user_id} className="border-t border-border">
+                <td className="px-3 py-2 align-top">{e.display_name}</td>
+                <td className="px-3 py-2 align-top font-medium tabular-nums">
+                  {e.forecast_points > 0 || semiScored || finalistScored || winnerScored
+                    ? e.forecast_points
+                    : "—"}
+                </td>
+                <td className="px-3 py-2 align-top text-muted-foreground">
+                  {formatTeams(e.semi_finalist_teams, actualSemiSet, semiScored)}
+                </td>
+                <td className="px-3 py-2 align-top text-muted-foreground">
+                  {formatTeams(e.finalist_teams, actualFinalistSet, finalistScored)}
+                </td>
+                <td className="px-3 py-2 align-top">
+                  {e.winner_team
+                    ? winnerScored
+                      ? `${e.winner_team}${normAnswer(e.winner_team) === actualWinnerNorm ? " ✓" : " ✗"}`
+                      : e.winner_team
+                    : "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
