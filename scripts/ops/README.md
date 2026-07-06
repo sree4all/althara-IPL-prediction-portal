@@ -1,5 +1,20 @@
 # Operator scripts — World Cup 2026 reset & import
 
+## Cloud Agent connectivity
+
+From repo root (Cursor Cloud Agent or local):
+
+```bash
+npm run ops:verify-cloud          # Git + Supabase + Vercel checks
+npm run db:link:ci && npm run db:push   # apply pending migrations
+npm run db:execute -- path/to.sql # run one SQL file on linked project
+npm run ops:vercel:status         # latest Vercel deploys (optional)
+```
+
+Secrets checklist: [`docs/cloud-agent-setup.md`](../../docs/cloud-agent-setup.md).
+
+---
+
 **Production reset is operator-only.** There is no in-app control to wipe competition data.
 
 ## Preconditions

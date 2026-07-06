@@ -1,0 +1,15 @@
+---
+description: Cloud Agent deployment, Supabase migrations, and Vercel production workflow
+globs:
+alwaysApply: true
+---
+
+# Cloud deploy & database ops
+
+When running as a **Cursor Cloud Agent** on this repo:
+
+1. Read [`AGENTS.md`](../../AGENTS.md) and [`docs/cloud-agent-setup.md`](../../docs/cloud-agent-setup.md).
+2. Run `npm run ops:verify-cloud` before migrations or deploys.
+3. Apply SQL via `npm run db:link:ci` then `npm run db:push` (never paste secrets into files).
+4. Production deploy: merge to **`main`** (Vercel auto-deploy). Use `npm run ops:vercel:deploy` only as fallback.
+5. New `public` tables in migrations must include GRANT + RLS per `supabase/migrations/README.md`.
