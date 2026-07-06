@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isMatchReadyForPredictions } from "@/lib/fifa/match-ready";
 import { dedupeMatchesByFixtureNumber } from "@/lib/matches/dedupe-by-match-number";
 
 export async function GET() {
@@ -24,7 +25,9 @@ export async function GET() {
         "Watch for bonus prompts—they may appear on match pages when organizers post them.",
       ],
     },
-    matches: dedupeMatchesByFixtureNumber(matches ?? []),
+    matches: dedupeMatchesByFixtureNumber(matches ?? []).filter((m) =>
+      isMatchReadyForPredictions(m.home_team as string, m.away_team as string),
+    ),
   });
 }
 

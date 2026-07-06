@@ -4,6 +4,7 @@ import {
   FIRST_NO_DRAW_MATCH_NUMBER,
   allowedWinnerPicks,
   isDrawAllowedForMatch,
+  isMatchReadyForPredictions,
 } from "@/lib/fifa/match-ready";
 import { DRAW_PICK } from "@/lib/fifa/stages";
 
@@ -32,4 +33,12 @@ test("allowedWinnerPicks omits draw for knockout fixtures", () => {
 test("allowedWinnerPicks includes draw for group fixtures", () => {
   const picks = allowedWinnerPicks("Brazil", "Japan", 12, "group");
   assert.deepEqual(picks, ["Brazil", "Japan", DRAW_PICK]);
+});
+
+test("isMatchReadyForPredictions rejects bracket placeholders and TBD", () => {
+  assert.equal(isMatchReadyForPredictions("France", "Morocco"), true);
+  assert.equal(isMatchReadyForPredictions("W93", "W94"), false);
+  assert.equal(isMatchReadyForPredictions("France", "W90"), false);
+  assert.equal(isMatchReadyForPredictions("TBD", "Spain"), false);
+  assert.equal(isMatchReadyForPredictions("RU101", "RU102"), false);
 });
