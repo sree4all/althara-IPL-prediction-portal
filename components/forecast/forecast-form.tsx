@@ -5,6 +5,23 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { finalHalfForGroup, sfGroupForTeam } from "@/lib/fifa/bracket-map";
 
+function finalHalfForTeam(team: string, aliveTeams: Set<string>): "left" | "right" | null {
+  const groupId = sfGroupForTeam(team, aliveTeams);
+  return groupId ? finalHalfForGroup(groupId) : null;
+}
+
+function isFinalistSelectable(
+  team: string,
+  selectedFinalists: string[],
+  aliveTeams: Set<string>,
+): boolean {
+  if (selectedFinalists.includes(team)) return true;
+  if (selectedFinalists.length >= 2) return false;
+  const half = finalHalfForTeam(team, aliveTeams);
+  if (!half) return false;
+  return !selectedFinalists.some((t) => finalHalfForTeam(t, aliveTeams) === half);
+}
+
 type Eligibility = {
   locked: boolean;
   lock_at_utc: string | null;
@@ -87,14 +104,7 @@ export function ForecastForm() {
         cur.splice(idx, 1);
         return { ...prev, finalist_teams: cur, winner_team: null };
       }
-      if (cur.length >= 2) return prev;
-      const gid = sfGroupForTeam(team, aliveSet);
-      const half = gid ? finalHalfForGroup(gid) : null;
-      for (const t of cur) {
-        const g2 = sfGroupForTeam(t, aliveSet);
-        const h2 = g2 ? finalHalfForGroup(g2) : null;
-        if (half && h2 === half) return prev;
-      }
+      if (!isFinalistSelectable(team, cur, aliveSet)) return prev;
       cur.push(team);
       return { ...prev, finalist_teams: cur, winner_team: null };
     });
@@ -126,6 +136,12 @@ export function ForecastForm() {
 
   const locked = eligibility.locked;
   const semiOptions = eligibility.eligible_teams;
+  const semiFinalHalves = new Set(
+    answers.semi_finalist_teams
+      .map((team) => finalHalfForTeam(team, aliveSet))
+      .filter((half): half is "left" | "right" => half != null),
+  );
+  const semiFinalistsSpanBothHalves = semiFinalHalves.size >= 2;
 
   return (
     <div className="space-y-6">
@@ -169,19 +185,49 @@ export function ForecastForm() {
 
       <section>
         <h2 className="text-sm font-semibold">Finalists (pick 2 from your semi-finalists)</h2>
+        <p className="text-xs text-muted-foreground">
+          Finalists must come from opposite sides of the bracket — they must be able to meet in the
+          final, not the same semi-final. For example, England and Argentina are both on the right
+          side of the draw, so only one of them can be a finalist.
+        </p>
+        {answers.semi_finalist_teams.length === 4 && !semiFinalistsSpanBothHalves ? (
+          <p className="mt-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-xs">
+            All four semi-finalists are from the same side of the bracket. Change at least one
+            semi-finalist pick to include a team from the other side before you can choose finalists.
+          </p>
+        ) : null}
         <div className="mt-2 flex flex-wrap gap-2">
-          {answers.semi_finalist_teams.map((team) => (
-            <Button
-              key={team}
-              type="button"
-              size="sm"
-              variant={answers.finalist_teams.includes(team) ? "default" : "outline"}
-              disabled={locked || answers.semi_finalist_teams.length < 4}
-              onClick={() => toggleFinalist(team)}
-            >
-              {team}
-            </Button>
-          ))}
+          {answers.semi_finalist_teams.map((team) => {
+            const selected = answers.finalist_teams.includes(team);
+            const half = finalHalfForTeam(team, aliveSet);
+            const selectable =
+              answers.semi_finalist_teams.length === 4 &&
+              isFinalistSelectable(team, answers.finalist_teams, aliveSet);
+            const blockedByHalf =
+              answers.semi_finalist_teams.length === 4 &&
+              !selected &&
+              !selectable &&
+              answers.finalist_teams.length > 0;
+            return (
+              <Button
+                key={team}
+                type="button"
+                size="sm"
+                variant={selected ? "default" : "outline"}
+                disabled={locked || answers.semi_finalist_teams.length < 4 || (!selected && !selectable)}
+                title={
+                  blockedByHalf
+                    ? "Same bracket side as your other finalist — these teams would meet in a semi-final"
+                    : half
+                      ? `${half === "left" ? "Left" : "Right"} side of the draw`
+                      : undefined
+                }
+                onClick={() => toggleFinalist(team)}
+              >
+                {team}
+              </Button>
+            );
+          })}
         </div>
       </section>
 

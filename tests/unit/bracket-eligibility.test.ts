@@ -18,6 +18,19 @@ test("Canada and Morocco cannot both be semi-finalists", () => {
   assert.equal(err, "INVALID_SEMI_FINALISTS");
 });
 
+test("England and Argentina cannot both be finalists", () => {
+  const state = computeBracketState([]);
+  const err = validateForecastAnswers(
+    {
+      semi_finalist_teams: ["England", "Argentina", "Brazil", "France"],
+      finalist_teams: ["England", "Argentina"],
+      winner_team: "England",
+    },
+    state,
+  );
+  assert.equal(err, "INVALID_FINALISTS");
+});
+
 test("valid semi-finalists from distinct groups pass", () => {
   const state = computeBracketState([]);
   const err = validateForecastAnswers(
