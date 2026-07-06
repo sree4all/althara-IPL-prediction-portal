@@ -7,6 +7,7 @@ import { createClient } from "@supabase/supabase-js";
 import { generateMatchBonus } from "../lib/ai/generate-match-bonus";
 import { selectOddMatchBonusCandidates } from "../lib/fifa/odd-match-bonus-candidates";
 import { resolveOddBonusCutoff } from "../lib/fifa/odd-match-bonus-cutoff";
+import { matchSeasonYearOrNullFilter } from "../lib/fifa/match-season-filter";
 import {
   formatOddBonusNoMatchesMessage,
   summarizeOddBonusSkips,
@@ -40,7 +41,7 @@ async function main() {
   const { data: matches } = await supabase
     .from("matches")
     .select("id, match_number, home_team, away_team, tournament_stage, match_time_utc, status")
-    .eq("season_year", SEASON)
+    .or(matchSeasonYearOrNullFilter(SEASON))
     .order("match_number");
 
   const candidates = selectOddMatchBonusCandidates(matches ?? [], {

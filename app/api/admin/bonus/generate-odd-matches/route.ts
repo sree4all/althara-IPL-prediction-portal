@@ -7,6 +7,7 @@ import {
   summarizeOddBonusSkips,
 } from "@/lib/fifa/odd-match-bonus-diagnostics";
 import { requireAdminOrResponse } from "@/lib/auth/require-admin";
+import { matchSeasonYearOrNullFilter } from "@/lib/fifa/match-season-filter";
 
 const SEASON_YEAR = 2026;
 
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
   const { data: matches, error: mErr } = await supabase
     .from("matches")
     .select("id, match_number, home_team, away_team, tournament_stage, match_time_utc, status")
-    .eq("season_year", seasonYear)
+    .or(matchSeasonYearOrNullFilter(seasonYear))
     .order("match_number", { ascending: true });
 
   if (mErr) return NextResponse.json({ error: mErr.message }, { status: 500 });
