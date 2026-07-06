@@ -25,8 +25,13 @@
     "ops:fix-r32": "tsx scripts/ops/fix-r32-fixtures.ts",
     "ops:fix-r16": "tsx scripts/ops/fix-r16-fixtures.ts",
     "db:link": "npx supabase link",
+    "db:link:ci": "bash scripts/ops/link-supabase-ci.sh",
     "db:push": "npx supabase db push",
-    "db:migration-list": "npx supabase migration list"
+    "db:execute": "bash scripts/ops/db-execute-file.sh",
+    "db:migration-list": "npx supabase migration list",
+    "ops:verify-cloud": "tsx scripts/ops/verify-cloud-setup.ts",
+    "ops:vercel:status": "bash scripts/ops/vercel-status.sh",
+    "ops:vercel:deploy": "bash scripts/ops/vercel-deploy-prod.sh"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.2",

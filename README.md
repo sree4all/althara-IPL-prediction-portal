@@ -15,6 +15,10 @@ Editable diagram (diagrams.net / draw.io): [`docs/app-architecture.drawio`](docs
 - Implementation plan: [`specs/001-ipl-prediction-portal/plan.md`](specs/001-ipl-prediction-portal/plan.md)
 - Tasks: [`specs/001-ipl-prediction-portal/tasks.md`](specs/001-ipl-prediction-portal/tasks.md)
 
+## Cloud Agents (Git + Supabase + Vercel)
+
+For Cursor Cloud Agents without local terminal access, see [`docs/cloud-agent-setup.md`](docs/cloud-agent-setup.md) and [`AGENTS.md`](AGENTS.md). Verify with `npm run ops:verify-cloud`.
+
 ## Quick start
 
 1. Copy `.env.local.example` to `.env.local` and add Supabase URL + anon key (and service role for `pnpm seed` only).
