@@ -1,36 +1,14 @@
 import { NextResponse } from "next/server";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireAdminOrResponse } from "@/lib/auth/require-admin";
 import { generateMatchBonus } from "@/lib/ai/generate-match-bonus";
 import { selectOddMatchBonusCandidates } from "@/lib/fifa/odd-match-bonus-candidates";
+import { resolveOddBonusCutoff } from "@/lib/fifa/odd-match-bonus-cutoff";
+import {
+  formatOddBonusNoMatchesMessage,
+  summarizeOddBonusSkips,
+} from "@/lib/fifa/odd-match-bonus-diagnostics";
+import { requireAdminOrResponse } from "@/lib/auth/require-admin";
 
 const SEASON_YEAR = 2026;
-
-async function maxBonusMatchCutoff(supabase: SupabaseClient): Promise<number> {
-  const { data: prompts } = await supabase
-    .from("bonus_prompts")
-    .select("match_id")
-    .eq("season_year", SEASON_YEAR)
-    .eq("scope", "match")
-    .eq("is_active", true);
-
-  const matchIds = (prompts ?? [])
-    .map((p) => p.match_id as string | null)
-    .filter((id): id is string => Boolean(id));
-  if (matchIds.length === 0) return 0;
-
-  const { data: matchRows } = await supabase
-    .from("matches")
-    .select("match_number")
-    .in("id", matchIds);
-
-  let max = 0;
-  for (const m of matchRows ?? []) {
-    const mn = m.match_number as number | null;
-    if (typeof mn === "number" && mn > max) max = mn;
-  }
-  return max;
-}
 
 export async function POST(request: Request) {
   const { supabase, denied } = await requireAdminOrResponse();
@@ -44,7 +22,7 @@ export async function POST(request: Request) {
   const dryRun = Boolean(body?.dry_run);
   const limit = Math.min(Math.max(body?.limit ?? 5, 1), 20);
 
-  const cutoff = await maxBonusMatchCutoff(supabase);
+  const cutoff = resolveOddBonusCutoff(seasonYear);
 
   const { data: matches, error: mErr } = await supabase
     .from("matches")
@@ -69,13 +47,25 @@ export async function POST(request: Request) {
   });
 
   if (candidates.length === 0) {
-    return NextResponse.json({ error: "NO_MATCHES" }, { status: 400 });
+    const skipped = summarizeOddBonusSkips(matches ?? [], {
+      cutoff,
+      hasBonusMatchIds: hasBonus,
+    });
+    return NextResponse.json(
+      {
+        error: "NO_MATCHES",
+        message: formatOddBonusNoMatchesMessage(cutoff, skipped),
+        cutoff,
+      },
+      { status: 400 },
+    );
   }
 
   const created: unknown[] = [];
   for (const m of candidates.slice(0, limit)) {
+    const matchNumber = m.match_number as number;
     const draft = await generateMatchBonus({
-      match_number: m.match_number as number,
+      match_number: matchNumber,
       home_team: m.home_team as string,
       away_team: m.away_team as string,
       tournament_stage: (m.tournament_stage as string) ?? "group",
@@ -83,11 +73,11 @@ export async function POST(request: Request) {
     });
 
     if (dryRun) {
-      created.push({ match_number: m.match_number, draft });
+      created.push({ match_number: matchNumber, draft });
       continue;
     }
 
-    const promptKey = `ai_m${m.match_number}_${Date.now()}`;
+    const promptKey = `ai_m${matchNumber}_${Date.now()}`;
     const { data: prompt, error: pErr } = await supabase
       .from("bonus_prompts")
       .insert({
@@ -119,8 +109,12 @@ export async function POST(request: Request) {
     const { error: oErr } = await supabase.from("bonus_prompt_options").insert(optionRows);
     if (oErr) return NextResponse.json({ error: oErr.message }, { status: 500 });
 
-    created.push({ match_number: m.match_number, prompt_id: prompt.id, prompt_text: draft.prompt_text });
+    created.push({
+      match_number: matchNumber,
+      prompt_id: prompt.id,
+      prompt_text: draft.prompt_text,
+    });
   }
 
-  return NextResponse.json({ ok: true, dry_run: dryRun, created });
+  return NextResponse.json({ ok: true, dry_run: dryRun, cutoff, created });
 }

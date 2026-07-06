@@ -99,6 +99,8 @@ export function ForecastAdminPanel({
   );
 }
 
+export const BONUS_PROMPTS_RELOAD_EVENT = "bonus-prompts:reload";
+
 export function OddMatchBonusAdminAction() {
   const [busy, setBusy] = useState(false);
 
@@ -110,12 +112,21 @@ export function OddMatchBonusAdminAction() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ limit: 5 }),
       });
-      const data = await res.json().catch(() => ({}));
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        message?: string;
+        created?: unknown[];
+      };
       if (!res.ok) {
-        toast.error(data.error ?? "Generation failed.");
+        toast.error(data.message ?? data.error ?? "Generation failed.");
         return;
       }
-      const n = (data.created as unknown[])?.length ?? 0;
+      const n = data.created?.length ?? 0;
+      if (n === 0) {
+        toast.message("No new odd-match bonuses were needed.");
+        return;
+      }
+      window.dispatchEvent(new Event(BONUS_PROMPTS_RELOAD_EVENT));
       toast.success(`Created ${n} odd-match bonus prompt(s).`);
     } finally {
       setBusy(false);
