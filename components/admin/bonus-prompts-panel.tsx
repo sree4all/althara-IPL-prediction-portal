@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { BONUS_PROMPTS_RELOAD_EVENT } from "@/components/admin/forecast-admin-panel";
 import { formatMatchLabelWithIst } from "@/lib/matches/match-display-label";
 
 type MatchRow = {
@@ -68,13 +69,12 @@ export function BonusPromptsPanel({
   const matchById = useMemo(() => new Map(matches.map((m) => [m.id, m])), [matches]);
 
   useEffect(() => {
-    void (async () => {
-      const list = await fetch("/api/admin/bonus-prompts");
-      if (list.ok) {
-        const data = await list.json();
-        setPrompts(data.prompts ?? []);
-      }
-    })();
+    void reloadPrompts();
+    function onReload() {
+      void reloadPrompts();
+    }
+    window.addEventListener(BONUS_PROMPTS_RELOAD_EVENT, onReload);
+    return () => window.removeEventListener(BONUS_PROMPTS_RELOAD_EVENT, onReload);
   }, []);
 
   async function reloadPrompts() {
