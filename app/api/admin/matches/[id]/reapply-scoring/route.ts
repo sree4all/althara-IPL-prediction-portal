@@ -28,7 +28,8 @@ export async function POST(
   }
 
   let forecastLedgerRows = 0;
-  if (isForecastScoringMatch(fixtureNumber(match))) {
+  const matchNum = match ? fixtureNumber(match) : null;
+  if (isForecastScoringMatch(matchNum)) {
     const forecastResult = await applyForecastScoring(supabase, 2026);
     if (!forecastResult.ok) {
       return NextResponse.json({ error: forecastResult.error }, { status: 500 });
