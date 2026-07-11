@@ -4,7 +4,7 @@ import {
   computeBracketState,
   type MatchResultRow,
 } from "@/lib/fifa/bracket-eligibility";
-import { earliestQuarterFinalKickoff, isForecastLocked } from "@/lib/fifa/forecast-lock";
+import { FORECAST_LOCK_UTC, isForecastLocked } from "@/lib/fifa/forecast-lock";
 
 const SEASON_YEAR = 2026;
 
@@ -18,14 +18,9 @@ export async function loadKnockoutMatchRows(supabase: SupabaseClient): Promise<M
   return (data ?? []) as MatchResultRow[];
 }
 
-export async function loadForecastLockContext(supabase: SupabaseClient) {
-  const { data: qfRows } = await supabase
-    .from("matches")
-    .select("match_time_utc, tournament_stage, match_number")
-    .eq("season_year", SEASON_YEAR)
-    .or("tournament_stage.eq.qf,match_number.in.(97,98,99,100)");
-
-  const lockAtUtc = earliestQuarterFinalKickoff(qfRows ?? []);
+export async function loadForecastLockContext(_supabase: SupabaseClient) {
+  void _supabase;
+  const lockAtUtc = FORECAST_LOCK_UTC;
   return {
     season_year: SEASON_YEAR,
     locked: isForecastLocked(lockAtUtc),

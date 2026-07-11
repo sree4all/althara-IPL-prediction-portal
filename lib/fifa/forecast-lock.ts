@@ -1,4 +1,13 @@
-/** Tournament Forecast locks at the earliest Round of 8 (quarter-final) kickoff — M97–M100. */
+/**
+ * Tournament Forecast lock.
+ *
+ * The forecast now closes at a fixed deadline — Tuesday, 14 July 2026, 3:00 PM ET
+ * (Eastern Daylight Time, UTC-4) = 2026-07-14T19:00:00Z — just before the
+ * France vs Spain semi-final. This replaces the previous "earliest Round of 8
+ * kickoff" rule, which never engaged because knockout fixtures (M97–M100) were
+ * not loaded, leaving the forecast permanently open.
+ */
+export const FORECAST_LOCK_UTC = "2026-07-14T19:00:00.000Z";
 
 export const ROUND_OF_8_MATCH_NUMBERS = [97, 98, 99, 100] as const;
 

@@ -82,32 +82,20 @@ export function validateForecastAnswers(
   payload: ForecastAnswersPayload,
   state: BracketState,
 ): ForecastValidationError | null {
-  const { semi_finalist_teams: semi, finalist_teams: final, winner_team: winner } = payload;
+  // The semi-finalist question is discarded, so only finalists and the winner
+  // are validated. Finalists are now picked directly from eligible teams
+  // (opposite halves of the bracket) rather than from a semi-finalist shortlist.
+  const { finalist_teams: final, winner_team: winner } = payload;
 
-  const allPicked = [...semi, ...final, ...(winner ? [winner] : [])];
-  for (const t of allPicked) {
+  const picked = [...final, ...(winner ? [winner] : [])];
+  for (const t of picked) {
     if (state.eliminatedTeams.has(t)) return "ELIMINATED_TEAM";
     if (!state.aliveTeams.has(t)) return "ELIMINATED_TEAM";
-  }
-
-  if (semi.length !== 4) return "INVALID_SEMI_FINALISTS";
-  const semiSet = new Set(semi);
-  if (semiSet.size !== 4) return "INVALID_SEMI_FINALISTS";
-
-  const groupUsed = new Map<string, string>();
-  for (const team of semi) {
-    const gid = sfGroupForTeam(team, state.aliveTeams);
-    if (!gid) return "INVALID_SEMI_FINALISTS";
-    if (groupUsed.has(gid)) return "INVALID_SEMI_FINALISTS";
-    groupUsed.set(gid, team);
   }
 
   if (final.length !== 2) return "INVALID_FINALISTS";
   const finalSet = new Set(final);
   if (finalSet.size !== 2) return "INVALID_FINALISTS";
-  for (const t of final) {
-    if (!semiSet.has(t)) return "INVALID_FINALISTS";
-  }
 
   const halves = final.map((t) => {
     const gid = sfGroupForTeam(t, state.aliveTeams);

@@ -45,23 +45,33 @@ function teamButtonClass(selected: boolean, isCorrect: boolean | null): string {
   return "";
 }
 
+/** Format an ISO UTC instant as a readable India Standard Time (IST) label. */
+function formatIstLockTime(utc: string): string {
+  const d = new Date(utc);
+  const date = d.toLocaleDateString("en-GB", {
+    timeZone: "Asia/Kolkata",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const time = d.toLocaleTimeString("en-US", {
+    timeZone: "Asia/Kolkata",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+  return `${date}, ${time} IST`;
+}
+
 function ForecastPointsSummary({ scoring }: { scoring: ForecastScoringBreakdown }) {
-  const { semi, finalist, winner, total_earned, total_max } = scoring.scoring;
-  const hasAnyScored = semi.scored || finalist.scored || winner.scored;
+  const { finalist, winner, total_earned, total_max } = scoring.scoring;
+  const hasAnyScored = finalist.scored || winner.scored;
 
   return (
     <div className="rounded-md border border-border bg-muted/30 p-3 text-sm">
       <p className="font-medium">Forecast scoring</p>
       <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
-        <li>
-          Semi-finalists: <strong className="text-foreground">10 pts</strong> per correct team (max 40)
-          {semi.scored ? (
-            <span className="text-foreground">
-              {" "}
-              — {semi.earned}/{semi.max} earned
-            </span>
-          ) : null}
-        </li>
         <li>
           Finalists: <strong className="text-foreground">15 pts</strong> per correct team (max 30)
           {finalist.scored ? (
@@ -130,29 +140,14 @@ export function ForecastForm() {
     [eligibility],
   );
 
-  const correctSemiSet = useMemo(
-    () => new Set((scoring?.scoring.semi.correct_teams ?? []).map(normAnswer)),
-    [scoring],
-  );
   const correctFinalistSet = useMemo(
     () => new Set((scoring?.scoring.finalist.correct_teams ?? []).map(normAnswer)),
-    [scoring],
-  );
-  const actualSemiSet = useMemo(
-    () => new Set((scoring?.actuals.semi_finalists ?? []).map(normAnswer)),
     [scoring],
   );
   const actualFinalistSet = useMemo(
     () => new Set((scoring?.actuals.finalists ?? []).map(normAnswer)),
     [scoring],
   );
-
-  function semiCorrectness(team: string): boolean | null {
-    if (!scoring?.scoring.semi.scored) return null;
-    const selected = answers.semi_finalist_teams.includes(team);
-    if (!selected) return null;
-    return correctSemiSet.has(normAnswer(team));
-  }
 
   function finalistCorrectness(team: string): boolean | null {
     if (!scoring?.scoring.finalist.scored) return null;
@@ -167,33 +162,9 @@ export function ForecastForm() {
     return scoring.scoring.winner.correct;
   }
 
-  function toggleSemi(team: string) {
-    if (eligibility?.locked) return;
-    setAnswers((prev) => {
-      const cur = [...prev.semi_finalist_teams];
-      const idx = cur.indexOf(team);
-      if (idx >= 0) {
-        cur.splice(idx, 1);
-        return { ...prev, semi_finalist_teams: cur, finalist_teams: [], winner_team: null };
-      }
-      if (cur.length >= 4) return prev;
-      const gid = sfGroupForTeam(team, aliveSet);
-      if (!gid) return prev;
-      const filtered = cur.filter((t) => sfGroupForTeam(t, aliveSet) !== gid);
-      filtered.push(team);
-      return {
-        ...prev,
-        semi_finalist_teams: filtered,
-        finalist_teams: [],
-        winner_team: null,
-      };
-    });
-  }
-
   function toggleFinalist(team: string) {
     if (eligibility?.locked) return;
     setAnswers((prev) => {
-      if (!prev.semi_finalist_teams.includes(team)) return prev;
       const cur = [...prev.finalist_teams];
       const idx = cur.indexOf(team);
       if (idx >= 0) {
@@ -232,22 +203,22 @@ export function ForecastForm() {
   }
 
   const locked = eligibility.locked;
-  const semiOptions = eligibility.eligible_teams;
-  const semiFinalHalves = new Set(
-    answers.semi_finalist_teams
-      .map((team) => finalHalfForTeam(team, aliveSet))
-      .filter((half): half is "left" | "right" => half != null),
-  );
-  const semiFinalistsSpanBothHalves = semiFinalHalves.size >= 2;
+  const finalistOptions = eligibility.eligible_teams;
 
   return (
     <div className="space-y-6">
       {scoring ? <ForecastPointsSummary scoring={scoring} /> : null}
 
+      {eligibility.lock_at_utc ? (
+        <p className="text-sm font-semibold text-red-600">
+          {locked ? "Forecast locked" : "Forecast locks"}:{" "}
+          {formatIstLockTime(eligibility.lock_at_utc)}
+        </p>
+      ) : null}
+
       {locked ? (
         <p className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
-          Forecast locked at Round of 8 kickoff
-          {eligibility.lock_at_utc ? ` (${new Date(eligibility.lock_at_utc).toLocaleString()})` : ""}.
+          Forecast locked — edits are closed for this tournament.
         </p>
       ) : null}
 
@@ -257,11 +228,6 @@ export function ForecastForm() {
         </p>
       ) : null}
 
-      {scoring?.scoring.semi.scored && scoring.actuals.semi_finalists.length > 0 ? (
-        <p className="text-xs text-muted-foreground">
-          Actual semi-finalists: {scoring.actuals.semi_finalists.join(", ")}
-        </p>
-      ) : null}
       {scoring?.scoring.finalist.scored && scoring.actuals.finalists.length > 0 ? (
         <p className="text-xs text-muted-foreground">
           Actual finalists: {scoring.actuals.finalists.join(", ")}
@@ -272,60 +238,20 @@ export function ForecastForm() {
       ) : null}
 
       <section>
-        <h2 className="text-sm font-semibold">Semi-finalists (pick 4) · 10 pts each</h2>
-        <p className="text-xs text-muted-foreground">
-          Bracket rules apply — only one team per Round of 16 path (e.g. Canada and Morocco cannot
-          both be selected).
-        </p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {semiOptions.map((team) => {
-            const selected = answers.semi_finalist_teams.includes(team);
-            const correctness = semiCorrectness(team);
-            const actual = scoring?.scoring.semi.scored && actualSemiSet.has(normAnswer(team));
-            return (
-              <Button
-                key={team}
-                type="button"
-                size="sm"
-                variant={selected ? "default" : "outline"}
-                className={teamButtonClass(selected, correctness)}
-                disabled={locked}
-                onClick={() => toggleSemi(team)}
-              >
-                {team}
-                {actual && !selected ? " (actual)" : ""}
-                {correctness === true ? " ✓" : correctness === false ? " ✗" : ""}
-              </Button>
-            );
-          })}
-        </div>
-      </section>
-
-      <section>
         <h2 className="text-sm font-semibold">Finalists (pick 2) · 15 pts each</h2>
         <p className="text-xs text-muted-foreground">
-          Finalists must come from opposite sides of the bracket — they must be able to meet in the
-          final, not the same semi-final. For example, England and Argentina are both on the right
-          side of the draw, so only one of them can be a finalist.
+          Pick the two teams you think reach the final. They must come from opposite sides of the
+          bracket — they must be able to meet in the final, not the same semi-final. For example,
+          England and Argentina are both on the right side of the draw, so only one of them can be a
+          finalist.
         </p>
-        {answers.semi_finalist_teams.length === 4 && !semiFinalistsSpanBothHalves ? (
-          <p className="mt-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-xs">
-            All four semi-finalists are from the same side of the bracket. Change at least one
-            semi-finalist pick to include a team from the other side before you can choose finalists.
-          </p>
-        ) : null}
         <div className="mt-2 flex flex-wrap gap-2">
-          {answers.semi_finalist_teams.map((team) => {
+          {finalistOptions.map((team) => {
             const selected = answers.finalist_teams.includes(team);
             const half = finalHalfForTeam(team, aliveSet);
-            const selectable =
-              answers.semi_finalist_teams.length === 4 &&
-              isFinalistSelectable(team, answers.finalist_teams, aliveSet);
+            const selectable = isFinalistSelectable(team, answers.finalist_teams, aliveSet);
             const blockedByHalf =
-              answers.semi_finalist_teams.length === 4 &&
-              !selected &&
-              !selectable &&
-              answers.finalist_teams.length > 0;
+              !selected && !selectable && answers.finalist_teams.length > 0;
             const correctness = finalistCorrectness(team);
             const actual =
               scoring?.scoring.finalist.scored && actualFinalistSet.has(normAnswer(team));
@@ -336,7 +262,7 @@ export function ForecastForm() {
                 size="sm"
                 variant={selected ? "default" : "outline"}
                 className={teamButtonClass(selected, correctness)}
-                disabled={locked || answers.semi_finalist_teams.length < 4 || (!selected && !selectable)}
+                disabled={locked || (!selected && !selectable)}
                 title={
                   blockedByHalf
                     ? "Same bracket side as your other finalist — these teams would meet in a semi-final"
@@ -383,7 +309,6 @@ export function ForecastForm() {
           type="button"
           disabled={
             busy ||
-            answers.semi_finalist_teams.length !== 4 ||
             answers.finalist_teams.length !== 2 ||
             !answers.winner_team
           }

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   earliestQuarterFinalKickoff,
+  FORECAST_LOCK_UTC,
   isForecastLocked,
   isRoundOf8Match,
 } from "@/lib/fifa/forecast-lock";
@@ -26,4 +27,22 @@ test("isForecastLocked is false before lock instant and true at/after", () => {
   assert.equal(isForecastLocked(lockAt, new Date("2026-07-09T19:59:59.000Z")), false);
   assert.equal(isForecastLocked(lockAt, new Date("2026-07-09T20:00:00.000Z")), true);
   assert.equal(isForecastLocked(null), false);
+});
+
+test("forecast locks at the fixed deadline: Tue 14 Jul 2026 3 PM ET (19:00 UTC)", () => {
+  assert.equal(FORECAST_LOCK_UTC, "2026-07-14T19:00:00.000Z");
+  // One minute before the deadline the forecast is still open.
+  assert.equal(
+    isForecastLocked(FORECAST_LOCK_UTC, new Date("2026-07-14T18:59:00.000Z")),
+    false,
+  );
+  // At and after the deadline it is locked.
+  assert.equal(
+    isForecastLocked(FORECAST_LOCK_UTC, new Date("2026-07-14T19:00:00.000Z")),
+    true,
+  );
+  assert.equal(
+    isForecastLocked(FORECAST_LOCK_UTC, new Date("2026-07-14T20:30:00.000Z")),
+    true,
+  );
 });

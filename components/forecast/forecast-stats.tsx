@@ -60,24 +60,16 @@ export function ForecastStatsView() {
     return <p className="text-sm text-muted-foreground">No tournament forecasts submitted yet.</p>;
   }
 
-  const semiScored = (actuals?.semi_finalists.length ?? 0) > 0;
   const finalistScored = (actuals?.finalists.length ?? 0) > 0;
   const winnerScored = Boolean(actuals?.winner);
-  const actualSemiSet = new Set((actuals?.semi_finalists ?? []).map(normAnswer));
   const actualFinalistSet = new Set((actuals?.finalists ?? []).map(normAnswer));
   const actualWinnerNorm = actuals?.winner ? normAnswer(actuals.winner) : null;
 
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">
-        Scoring: 10 pts per correct semi-finalist (max 40), 15 pts per correct finalist (max 30), 20
-        pts for the correct winner.
+        Scoring: 15 pts per correct finalist (max 30), 20 pts for the correct winner.
       </p>
-      {semiScored ? (
-        <p className="text-xs text-muted-foreground">
-          Actual semi-finalists: {actuals!.semi_finalists.join(", ")}
-        </p>
-      ) : null}
       {finalistScored ? (
         <p className="text-xs text-muted-foreground">
           Actual finalists: {actuals!.finalists.join(", ")}
@@ -93,7 +85,6 @@ export function ForecastStatsView() {
             <tr>
               <th className="px-3 py-2 font-medium">Player</th>
               <th className="px-3 py-2 font-medium">Pts</th>
-              <th className="px-3 py-2 font-medium">Semi-finalists</th>
               <th className="px-3 py-2 font-medium">Finalists</th>
               <th className="px-3 py-2 font-medium">Winner</th>
             </tr>
@@ -103,12 +94,9 @@ export function ForecastStatsView() {
               <tr key={e.user_id} className="border-t border-border">
                 <td className="px-3 py-2 align-top">{e.display_name}</td>
                 <td className="px-3 py-2 align-top font-medium tabular-nums">
-                  {e.forecast_points > 0 || semiScored || finalistScored || winnerScored
+                  {e.forecast_points > 0 || finalistScored || winnerScored
                     ? e.forecast_points
                     : "—"}
-                </td>
-                <td className="px-3 py-2 align-top text-muted-foreground">
-                  {formatTeams(e.semi_finalist_teams, actualSemiSet, semiScored)}
                 </td>
                 <td className="px-3 py-2 align-top text-muted-foreground">
                   {formatTeams(e.finalist_teams, actualFinalistSet, finalistScored)}
