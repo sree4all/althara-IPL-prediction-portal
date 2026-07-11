@@ -24,9 +24,9 @@ export default async function ForecastPage() {
         <div>
           <h1 className="text-lg font-bold">Tournament Forecast</h1>
           <p className="text-sm text-muted-foreground">
-            Predict the two finalists and the winner. Edits lock Tuesday, 14 July 2026 at 3:00 PM ET
-            (before the France vs Spain semi-final). Scoring: 15 pts per correct finalist (max 30),
-            20 pts for the correct winner.
+            Predict the two finalists and the winner. Edits lock Wednesday, 15 July 2026 at 12:30 AM
+            IST (before the France vs Spain semi-final). Scoring: 15 pts per correct finalist (max
+            30), 20 pts for the correct winner.
           </p>
         </div>
         {showPicksLink ? (

@@ -45,6 +45,25 @@ function teamButtonClass(selected: boolean, isCorrect: boolean | null): string {
   return "";
 }
 
+/** Format an ISO UTC instant as a readable India Standard Time (IST) label. */
+function formatIstLockTime(utc: string): string {
+  const d = new Date(utc);
+  const date = d.toLocaleDateString("en-GB", {
+    timeZone: "Asia/Kolkata",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const time = d.toLocaleTimeString("en-US", {
+    timeZone: "Asia/Kolkata",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+  return `${date}, ${time} IST`;
+}
+
 function ForecastPointsSummary({ scoring }: { scoring: ForecastScoringBreakdown }) {
   const { finalist, winner, total_earned, total_max } = scoring.scoring;
   const hasAnyScored = finalist.scored || winner.scored;
@@ -190,10 +209,16 @@ export function ForecastForm() {
     <div className="space-y-6">
       {scoring ? <ForecastPointsSummary scoring={scoring} /> : null}
 
+      {eligibility.lock_at_utc ? (
+        <p className="text-sm font-semibold text-red-600">
+          {locked ? "Forecast locked" : "Forecast locks"}:{" "}
+          {formatIstLockTime(eligibility.lock_at_utc)}
+        </p>
+      ) : null}
+
       {locked ? (
         <p className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
-          Forecast locked
-          {eligibility.lock_at_utc ? ` (${new Date(eligibility.lock_at_utc).toLocaleString()})` : ""}.
+          Forecast locked — edits are closed for this tournament.
         </p>
       ) : null}
 
