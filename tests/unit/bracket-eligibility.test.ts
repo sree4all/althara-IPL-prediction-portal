@@ -5,24 +5,11 @@ import {
   validateForecastAnswers,
 } from "@/lib/fifa/bracket-eligibility";
 
-test("Canada and Morocco cannot both be semi-finalists", () => {
+test("England and Argentina cannot both be finalists (same bracket side)", () => {
   const state = computeBracketState([]);
   const err = validateForecastAnswers(
     {
-      semi_finalist_teams: ["Canada", "Morocco", "Brazil", "France"],
-      finalist_teams: [],
-      winner_team: null,
-    },
-    state,
-  );
-  assert.equal(err, "INVALID_SEMI_FINALISTS");
-});
-
-test("England and Argentina cannot both be finalists", () => {
-  const state = computeBracketState([]);
-  const err = validateForecastAnswers(
-    {
-      semi_finalist_teams: ["England", "Argentina", "Brazil", "France"],
+      semi_finalist_teams: [],
       finalist_teams: ["England", "Argentina"],
       winner_team: "England",
     },
@@ -31,11 +18,11 @@ test("England and Argentina cannot both be finalists", () => {
   assert.equal(err, "INVALID_FINALISTS");
 });
 
-test("valid semi-finalists from distinct groups pass", () => {
+test("finalists from opposite halves pass (semi-finalists ignored)", () => {
   const state = computeBracketState([]);
   const err = validateForecastAnswers(
     {
-      semi_finalist_teams: ["Canada", "Germany", "Brazil", "Argentina"],
+      semi_finalist_teams: [],
       finalist_teams: ["Canada", "Brazil"],
       winner_team: "Brazil",
     },
@@ -44,7 +31,33 @@ test("valid semi-finalists from distinct groups pass", () => {
   assert.equal(err, null);
 });
 
-test("eliminated team rejected", () => {
+test("exactly two finalists are required", () => {
+  const state = computeBracketState([]);
+  const err = validateForecastAnswers(
+    {
+      semi_finalist_teams: [],
+      finalist_teams: ["Brazil"],
+      winner_team: null,
+    },
+    state,
+  );
+  assert.equal(err, "INVALID_FINALISTS");
+});
+
+test("winner must be one of the two finalists", () => {
+  const state = computeBracketState([]);
+  const err = validateForecastAnswers(
+    {
+      semi_finalist_teams: [],
+      finalist_teams: ["Canada", "Brazil"],
+      winner_team: "France",
+    },
+    state,
+  );
+  assert.equal(err, "INVALID_WINNER");
+});
+
+test("eliminated finalist pick rejected", () => {
   const state = computeBracketState([
     {
       match_number: 73,
@@ -58,9 +71,9 @@ test("eliminated team rejected", () => {
   assert.ok(state.eliminatedTeams.has("Canada"));
   const err = validateForecastAnswers(
     {
-      semi_finalist_teams: ["Canada", "Germany", "Brazil", "France"],
-      finalist_teams: [],
-      winner_team: null,
+      semi_finalist_teams: [],
+      finalist_teams: ["Canada", "Brazil"],
+      winner_team: "Brazil",
     },
     state,
   );

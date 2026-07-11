@@ -8,8 +8,13 @@ export const FORECAST_POINTS = {
   winner: 20,
 } as const;
 
+/**
+ * The semi-finalist question has been discarded (see forecast-lock.ts): users
+ * were able to edit it after the quarter-finals, so it no longer counts. Only
+ * finalists (2 × 15) and the winner (20) are scored — max 50 points.
+ */
 export const FORECAST_MAX_POINTS =
-  FORECAST_POINTS.semi * 4 + FORECAST_POINTS.finalist * 2 + FORECAST_POINTS.winner;
+  FORECAST_POINTS.finalist * 2 + FORECAST_POINTS.winner;
 
 export const FORECAST_QF_MATCH_NUMBERS = [97, 98, 99, 100] as const;
 export const FORECAST_SF_MATCH_NUMBERS = [101, 102] as const;
@@ -131,10 +136,6 @@ export function computeForecastScoringBreakdown(
   >,
   actuals: ForecastActuals,
 ): ForecastScoringBreakdown {
-  const semiCorrect =
-    actuals.semiFinalists != null
-      ? teamsInSet(answer.semi_finalist_teams, normSet(actuals.semiFinalists))
-      : [];
   const finalistCorrect =
     actuals.finalists != null
       ? teamsInSet(answer.finalist_teams, normSet(actuals.finalists))
@@ -144,23 +145,24 @@ export function computeForecastScoringBreakdown(
     answer.winner_team != null &&
     normAnswer(answer.winner_team) === normAnswer(actuals.winner);
 
-  const semiEarned = semiCorrect.length * FORECAST_POINTS.semi;
   const finalistEarned = finalistCorrect.length * FORECAST_POINTS.finalist;
   const winnerEarned = winnerCorrect ? FORECAST_POINTS.winner : 0;
 
   return {
     points_config: FORECAST_POINTS,
     actuals: {
-      semi_finalists: actuals.semiFinalists ?? [],
+      // Semi-finalists are discarded from scoring; keep the field empty so the
+      // UI never renders semi-finalist results.
+      semi_finalists: [],
       finalists: actuals.finalists ?? [],
       winner: actuals.winner,
     },
     scoring: {
       semi: {
-        earned: semiEarned,
-        max: FORECAST_POINTS.semi * 4,
-        correct_teams: semiCorrect,
-        scored: actuals.semiFinalists != null,
+        earned: 0,
+        max: 0,
+        correct_teams: [],
+        scored: false,
       },
       finalist: {
         earned: finalistEarned,
@@ -175,7 +177,7 @@ export function computeForecastScoringBreakdown(
         correct: winnerCorrect,
         scored: actuals.winner != null,
       },
-      total_earned: semiEarned + finalistEarned + winnerEarned,
+      total_earned: finalistEarned + winnerEarned,
       total_max: FORECAST_MAX_POINTS,
     },
   };
@@ -193,18 +195,7 @@ export function scoreForecastAnswer(
   const breakdown = computeForecastScoringBreakdown(answer, actuals);
   const rows: ForecastLedgerRow[] = [];
 
-  if (breakdown.scoring.semi.scored) {
-    for (const team of breakdown.scoring.semi.correct_teams) {
-      rows.push({
-        user_id: answer.user_id,
-        source_id: answer.id,
-        points_delta: FORECAST_POINTS.semi,
-        reason: reasonKey("semi", team),
-        awarded_at: awardedAt,
-      });
-    }
-  }
-
+  // Semi-finalists are discarded and never award points.
   if (breakdown.scoring.finalist.scored) {
     for (const team of breakdown.scoring.finalist.correct_teams) {
       rows.push({

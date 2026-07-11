@@ -19,7 +19,24 @@ const fullActuals: ForecastActuals = {
   winner: "Brazil",
 };
 
-test("computeForecastScoringBreakdown awards 10/15/20 per correct pick", () => {
+test("semi-finalists are discarded and never scored", () => {
+  const breakdown = computeForecastScoringBreakdown(
+    {
+      semi_finalist_teams: ["Brazil", "France", "Germany", "Spain"],
+      finalist_teams: ["Brazil", "Argentina"],
+      winner_team: "Brazil",
+    },
+    fullActuals,
+  );
+
+  assert.equal(breakdown.scoring.semi.scored, false);
+  assert.equal(breakdown.scoring.semi.earned, 0);
+  assert.equal(breakdown.scoring.semi.max, 0);
+  assert.deepEqual(breakdown.scoring.semi.correct_teams, []);
+  assert.deepEqual(breakdown.actuals.semi_finalists, []);
+});
+
+test("computeForecastScoringBreakdown awards 15/20 per correct pick", () => {
   const breakdown = computeForecastScoringBreakdown(
     {
       semi_finalist_teams: ["Brazil", "France", "England", "Argentina"],
@@ -29,18 +46,15 @@ test("computeForecastScoringBreakdown awards 10/15/20 per correct pick", () => {
     fullActuals,
   );
 
-  assert.equal(breakdown.scoring.semi.earned, 20);
-  assert.equal(breakdown.scoring.semi.max, 40);
-  assert.deepEqual(breakdown.scoring.semi.correct_teams, ["Brazil", "France"]);
-
   assert.equal(breakdown.scoring.finalist.earned, 15);
   assert.equal(breakdown.scoring.finalist.max, 30);
   assert.deepEqual(breakdown.scoring.finalist.correct_teams, ["Brazil"]);
 
   assert.equal(breakdown.scoring.winner.earned, 20);
   assert.equal(breakdown.scoring.winner.correct, true);
-  assert.equal(breakdown.scoring.total_earned, 55);
+  assert.equal(breakdown.scoring.total_earned, 35);
   assert.equal(breakdown.scoring.total_max, FORECAST_MAX_POINTS);
+  assert.equal(FORECAST_MAX_POINTS, 50);
 });
 
 test("computeForecastScoringBreakdown scores only known stages", () => {
@@ -59,16 +73,14 @@ test("computeForecastScoringBreakdown scores only known stages", () => {
     partialActuals,
   );
 
-  assert.equal(breakdown.scoring.semi.scored, true);
-  assert.equal(breakdown.scoring.semi.earned, 20);
   assert.equal(breakdown.scoring.finalist.scored, false);
   assert.equal(breakdown.scoring.finalist.earned, 0);
   assert.equal(breakdown.scoring.winner.scored, false);
   assert.equal(breakdown.scoring.winner.earned, 0);
-  assert.equal(breakdown.scoring.total_earned, 20);
+  assert.equal(breakdown.scoring.total_earned, 0);
 });
 
-test("scoreForecastAnswer writes ledger rows only for scored stages", () => {
+test("scoreForecastAnswer writes ledger rows only for finalist and winner", () => {
   const rows = scoreForecastAnswer(
     {
       id: ANSWER_ID,
@@ -81,12 +93,10 @@ test("scoreForecastAnswer writes ledger rows only for scored stages", () => {
     AWARDED_AT,
   );
 
-  assert.equal(rows.length, 4);
+  assert.equal(rows.length, 2);
   assert.deepEqual(
     rows.map((r) => ({ points_delta: r.points_delta, reason: r.reason })),
     [
-      { points_delta: FORECAST_POINTS.semi, reason: "forecast_semi:BRAZIL" },
-      { points_delta: FORECAST_POINTS.semi, reason: "forecast_semi:FRANCE" },
       { points_delta: FORECAST_POINTS.finalist, reason: "forecast_finalist:BRAZIL" },
       { points_delta: FORECAST_POINTS.winner, reason: "forecast_winner:BRAZIL" },
     ],
@@ -94,7 +104,7 @@ test("scoreForecastAnswer writes ledger rows only for scored stages", () => {
   assert.ok(rows.every((r) => r.user_id === USER_ID && r.source_id === ANSWER_ID));
 });
 
-test("perfect forecast earns 90 points", () => {
+test("perfect forecast earns 50 points", () => {
   const breakdown = computeForecastScoringBreakdown(
     {
       semi_finalist_teams: ["Brazil", "France", "Germany", "Spain"],
@@ -104,7 +114,7 @@ test("perfect forecast earns 90 points", () => {
     fullActuals,
   );
 
-  assert.equal(breakdown.scoring.total_earned, 90);
+  assert.equal(breakdown.scoring.total_earned, 50);
 });
 
 test("no correct picks earns zero", () => {
