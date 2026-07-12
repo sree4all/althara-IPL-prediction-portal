@@ -120,7 +120,7 @@ export async function recomputeAllCompletedMatchScoring(
         .in("match_id", aliasIdList),
       supabase
         .from("bonus_prompts")
-        .select("id, match_id, correct_answer, display_order")
+        .select("id, match_id, correct_answer, display_order, correct_points")
         .eq("season_year", seasonYear)
         .eq("scope", "match")
         .in("match_id", aliasIdList)
@@ -216,11 +216,15 @@ export async function recomputeAllCompletedMatchScoring(
           if (!official) continue;
           const userAns = answersByUserPrompt.get(`${userId}\t${pid}`)?.trim() ?? "";
           if (userAns && normAnswer(userAns) === normAnswer(official)) {
+            // Per-prompt override (e.g. +3 AI bonuses) mirrors applyMatchScoring.
+            const cp = (pr as { correct_points?: number | null }).correct_points;
+            const bonusDelta =
+              cp != null && Number.isFinite(Number(cp)) ? Number(cp) : bonusPts;
             toInsert.push({
               user_id: userId,
               source_type: "bonus",
               source_id: matchId,
-              points_delta: bonusPts,
+              points_delta: bonusDelta,
               reason: `match_bonus:${pid}`,
               awarded_at: now,
             });

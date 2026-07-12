@@ -51,6 +51,12 @@ export const BRACKET_FEEDS: BracketFeed[] = [
   { sourceMatchNumber: 102, targetMatchNumber: 104, targetSlot: "away" },
 ];
 
+/** Loser of source match fills target slot (third-place playoff: RU101 vs RU102). */
+export const BRACKET_LOSER_FEEDS: BracketFeed[] = [
+  { sourceMatchNumber: 101, targetMatchNumber: 103, targetSlot: "home" },
+  { sourceMatchNumber: 102, targetMatchNumber: 103, targetSlot: "away" },
+];
+
 /** At most one semi-finalist pick per R16 feeder pair. */
 export const SF_EXCLUSION_GROUPS: SfExclusionGroup[] = [
   { group_id: "r16-89", r16_match_number: 89, feeder_r32_match_numbers: [73, 75] },
@@ -99,6 +105,10 @@ export const R32_MATCH_NUMBERS = Object.keys(R32_INITIAL_TEAMS).map(Number);
 
 export function feedsFromSource(sourceMatchNumber: number): BracketFeed[] {
   return BRACKET_FEEDS.filter((f) => f.sourceMatchNumber === sourceMatchNumber);
+}
+
+export function loserFeedsFromSource(sourceMatchNumber: number): BracketFeed[] {
+  return BRACKET_LOSER_FEEDS.filter((f) => f.sourceMatchNumber === sourceMatchNumber);
 }
 
 export function sfGroupForTeam(team: string, aliveTeams: Set<string>): string | null {
