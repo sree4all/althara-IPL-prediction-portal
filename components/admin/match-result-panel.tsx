@@ -22,11 +22,19 @@ export type AdminMatchRow = {
   tournament_stage?: string | null;
 };
 
+type MatchBonusPromptOption = {
+  id: string;
+  label: string;
+  value: string;
+  sort_order: number;
+};
+
 type MatchBonusPrompt = {
   id: string;
   prompt_text: string;
   prompt_key: string;
   correct_answer?: string | null;
+  options?: MatchBonusPromptOption[];
 };
 
 function label(m: AdminMatchRow) {
@@ -222,14 +230,31 @@ export function MatchResultPanel({ matches }: { matches: AdminMatchRow[] }) {
                 <label key={p.id} className="block text-xs text-muted-foreground">
                   <span className="font-medium text-foreground">{p.prompt_text}</span>
                   <span className="ml-1 text-[10px] opacity-70">({p.prompt_key})</span>
-                  <input
-                    className="mt-1 w-full rounded-md border border-input px-2 py-1 text-sm"
-                    value={promptResults[p.id] ?? ""}
-                    onChange={(e) =>
-                      setPromptResults((prev) => ({ ...prev, [p.id]: e.target.value }))
-                    }
-                    placeholder="e.g. option value or letter — empty skips points for this question"
-                  />
+                  {(p.options?.length ?? 0) > 0 ? (
+                    <select
+                      className="mt-1 w-full rounded-md border border-input bg-background px-2 py-1 text-sm"
+                      value={promptResults[p.id] ?? ""}
+                      onChange={(e) =>
+                        setPromptResults((prev) => ({ ...prev, [p.id]: e.target.value }))
+                      }
+                    >
+                      <option value="">No answer — skips points for this question</option>
+                      {p.options!.map((o) => (
+                        <option key={o.id} value={o.value}>
+                          {o.label} ({o.value})
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      className="mt-1 w-full rounded-md border border-input px-2 py-1 text-sm"
+                      value={promptResults[p.id] ?? ""}
+                      onChange={(e) =>
+                        setPromptResults((prev) => ({ ...prev, [p.id]: e.target.value }))
+                      }
+                      placeholder="e.g. option value or letter — empty skips points for this question"
+                    />
+                  )}
                 </label>
               ))}
             </div>

@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { matchSeasonYearOrNullFilter } from "@/lib/fifa/match-season-filter";
 import { normAnswer } from "@/lib/scoring/normalize";
 import { syncProfilePointsFromLedger } from "@/lib/scoring/sync-profile-points";
 
@@ -92,10 +93,11 @@ export async function loadForecastActuals(
   supabase: SupabaseClient,
   seasonYear: number,
 ): Promise<ForecastActuals> {
+  // Tolerate null season_year (legacy imports left it unset; see migration 0043).
   const { data: rows, error } = await supabase
     .from("matches")
     .select("match_number, winner, status")
-    .eq("season_year", seasonYear)
+    .or(matchSeasonYearOrNullFilter(seasonYear))
     .in("match_number", [...FORECAST_SCORING_MATCH_NUMBERS]);
 
   if (error) throw new Error(error.message);

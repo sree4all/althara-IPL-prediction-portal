@@ -1,5 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { feedsFromSource, type BracketFeed } from "@/lib/fifa/bracket-map";
+import {
+  feedsFromSource,
+  loserFeedsFromSource,
+  type BracketFeed,
+} from "@/lib/fifa/bracket-map";
 
 export type PropagationUpdate = {
   match_number: number;
@@ -84,6 +88,27 @@ export async function propagateKnockoutWinner(
 
   for (const feed of feeds) {
     await applyFeed(supabase, feed, winner, seasonYear, result);
+  }
+
+  return result;
+}
+
+/** Semi-final losers fill the third-place playoff (M103). */
+export async function propagateKnockoutLoser(
+  supabase: SupabaseClient,
+  sourceMatchNumber: number,
+  loserTeamName: string,
+  seasonYear = 2026,
+): Promise<PropagationResult> {
+  const result: PropagationResult = { updated: [], conflicts: [] };
+  const feeds = loserFeedsFromSource(sourceMatchNumber);
+  if (feeds.length === 0) return result;
+
+  const loser = loserTeamName.trim();
+  if (!loser || isBracketPlaceholder(loser)) return result;
+
+  for (const feed of feeds) {
+    await applyFeed(supabase, feed, loser, seasonYear, result);
   }
 
   return result;

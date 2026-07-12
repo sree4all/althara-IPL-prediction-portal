@@ -5,14 +5,16 @@ import {
   type MatchResultRow,
 } from "@/lib/fifa/bracket-eligibility";
 import { FORECAST_LOCK_UTC, isForecastLocked } from "@/lib/fifa/forecast-lock";
+import { matchSeasonYearOrNullFilter } from "@/lib/fifa/match-season-filter";
 
 const SEASON_YEAR = 2026;
 
 export async function loadKnockoutMatchRows(supabase: SupabaseClient): Promise<MatchResultRow[]> {
+  // Tolerate null season_year (legacy imports left it unset; see migration 0043).
   const { data } = await supabase
     .from("matches")
     .select("match_number, home_team, away_team, winner, status, tournament_stage")
-    .eq("season_year", SEASON_YEAR)
+    .or(matchSeasonYearOrNullFilter(SEASON_YEAR))
     .gte("match_number", 73)
     .lte("match_number", 96);
   return (data ?? []) as MatchResultRow[];

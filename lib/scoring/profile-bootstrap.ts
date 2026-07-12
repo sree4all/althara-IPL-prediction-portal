@@ -101,7 +101,7 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
 
       const { data: prompts } = await supabase
         .from("bonus_prompts")
-        .select("id, match_id, correct_answer, display_order")
+        .select("id, match_id, correct_answer, display_order, correct_points")
         .eq("season_year", SEASON_YEAR)
         .eq("scope", "match")
         .in(
@@ -112,17 +112,22 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
         )
         .order("display_order", { ascending: true });
 
-      const promptsByMatch = new Map<
-        string,
-        { id: string; correct_answer: string | null; display_order: number }[]
-      >();
+      type PromptRow = {
+        id: string;
+        correct_answer: string | null;
+        display_order: number;
+        correct_points: number | null;
+      };
+      const promptsByMatch = new Map<string, PromptRow[]>();
       for (const p of prompts ?? []) {
         const mid = p.match_id as string;
         if (!promptsByMatch.has(mid)) promptsByMatch.set(mid, []);
+        const cp = (p as { correct_points?: number | null }).correct_points;
         promptsByMatch.get(mid)!.push({
           id: p.id as string,
           correct_answer: (p.correct_answer as string | null) ?? null,
           display_order: Number(p.display_order ?? 0),
+          correct_points: cp != null && Number.isFinite(Number(cp)) ? Number(cp) : null,
         });
       }
 
@@ -186,8 +191,7 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
           }
         }
 
-        const promptsForMatch: { id: string; correct_answer: string | null; display_order: number }[] =
-          [];
+        const promptsForMatch: PromptRow[] = [];
         for (const aliasId of aliasIds) {
           const list = promptsByMatch.get(aliasId) ?? [];
           promptsForMatch.push(...list);
@@ -207,7 +211,8 @@ export async function ensureProfileScoringBootstrap(userId: string): Promise<voi
               user_id: userId,
               source_type: "bonus",
               source_id: canonicalId,
-              points_delta: bonusPts,
+              // Per-prompt override (e.g. +3 AI bonuses) mirrors applyMatchScoring.
+              points_delta: p.correct_points ?? bonusPts,
               reason: `match_bonus:${p.id}`,
               awarded_at: now,
             });

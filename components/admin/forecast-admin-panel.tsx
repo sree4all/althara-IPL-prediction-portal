@@ -92,8 +92,9 @@ export function ForecastAdminPanel({
         {scoringBusy ? "Scoring…" : "Apply forecast scoring"}
       </Button>
       <p className="text-xs text-muted-foreground">
-        Awards 10 / 15 / 20 pts for correct semi-finalists, finalists, and winner. Also runs
-        automatically when QF, SF, or Final results are recorded.
+        Awards 15 pts per correct finalist and 20 pts for the correct winner (max 50; the
+        semi-finalist question is not scored). Also runs automatically when QF, SF, or Final
+        results are recorded.
       </p>
     </div>
   );

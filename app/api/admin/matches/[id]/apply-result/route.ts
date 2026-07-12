@@ -3,7 +3,11 @@ import { requireAdminOrResponse } from "@/lib/auth/require-admin";
 import { DRAW_PICK } from "@/lib/fifa/stages";
 import { isDrawAllowedForMatch } from "@/lib/fifa/match-ready";
 import { fixtureNumber } from "@/lib/matches/dedupe-by-match-number";
-import { propagateKnockoutWinner, type PropagationResult } from "@/lib/fifa/bracket-progression";
+import {
+  propagateKnockoutLoser,
+  propagateKnockoutWinner,
+  type PropagationResult,
+} from "@/lib/fifa/bracket-progression";
 import {
   applyForecastScoring,
   isForecastScoringMatch,
@@ -107,6 +111,14 @@ export async function POST(
   let propagation: PropagationResult = { updated: [], conflicts: [] };
   if (matchNum != null && winner !== DRAW_PICK) {
     propagation = await propagateKnockoutWinner(supabase, matchNum, winner, 2026);
+    const loser = teams.find((t) => t.trim() !== winner);
+    if (loser) {
+      const loserPropagation = await propagateKnockoutLoser(supabase, matchNum, loser, 2026);
+      propagation = {
+        updated: [...propagation.updated, ...loserPropagation.updated],
+        conflicts: [...propagation.conflicts, ...loserPropagation.conflicts],
+      };
+    }
   }
 
   const result = await applyMatchScoring(supabase, matchId, 2026);
