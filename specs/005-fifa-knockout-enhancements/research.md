@@ -22,7 +22,7 @@
 | R32 | 73–88 | R16 89–96 |
 | R16 | 89–96 | QF 97–100 |
 | QF | 97–100 | SF 101–102 |
-| SF | 101–102 | Final 104 |
+| SF | 101–102 | Final 104 (winners); Third Place 103 (losers) |
 
 **Semi-finalist exclusion**: For each R16 fixture (e.g. M89 = W73 vs W75), teams reachable from feeder R32 matches `{73, 75}` form one **SF slot group** — at most one selected semi-finalist from that group. Example: Canada (M73) and Morocco (M75) are mutually exclusive for SF picks because only one advances from M89.
 
@@ -66,16 +66,16 @@
 
 ## 6. Knockout winner propagation
 
-**Decision**: After `apply-result` saves winner, call `propagateKnockoutWinner(supabase, matchNumber, winnerTeamName)` which:
+**Decision**: After `apply-result` saves winner, call `propagateKnockoutWinner(supabase, matchNumber, winnerTeamName, seasonYear, { homeTeam, awayTeam })` which:
 
-1. Looks up bracket map entry for source match number.
-2. Finds target match + slot (`home` | `away`).
+1. Looks up bracket map entries for source match number (`kind`: `winner` default, or `loser` for SF → M103).
+2. For each feed, resolves the team to write (winner, or the other participant for loser feeds).
 3. Updates `matches.home_team` / `away_team` (and display columns) on target row by `external_key`.
-4. Returns `{ updated: [...], conflicts: [...] }` if slot already holds a different non-TBD team.
+4. Returns `{ updated: [...], conflicts: [...] }` if slot already holds a different non-TBD/RU team.
 
-Skip propagation for group-stage matches. Use team **name** strings to match existing `matches` model.
+Skip propagation for group-stage matches. Use team **name** strings to match existing `matches` model. SF losers replace `RU101`/`RU102` on Third Place (M103) while winners fill Final (M104).
 
-**Rationale**: Spec FR-014; FIFA CSV uses `W{n}` placeholders resolved at import — propagation replaces TBD/placeholder with actual winner name.
+**Rationale**: Spec FR-014; FIFA CSV uses `W{n}` / `RU{n}` placeholders resolved at import — propagation replaces TBD/placeholder with actual team names.
 
 **Alternatives considered**:
 - Re-import full CSV after each result — would overwrite manual fixes and conflict with partial knowledge.

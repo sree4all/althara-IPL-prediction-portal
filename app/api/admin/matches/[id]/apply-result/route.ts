@@ -106,7 +106,10 @@ export async function POST(
 
   let propagation: PropagationResult = { updated: [], conflicts: [] };
   if (matchNum != null && winner !== DRAW_PICK) {
-    propagation = await propagateKnockoutWinner(supabase, matchNum, winner, 2026);
+    propagation = await propagateKnockoutWinner(supabase, matchNum, winner, 2026, {
+      homeTeam: match.home_team as string,
+      awayTeam: match.away_team as string,
+    });
   }
 
   const result = await applyMatchScoring(supabase, matchId, 2026);

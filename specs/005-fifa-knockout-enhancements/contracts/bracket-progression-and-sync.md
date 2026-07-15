@@ -9,12 +9,13 @@
 ### Behavior
 
 1. Resolve source `match_number` from match row.
-2. If `tournament_stage` ∉ `{r32, r16, qf, sf}` — skip (no propagation for group / third_place / final beyond normal completion).
-3. Look up `BracketFeed[]` for source match → `{ targetMatchNumber, targetSlot }`.
-4. Update target match:
-   - `home_team` or `away_team` = winning team name string
+2. If `tournament_stage` ∉ `{r32, r16, qf, sf}` — skip (no propagation **from** group / third_place / final beyond normal completion). SF **into** third_place is allowed via loser feeds.
+3. Look up `BracketFeed[]` for source match → `{ targetMatchNumber, targetSlot, kind? }` (`kind` defaults to `winner`; SF also has `loser` → M103).
+4. Resolve team name per feed: winner for `kind=winner`; the other participant for `kind=loser`.
+5. Update target match:
+   - `home_team` or `away_team` = resolved team name string
    - Mirror `home_team_display` / `away_team_display` if columns exist
-5. If target slot already contains a different confirmed team (not TBD/W{n}/empty), record conflict — do not overwrite; return in response.
+6. If target slot already contains a different confirmed team (not TBD/W{n}/RU{n}/empty), record conflict — do not overwrite; return in response.
 
 ### Response extension (apply-result 200)
 
@@ -36,6 +37,10 @@
 | M73 winner | M89 | home (W73) |
 | M75 winner | M89 | away (W75) |
 | M89 winner | M97 | home (W89) |
+| M101 winner | M104 | home (W101) |
+| M101 loser | M103 | home (RU101) |
+| M102 winner | M104 | away (W102) |
+| M102 loser | M103 | away (RU102) |
 | … | … | … |
 
 Full map maintained in `lib/fifa/bracket-map.ts`.

@@ -69,11 +69,38 @@ export async function resolveBracketTargetMatch(
   return null;
 }
 
+export type PropagationParticipants = {
+  homeTeam: string;
+  awayTeam: string;
+};
+
+/** Resolve which team name to write for a feed (winner vs SF loser → third place). */
+export function teamForFeed(
+  feed: BracketFeed,
+  winnerTeamName: string,
+  participants?: PropagationParticipants | null,
+): string | null {
+  const winner = winnerTeamName.trim();
+  if (!winner) return null;
+
+  const kind = feed.kind ?? "winner";
+  if (kind === "winner") return winner;
+
+  if (!participants) return null;
+  const home = participants.homeTeam.trim();
+  const away = participants.awayTeam.trim();
+  if (!home || !away) return null;
+  if (winner === home) return away;
+  if (winner === away) return home;
+  return null;
+}
+
 export async function propagateKnockoutWinner(
   supabase: SupabaseClient,
   sourceMatchNumber: number,
   winnerTeamName: string,
   seasonYear = 2026,
+  participants?: PropagationParticipants | null,
 ): Promise<PropagationResult> {
   const result: PropagationResult = { updated: [], conflicts: [] };
   const feeds = feedsFromSource(sourceMatchNumber);
@@ -83,7 +110,9 @@ export async function propagateKnockoutWinner(
   if (!winner) return result;
 
   for (const feed of feeds) {
-    await applyFeed(supabase, feed, winner, seasonYear, result);
+    const team = teamForFeed(feed, winner, participants);
+    if (!team) continue;
+    await applyFeed(supabase, feed, team, seasonYear, result);
   }
 
   return result;
@@ -92,7 +121,7 @@ export async function propagateKnockoutWinner(
 async function applyFeed(
   supabase: SupabaseClient,
   feed: BracketFeed,
-  winner: string,
+  team: string,
   seasonYear: number,
   result: PropagationResult,
 ) {
@@ -104,21 +133,21 @@ async function applyFeed(
       ? (target.home_team as string)
       : (target.away_team as string);
 
-  if (!isBracketPlaceholder(slotTeam) && slotTeam.trim() !== winner) {
+  if (!isBracketPlaceholder(slotTeam) && slotTeam.trim() !== team) {
     result.conflicts.push({
       match_number: feed.targetMatchNumber,
       slot: feed.targetSlot,
       existing_team: slotTeam,
-      attempted_team: winner,
+      attempted_team: team,
     });
     return;
   }
 
-  if (!isBracketPlaceholder(slotTeam) && slotTeam.trim() === winner) {
+  if (!isBracketPlaceholder(slotTeam) && slotTeam.trim() === team) {
     result.updated.push({
       match_number: feed.targetMatchNumber,
       slot: feed.targetSlot,
-      team: winner,
+      team,
     });
     return;
   }
@@ -127,11 +156,11 @@ async function applyFeed(
     updated_at: new Date().toISOString(),
   };
   if (feed.targetSlot === "home") {
-    patch.home_team = winner;
-    if ("home_team_display" in target) patch.home_team_display = winner;
+    patch.home_team = team;
+    if ("home_team_display" in target) patch.home_team_display = team;
   } else {
-    patch.away_team = winner;
-    if ("away_team_display" in target) patch.away_team_display = winner;
+    patch.away_team = team;
+    if ("away_team_display" in target) patch.away_team_display = team;
   }
 
   const { error: uErr } = await supabase.from("matches").update(patch).eq("id", target.id);
@@ -139,7 +168,7 @@ async function applyFeed(
     result.updated.push({
       match_number: feed.targetMatchNumber,
       slot: feed.targetSlot,
-      team: winner,
+      team,
     });
   }
 }

@@ -1,9 +1,13 @@
 /** FIFA WC26 knockout bracket derived from docs/fifa/matches.csv (M73–M104). */
 
+export type BracketFeedKind = "winner" | "loser";
+
 export type BracketFeed = {
   sourceMatchNumber: number;
   targetMatchNumber: number;
   targetSlot: "home" | "away";
+  /** Default winner: advancing team. Loser fills third-place (M103) from SF. */
+  kind?: BracketFeedKind;
 };
 
 export type SfExclusionGroup = {
@@ -17,7 +21,10 @@ export type FinalHalf = {
   sf_exclusion_group_ids: string[];
 };
 
-/** Winner of source match fills target slot on target match. */
+/**
+ * Bracket feeds from `docs/fifa/matches.csv`.
+ * Default `kind` is `winner` (W{n}); SF also emit `loser` feeds into Third Place (RU{n} → M103).
+ */
 export const BRACKET_FEEDS: BracketFeed[] = [
   { sourceMatchNumber: 73, targetMatchNumber: 89, targetSlot: "home" },
   { sourceMatchNumber: 75, targetMatchNumber: 89, targetSlot: "away" },
@@ -49,6 +56,9 @@ export const BRACKET_FEEDS: BracketFeed[] = [
   { sourceMatchNumber: 100, targetMatchNumber: 102, targetSlot: "away" },
   { sourceMatchNumber: 101, targetMatchNumber: 104, targetSlot: "home" },
   { sourceMatchNumber: 102, targetMatchNumber: 104, targetSlot: "away" },
+  // Third Place (M103): RU101 vs RU102 — SF losers
+  { sourceMatchNumber: 101, targetMatchNumber: 103, targetSlot: "home", kind: "loser" },
+  { sourceMatchNumber: 102, targetMatchNumber: 103, targetSlot: "away", kind: "loser" },
 ];
 
 /** At most one semi-finalist pick per R16 feeder pair. */
